@@ -1965,25 +1965,217 @@
   justify-content: center;
   gap: 24px;
 }
-.nlx-home .cta-photo {
+/* --- the cohort: an avatar row over an overlapped collage ----
+   One photograph made the closing band a stock shot of one
+   person. Four of them, pinned like a corkboard, say the thing
+   the copy says: other people are already in here. --------- */
+.nlx-home .cta-proof {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.nlx-home .cta-faces {
+  display: flex;
+  flex-shrink: 0;
+}
+.nlx-home .cta-face {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-ink);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.nlx-home .cta-faces .cta-face:not(:first-child) {
+  margin-left: -11px;
+}
+.nlx-home .cta-proof-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.66);
+}
+.nlx-home .cta-proof-text strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.nlx-home .cta-collage {
   position: relative;
   display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 260px;
+  padding: 30px 24px;
   overflow: hidden;
 }
-.nlx-home .cta-photo img {
+.nlx-home .cta-tile {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(72px, 8.2vw, 112px);
+  aspect-ratio: 3 / 4;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 3px solid var(--color-ink);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+.nlx-home .cta-tile img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 35%;
+  object-position: 50% 22%;
 }
-/* the photograph fades into the band rather than butting against it */
-.nlx-home .cta-photo::after {
+.nlx-home .cta-tile + .cta-tile {
+  margin-left: -18px;
+}
+/* the stagger is what keeps four rectangles from reading as a filmstrip */
+.nlx-home .cta-tile-c {
+  transform: rotate(-5deg) translateY(-11px);
+  z-index: 1;
+}
+.nlx-home .cta-tile-a {
+  transform: rotate(3deg) translateY(10px);
+  z-index: 2;
+}
+.nlx-home .cta-tile-e {
+  transform: rotate(-2.5deg) translateY(-7px);
+  z-index: 3;
+}
+.nlx-home .cta-tile-d {
+  transform: rotate(4.5deg) translateY(11px);
+  z-index: 4;
+}
+/* the collage fades into the band rather than butting against it */
+.nlx-home .cta-collage::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, var(--color-ink) 0%, rgba(20, 22, 26, 0) 42%);
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--color-ink) 0%, rgba(20, 22, 26, 0) 30%);
 }
+
+/* ============================================================
+   HERO — THE DARK STAGE
+   The paper-on-paper version had a hard vertical seam between
+   type and photograph and showed none of the product. This one
+   inverts to ink for the one moment on the page that has to
+   stop someone, fades the photograph into that ink instead of
+   butting against it, and floats the actual question UI across
+   the seam so the two halves read as a single image.
+   The closing band is ink too, so the page is book-ended.
+   ============================================================ */
+
+.nlx-home .hero {
+  padding: 0;
+  overflow: hidden;
+  min-height: calc(100vh - 4rem);
+  min-height: calc(100svh - 4rem);
+  display: grid;
+  border-bottom: 0;
+  color: #fff;
+  background-color: var(--color-ink);
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.nlx-home .hero-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  gap: clamp(28px, 4.5vw, 64px);
+  align-items: stretch;
+}
+.nlx-home .hero-copy {
+  padding-top: clamp(44px, 5.5vw, 82px);
+  padding-bottom: clamp(44px, 5.5vw, 82px);
+}
+
+/* --- type on ink -------------------------------------------- */
+.nlx-home .hero .section-eyebrow {
+  color: rgba(255, 255, 255, 0.52);
+}
+.nlx-home .hero-heading {
+  color: #fff;
+  max-width: 12ch;
+}
+/* On paper the highlighter is a 0.42em stroke near the baseline and the
+   ink text stays readable above it. On ink that fails: everything above
+   the stroke is ink-on-ink, i.e. invisible. So on the dark hero the
+   stroke grows to cover the whole word — a marker block, not a swipe. */
+.nlx-home .hero-heading .accent {
+  color: var(--color-ink);
+  background-position: 0 78%;
+  background-size: 100% 0.9em;
+  padding: 0 0.08em;
+  margin: 0 -0.04em;
+}
+.nlx-home .hero-sub {
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 44ch;
+}
+.nlx-home .hero-note {
+  color: rgba(255, 255, 255, 0.5);
+}
+/* on ink the primary button is the highlighter, same as the closing band */
+.nlx-home .hero .btn-pill {
+  background: var(--color-highlight);
+  color: var(--color-ink);
+}
+.nlx-home .hero .btn-pill:hover {
+  background: #efe04a;
+}
+.nlx-home .hero-stats {
+  border-top-color: rgba(255, 255, 255, 0.16);
+}
+.nlx-home .hero-stats > div {
+  border-bottom-color: rgba(255, 255, 255, 0.16);
+}
+.nlx-home .hero-stats dt {
+  color: #fff;
+}
+.nlx-home .hero-stats dd {
+  color: rgba(255, 255, 255, 0.66);
+}
+
+/* --- the stage ---------------------------------------------- */
+.nlx-home .hero-stage {
+  position: relative;
+  min-height: 580px;
+  align-self: stretch;
+}
+.nlx-home .hero-photo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  min-height: 0;
+}
+.nlx-home .hero-photo img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+  object-position: 48% 50%;
+  border-radius: 0;
+  mix-blend-mode: normal;
+}
+/* the photograph dissolves into the ink on its left and bottom edges,
+   which is what removes the seam the first version had */
+.nlx-home .hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      var(--color-ink) 0%,
+      rgba(20, 22, 26, 0.86) 9%,
+      rgba(20, 22, 26, 0.28) 26%,
+      rgba(20, 22, 26, 0) 46%
+    ),
+    linear-gradient(0deg, rgba(20, 22, 26, 0.4) 0%, rgba(20, 22, 26, 0) 24%);
+}
+
+
 
 /* ============================================================
    RESPONSIVE
@@ -2095,16 +2287,25 @@
     padding-right: 24px;
     padding-bottom: 32px;
   }
+  .nlx-home .hero {
+    min-height: 0;
+  }
+  .nlx-home .hero-stage {
+    min-height: 0;
+    padding: 0 24px 32px;
+  }
   .nlx-home .hero-photo {
+    position: relative;
+    inset: auto;
     width: 100%;
-    min-height: 0;
-  }
-  .nlx-home .hero-photo img {
-    min-height: 0;
-    height: auto;
     aspect-ratio: 3 / 2;
+    border-radius: 4px;
+    overflow: hidden;
   }
-  .nlx-home .anywhere-places {
+  .nlx-home .hero-photo::after {
+    background: linear-gradient(0deg, rgba(20, 22, 26, 0.45) 0%, rgba(20, 22, 26, 0) 45%);
+  }
+    .nlx-home .anywhere-places {
     flex-direction: row;
     flex: 1 1 auto;
     max-width: 100%;
@@ -2345,12 +2546,21 @@
     justify-content: flex-start;
     align-items: flex-start;
   }
-  .nlx-home .cta-photo {
-    min-height: 200px;
-    max-height: 240px;
+  .nlx-home .cta-collage {
+    min-height: 0;
+    padding: 4px 18px 34px;
   }
-  .nlx-home .cta-photo::after {
-    background: linear-gradient(0deg, rgba(20, 22, 26, 0) 40%, var(--color-ink) 100%);
+  .nlx-home .cta-tile {
+    width: clamp(74px, 21vw, 104px);
+  }
+  .nlx-home .cta-tile + .cta-tile {
+    margin-left: -12px;
+  }
+  .nlx-home .cta-collage::after {
+    background: linear-gradient(0deg, rgba(20, 22, 26, 0) 55%, var(--color-ink) 100%);
+  }
+  .nlx-home .cta-proof-text {
+    font-size: 12.5px;
   }
   .nlx-home .cta-strip-action {
     flex-direction: column;

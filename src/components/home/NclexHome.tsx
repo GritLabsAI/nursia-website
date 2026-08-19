@@ -13,6 +13,14 @@ import { QTYPE_DATA } from "./qtypeData";
    in the mock; they are React state here.
    ============================================================ */
 
+/* The closing band's cohort. Faces are the avatar row, COLLAGE the
+   overlapped tiles behind it — both sliced from the same shoot so the
+   band reads as one group of people rather than assorted stock.
+   SOCIAL_PROOF is a claim: set it to the real signup count before launch. */
+const SOCIAL_PROOF = "12,000+";
+const FACES = ["a", "d", "b", "e", "c"] as const;
+const COLLAGE = [{ id: "c" }, { id: "a" }, { id: "e" }, { id: "d" }] as const;
+
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -240,17 +248,22 @@ export function NclexHome() {
               ))}
             </dl>
           </div>
-          {/* an environmental frame, so it runs to the edge of the viewport
-              rather than sitting in a card */}
-          <div className="hero-photo">
-            <Image
-              src="/home/hero-desk.webp"
-              alt="A nursing student writing up NCLEX practice questions at her desk, a study plan on the whiteboard behind her"
-              width={1400}
-              height={933}
-              priority
-              sizes="(max-width: 900px) 100vw, 46vw"
-            />
+          {/* the stage: photograph as ground, product on top. The card
+              straddles the seam so the two halves read as one image. */}
+          <div className="hero-stage">
+            <div className="hero-photo">
+              <Image
+                src="/home/hero-desk.png"
+                alt="A nursing student in scrubs working through NCLEX practice questions at her desk, a study plan on the whiteboard behind her"
+                width={1536}
+                height={1024}
+                priority
+                quality={95}
+                sizes="(max-width: 900px) 100vw, 52vw"
+              />
+            </div>
+
+
           </div>
         </div>
       </section>
@@ -679,6 +692,24 @@ export function NclexHome() {
       {/* -------------------------------------------------- cta strip */}
       <section className="section-cta-strip">
         <div className="cta-strip">
+          <div className="cta-proof">
+            <div className="cta-faces">
+              {FACES.map((f) => (
+                <Image
+                  key={f}
+                  className="cta-face"
+                  src={`/home/face-${f}.webp`}
+                  alt=""
+                  aria-hidden
+                  width={128}
+                  height={128}
+                />
+              ))}
+            </div>
+            <p className="cta-proof-text">
+              Join <strong>{SOCIAL_PROOF}</strong> NCLEX-RN aspirants and RNs
+            </p>
+          </div>
           <h2 className="cta-strip-heading">50 free questions. No card.</h2>
           <div className="cta-strip-action">
             <Link href="/signup" className="btn-pill">
@@ -687,14 +718,20 @@ export function NclexHome() {
             <span className="cta-strip-note">No card needed</span>
           </div>
         </div>
-        <div className="cta-photo">
-          <Image
-            src="/home/cta-night.webp"
-            alt="A nursing student studying late at a desk lit by a lamp"
-            width={1000}
-            height={695}
-            sizes="(max-width: 900px) 100vw, 38vw"
-          />
+
+        {/* four of them, overlapped — the band should read as a cohort, not a stock photo */}
+        <div className="cta-collage" aria-hidden>
+          {COLLAGE.map((c) => (
+            <div key={c.id} className={`cta-tile cta-tile-${c.id}`}>
+              <Image
+                src={`/home/who-${c.id}.webp`}
+                alt=""
+                width={384}
+                height={512}
+                sizes="(max-width: 900px) 45vw, 22vw"
+              />
+            </div>
+          ))}
         </div>
       </section>
     </div>
