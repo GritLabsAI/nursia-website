@@ -16,9 +16,12 @@ const NAV = [
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-rule bg-paper/92 backdrop-blur-sm">
-      {/* Three columns rather than a flex row, so the nav centres on the bar
-          itself and does not drift when the wordmark or the buttons change width. */}
-      <div className="mx-auto grid h-16 max-w-[1140px] grid-cols-[1fr_auto_1fr] items-center gap-6 px-5 sm:px-8">
+      {/* From lg up: three columns, so the nav centres on the bar itself and does
+          not drift when the wordmark or the buttons change width. Below lg the nav
+          is display:none, which would take it out of the grid entirely and let the
+          buttons auto-place into the empty middle column — so small screens use a
+          plain flex row that keeps them on the right gutter. */}
+      <div className="mx-auto flex h-16 max-w-[1140px] items-center justify-between gap-6 px-5 sm:px-8 lg:grid lg:grid-cols-[1fr_auto_1fr]">
         <Link href="/" className="flex items-center justify-self-start" aria-label="Nursia — home">
           <Wordmark />
         </Link>
@@ -35,7 +38,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 justify-self-end sm:gap-4">
+        <div className="col-start-3 flex items-center gap-2 justify-self-end sm:gap-4">
           <Link
             href="/login"
             className="text-sm font-medium text-ink-2 transition-colors hover:text-teal sm:text-[0.9375rem]"

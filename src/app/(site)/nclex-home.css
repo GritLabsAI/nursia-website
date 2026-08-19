@@ -1,0 +1,2383 @@
+/* ============================================================
+   Landing sections ported from the NCLEX landing-page mock.
+   Every rule is scoped under .nlx-home so it cannot leak into
+   the rest of the site (which runs on the Tailwind design
+   system in globals.css). Responsive rules live at the bottom.
+   ============================================================ */
+
+.nlx-home {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #14161a;
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+.nlx-home *,
+.nlx-home *::before,
+.nlx-home *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.nlx-home img,
+.nlx-home svg {
+  display: block;
+}
+.nlx-home a {
+  text-decoration: none;
+  color: inherit;
+}
+.nlx-home button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.nlx-home h1,
+.nlx-home h2,
+.nlx-home h3 {
+  font-family: inherit;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.nlx-home .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+}
+.nlx-home .accent {
+    background: linear-gradient(90deg, #0b6b62, #0b6b62);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.nlx-home .btn-pill {
+    display: inline-block;
+    background: #14161a;
+    color: #fff;
+    padding: 16px 30px;
+    border-radius: 100px;
+    font-size: 15px;
+    font-weight: 700;
+}
+/* ---------- LOOP FOLD SECTION ---------- */
+.nlx-home .loop-fold {
+    padding: 8px 0 64px;
+    box-sizing: border-box;
+    background-color: #f4f2eb;
+    background-image:
+      radial-gradient(circle at 12% 15%, rgba(11,107,98,0.10), transparent 42%),
+      linear-gradient(135deg, rgba(11,107,98,0.06) 1px, transparent 1px),
+      linear-gradient(45deg, rgba(11,107,98,0.06) 1px, transparent 1px);
+    background-size: auto, 28px 28px, 28px 28px;
+}
+.nlx-home .loop-fold .wrap { width: 100%;
+}
+.nlx-home .loop-fold-head {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 44px;
+}
+.nlx-home .loop-fold-head h2 {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    line-height: 1.28;
+    margin-top: 12px;
+}
+/* ---------- LOOP + CAROUSEL BODY ---------- */
+.nlx-home .loop-body {
+    display: grid;
+    grid-template-columns: 0.45fr 1fr;
+    gap: 40px;
+    align-items: center;
+    max-width: 1040px;
+    margin: 0 auto;
+}
+/* ---------- LOOP DIAGRAM (vertical) ---------- */
+.nlx-home .loop {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+}
+.nlx-home .loop-step {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    border-radius: 16px;
+    padding: 4px;
+    margin: -4px;
+    transition: background 0.15s;
+}
+.nlx-home .loop-step:hover {
+    background: rgba(11, 107, 98, 0.06);
+}
+.nlx-home .loop-step:hover .loop-icon {
+    transform: translateY(-1px);
+}
+.nlx-home .loop-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f2eb;
+    border: 1.5px solid #e3dfd4;
+    transition: transform 0.15s;
+    flex-shrink: 0;
+}
+.nlx-home .loop-icon { background: #f4f2eb; border-color: #e3dfd4;
+}
+.nlx-home .loop-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #14161a;
+    transition: color 0.2s;
+}
+.nlx-home .loop-step.active .loop-icon {
+    background: #0b6b62;
+    border-color: #0b6b62;
+}
+.nlx-home .loop-step.active .loop-icon svg { stroke: #fff;
+}
+.nlx-home .loop-step.active .loop-label {
+    color: #0b6b62;
+    font-weight: 800;
+}
+.nlx-home .loop-arrow {
+    color: #cdc7b6;
+    font-size: 20px;
+    line-height: 1;
+    margin: 4px 0 4px 27px;
+}
+/* ---------- AUTO-CYCLING STACKED SCREENS ---------- */
+.nlx-home .cycle-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    zoom: 1.5;
+}
+.nlx-home .cycle-stack {
+    position: relative;
+    width: 420px;
+    height: 272px;
+}
+.nlx-home .cycle-deck {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid #e3dfd4;
+    box-shadow: 0 10px 24px rgba(20,22,26,0.05);
+}
+.nlx-home .deck-3 {
+    width: 88%;
+    height: 90%;
+    transform: translateX(-50%) translateY(4px) scale(0.94);
+    background: #f4f2eb;
+}
+.nlx-home .deck-2 {
+    width: 94%;
+    height: 95%;
+    transform: translateX(-50%) translateY(2px) scale(0.97);
+    background: #fbfaf6;
+}
+.nlx-home .cycle-screen {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e3dfd4;
+    box-shadow: 0 22px 44px rgba(20,22,26,0.1);
+    overflow: hidden;
+}
+.nlx-home .cycle-topbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    background: linear-gradient(90deg, #0b6b62, #084f49);
+}
+.nlx-home .cycle-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.85);
+}
+.nlx-home .cycle-stage-label {
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #fff;
+    transition: opacity 0.25s;
+}
+.nlx-home .cycle-subheader { background: #e3dfd4; height: 4px;
+}
+.nlx-home .cycle-subheader .fill { height: 100%; background: #0b6b62;
+}
+.nlx-home .cycle-body {
+    padding: 16px 18px 14px;
+    height: calc(100% - 46px);
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.28s ease;
+}
+.nlx-home .cycle-body.fade { opacity: 0;
+}
+.nlx-home .cy-counter {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #0b6b62;
+    background: #f4f2eb;
+    padding: 3px 8px;
+    border-radius: 5px;
+    margin-bottom: 9px;
+}
+.nlx-home .cy-q { font-size: 12px; line-height: 1.45; color: #3a3d44; margin-bottom: 11px; flex-shrink: 0;
+}
+.nlx-home .cy-opts { display: flex; flex-direction: column; gap: 6px;
+}
+.nlx-home .cy-opt {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: #fff;
+    border: 1px solid #e3dfd4;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 11px;
+    color: #3a3d44;
+}
+.nlx-home .cy-opt .letter { font-weight: 800; color: #6e6b63; font-size: 10.5px; flex-shrink: 0;
+}
+.nlx-home .cy-opt .c { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid #cdc7b6; flex-shrink: 0;
+}
+.nlx-home .cy-opt.selected { border-color: #0b6b62; background: #f4f2eb;
+}
+.nlx-home .cy-opt.selected .c { border-color: #0b6b62; background: #0b6b62;
+}
+.nlx-home .cy-opt.right { border-color: #157f52; background: #f3faf5;
+}
+.nlx-home .cy-opt.right .c { border-color: #157f52; background: #157f52;
+}
+.nlx-home .cy-opt.wrong { border-color: #b23a2e; background: #fdf5f3;
+}
+.nlx-home .cy-opt.wrong .c { border-color: #b23a2e; background: #b23a2e;
+}
+.nlx-home .cy-opt.wrong .letter { color: #b23a2e;
+}
+.nlx-home .cy-opt.right .letter { color: #157f52;
+}
+.nlx-home .cy-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 9px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 10.5px;
+    font-weight: 800;
+}
+.nlx-home .cy-status.correct { background: #f3faf5; color: #157f52;
+}
+.nlx-home .cy-status .ico { width: 15px; height: 15px; border-radius: 50%; background: #157f52; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0;
+}
+.nlx-home .cy-explain { background: #f4f2eb; border: 1px solid #e3dfd4; border-radius: 9px; padding: 9px 11px; font-size: 10.5px; line-height: 1.5; color: #3a3d44; margin-top: 8px;
+}
+.nlx-home .cy-explain b { color: #0b6b62;
+}
+.nlx-home .cy-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    padding-top: 10px;
+}
+.nlx-home .cy-btn { font-size: 10px; font-weight: 800; padding: 6px 14px; border-radius: 7px;
+}
+.nlx-home .cy-btn-outline { background: #fff; color: #0b6b62; border: 1.5px solid #0b6b62;
+}
+.nlx-home .cy-btn-solid { background: #0b6b62; color: #fff;
+}
+.nlx-home .cy-readiness-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; flex-shrink: 0;
+}
+.nlx-home .cy-readiness-score { font-size: 22px; font-weight: 800; color: #14161a;
+}
+.nlx-home .cy-readiness-delta { font-size: 9.5px; font-weight: 800; color: #157f52; background: #f3faf5; padding: 2px 7px; border-radius: 100px;
+}
+.nlx-home .cy-area-row { margin-bottom: 8px;
+}
+.nlx-home .cy-area-top { display: flex; justify-content: space-between; font-size: 9.5px; font-weight: 700; color: #3a3d44; margin-bottom: 3px;
+}
+.nlx-home .cy-area-track { height: 5px; border-radius: 3px; background: #e3dfd4; overflow: hidden;
+}
+.nlx-home .cy-area-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #0b6b62, #0b6b62);
+}
+.nlx-home .cy-plan-item { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #e3dfd4; border-radius: 8px; padding: 8px 10px; margin-bottom: 7px;
+}
+.nlx-home .cy-plan-item .ic { width: 26px; height: 26px; border-radius: 7px; background: #f4f2eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.nlx-home .cy-plan-item .txt { flex: 1;
+}
+.nlx-home .cy-plan-item .t1 { font-size: 10.5px; font-weight: 700; color: #14161a; margin-bottom: 2px;
+}
+.nlx-home .cy-plan-item .t2 { font-size: 9px; color: #6e6b63;
+}
+.nlx-home .cy-plan-item .go { font-size: 9px; font-weight: 800; color: #0b6b62; background: #f4f2eb; padding: 3px 8px; border-radius: 100px; flex-shrink: 0;
+}
+.nlx-home .cy-retest-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; flex-shrink: 0;
+}
+.nlx-home .cy-retest-ring { width: 46px; height: 46px; border-radius: 50%; border: 5px solid #e3dfd4; border-top-color: #0b6b62; border-right-color: #0b6b62; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 800; color: #14161a; flex-shrink: 0;
+}
+.nlx-home .cy-retest-title { font-size: 11.5px; font-weight: 800; color: #14161a;
+}
+.nlx-home .cy-retest-sub { font-size: 9.5px; color: #6e6b63;
+}
+.nlx-home .cy-growth-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-shrink: 0;
+}
+.nlx-home .cy-growth-sub { font-size: 9.5px; color: #6e6b63; margin-top: 2px;
+}
+.nlx-home .cy-growth-delta { font-size: 11px; font-weight: 800; color: #157f52; background: #f3faf5; padding: 3px 9px; border-radius: 100px; flex-shrink: 0;
+}
+.nlx-home .cy-growth-chart { width: 100%; height: 82px; margin-bottom: 10px;
+}
+.nlx-home .cy-growth-chart svg { width: 100%; height: 100%; display: block;
+}
+.nlx-home .cy-growth-stats { display: flex; align-items: center; gap: 10px; background: #f4f2eb; border: 1px solid #e3dfd4; border-radius: 8px; padding: 8px 12px;
+}
+.nlx-home .cy-growth-stat { display: flex; flex-direction: column; gap: 2px;
+}
+.nlx-home .cy-growth-stat .lbl { font-size: 8.5px; font-weight: 700; color: #6e6b63; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.nlx-home .cy-growth-stat .val { font-size: 14px; font-weight: 800; color: #14161a;
+}
+.nlx-home .cy-growth-stat .val.strong { color: #0b6b62;
+}
+.nlx-home .cy-growth-arrow { font-size: 13px; font-weight: 800; color: #a29d90;
+}
+.nlx-home .cycle-dots { display: flex; gap: 7px;
+}
+.nlx-home .cdot { width: 7px; height: 7px; border-radius: 50%; background: #e3dfd4; transition: background 0.2s, width 0.2s;
+}
+.nlx-home .cdot.active { background: #0b6b62; width: 20px; border-radius: 100px;
+}
+/* ---------- SECTION SHARED ---------- */
+.nlx-home section { padding: 88px 0;
+}
+.nlx-home .section-readiness {
+    background-color: #f4f2eb;
+    background-image:
+      radial-gradient(circle at 90% 10%, rgba(11,107,98,0.10), transparent 45%),
+      radial-gradient(rgba(11,107,98,0.10) 1.5px, transparent 1.5px);
+    background-size: auto, 22px 22px;
+}
+.nlx-home .section-why {
+    padding: 60px 0;
+    background-color: #f4f2eb;
+    background-image:
+      radial-gradient(circle at 8% 88%, rgba(21,127,82,0.10), transparent 42%),
+      linear-gradient(rgba(21,127,82,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(21,127,82,0.07) 1px, transparent 1px);
+    background-size: auto, 26px 26px, 26px 26px;
+}
+.nlx-home .section-qtypes {
+    background-color: #f4f2eb;
+    background-image:
+      radial-gradient(circle at 92% 85%, rgba(11,107,98,0.12), transparent 42%),
+      radial-gradient(rgba(11,107,98,0.10) 1.5px, transparent 1.5px);
+    background-size: auto, 22px 22px;
+}
+.nlx-home .section-head {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 56px;
+}
+.nlx-home .why-section-head {
+    margin: 0 auto 24px;
+}
+.nlx-home .qtype-section-head {
+    max-width: none;
+    white-space: nowrap;
+}
+.nlx-home .section-eyebrow {
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #0b6b62;
+    margin-bottom: 12px;
+}
+.nlx-home .section-head h2 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    margin-bottom: 14px;
+}
+.nlx-home .section-head p {
+    font-size: 16px;
+    color: #3a3d44;
+    line-height: 1.6;
+}
+/* ---------- READINESS SCORE ---------- */
+.nlx-home .readiness-grid {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 28px;
+    align-items: stretch;
+}
+.nlx-home .readiness-card {
+    background: #14161a;
+    border-radius: 20px;
+    padding: 40px 36px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+.nlx-home .readiness-card::before {
+    content: "";
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(11,107,98,0.35), transparent 70%);
+    top: -140px;
+    right: -140px;
+}
+.nlx-home .readiness-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #a29d90;
+    margin-bottom: 18px;
+    position: relative;
+}
+.nlx-home .readiness-score-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    position: relative;
+    margin-bottom: 8px;
+}
+.nlx-home .readiness-number {
+    font-size: 76px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+.nlx-home .readiness-delta {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(21,127,82,0.18);
+    color: #6ec99a;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 7px 12px;
+    border-radius: 100px;
+    margin-bottom: 10px;
+}
+.nlx-home .readiness-sub {
+    font-size: 14.5px;
+    color: #bdb8aa;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    position: relative;
+}
+.nlx-home .readiness-spark {
+    position: relative;
+    height: 64px;
+}
+.nlx-home .readiness-areas {
+    background: #fff;
+    border: 1px solid #e3dfd4;
+    border-radius: 20px;
+    padding: 34px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 22px;
+}
+.nlx-home .area-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+}
+.nlx-home .area-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #14161a;
+}
+.nlx-home .area-pct {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: #14161a;
+    min-width: 42px;
+    text-align: right;
+}
+.nlx-home .area-delta {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 100px;
+    white-space: nowrap;
+}
+.nlx-home .area-delta.up { color: #157f52; background: #f3faf5;
+}
+.nlx-home .area-delta.down { color: #b23a2e; background: #fdf5f3;
+}
+.nlx-home .area-track {
+    grid-column: 1 / -1;
+    height: 9px;
+    border-radius: 100px;
+    background: #e3dfd4;
+    overflow: hidden;
+}
+.nlx-home .area-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, #0b6b62, #0b6b62);
+}
+/* ---------- WHY SECTION ---------- */
+.nlx-home .why-panel {
+    background: #fff;
+    border: 2px solid #0b6b62;
+    border-radius: 20px;
+    padding: 28px 32px;
+    max-width: 1040px;
+    margin: 0 auto;
+    box-shadow: 0 20px 50px rgba(20,22,26,0.06);
+}
+.nlx-home .why-question {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #14161a;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed #e3dfd4;
+}
+.nlx-home .why-priority {
+    display: block;
+    margin-top: 6px;
+    font-weight: 800;
+    color: #0b6b62;
+}
+.nlx-home .why-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+.nlx-home .why-compare-4 .why-card-reason {
+    min-height: 0;
+}
+.nlx-home .why-card {
+    border-radius: 12px;
+    padding: 14px 16px 13px;
+    border: 1.5px solid;
+}
+.nlx-home .why-card.wrong { background: #fdf5f3; border-color: #e5c3bb;
+}
+.nlx-home .why-card.right { background: #f3faf5; border-color: #c4ddcd;
+}
+.nlx-home .why-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 100px;
+    margin-bottom: 8px;
+}
+.nlx-home .why-card.wrong .why-tag { background: #b23a2e; color: #fff;
+}
+.nlx-home .why-card.right .why-tag { background: #157f52; color: #fff;
+}
+.nlx-home .why-card-option {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #14161a;
+    margin-bottom: 5px;
+}
+.nlx-home .why-card-reason {
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #3a3d44;
+}
+/* ---------- QUESTION TYPES ---------- */
+.nlx-home .qtype-stack-wrap {
+    max-width: 760px;
+    margin: 32px auto 0;
+}
+.nlx-home .qtype-stack {
+    position: relative;
+    width: 700px;
+    height: 452px;
+    margin: 0 auto 32px;
+}
+.nlx-home .qtype-deck {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 22px;
+    background: #fff;
+    border: 1px solid #e3dfd4;
+    box-shadow: 0 14px 30px rgba(20,22,26,0.06);
+}
+.nlx-home .qtype-deck-3 { transform: translate(34px, -34px) scale(0.92); opacity: 0.35;
+}
+.nlx-home .qtype-deck-2 { transform: translate(20px, -20px) scale(0.955); opacity: 0.55;
+}
+.nlx-home .qtype-deck-1 { transform: translate(9px, -9px) scale(0.98); opacity: 0.8;
+}
+.nlx-home .qtype-stack-front {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid #e3dfd4;
+    background: #fff;
+    box-shadow: 0 30px 62px rgba(20,22,26,0.16);
+    display: flex;
+    flex-direction: column;
+}
+.nlx-home .qs-topbar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(90deg, #0b6b62, #084f49);
+}
+.nlx-home .qs-back { color: #fff; opacity: 0.85; font-size: 14px;
+}
+.nlx-home .qs-topbar-title {
+    flex: 1;
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 800;
+}
+.nlx-home .qs-topbar-counter {
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.16);
+    padding: 4px 10px;
+    border-radius: 100px;
+}
+.nlx-home .qs-subbar {
+    flex-shrink: 0;
+    height: 4px;
+    background: #e3dfd4;
+}
+.nlx-home .qs-subbar-fill {
+    height: 100%;
+    background: #0b6b62;
+    transition: width 0.3s;
+}
+.nlx-home .qs-body {
+    flex: 1;
+    padding: 26px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    overflow: hidden;
+    transition: opacity 0.2s;
+}
+.nlx-home .qs-body.fade { opacity: 0;
+}
+.nlx-home .qs-footer {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 22px;
+    border-top: 1px solid #e3dfd4;
+}
+.nlx-home .qs-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 22px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 800;
+}
+.nlx-home .qs-btn-outline { border: 1.5px solid #e3dfd4; color: #6e6b63;
+}
+.nlx-home .qs-btn-solid { background: #0b6b62; color: #fff;
+}
+/* structural skeleton pieces (no real question content) */
+.nlx-home .qs-stem { font-size: 14.5px; font-weight: 700; color: #14161a; line-height: 1.4; margin-bottom: 4px;
+}
+.nlx-home .qs-opts { display: flex; flex-direction: column; gap: 12px;
+}
+.nlx-home .qs-opt-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border: 1.5px solid #e3dfd4;
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+.nlx-home .qs-opt-row.selected, .nlx-home .qs-opt-row.checked { border-color: #0b6b62; background: #f4f2eb;
+}
+.nlx-home .qs-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #cdc7b6; flex-shrink: 0;
+}
+.nlx-home .qs-opt-row.selected .qs-radio { border-color: #0b6b62; background: #0b6b62; box-shadow: inset 0 0 0 3px #f4f2eb;
+}
+.nlx-home .qs-check { width: 18px; height: 18px; border-radius: 5px; border: 2px solid #cdc7b6; flex-shrink: 0;
+}
+.nlx-home .qs-opt-row.checked .qs-check { border-color: #157f52; background: #157f52;
+}
+.nlx-home .qs-opt-text { font-size: 13.5px; font-weight: 600; color: #3a3d44; line-height: 1.35;
+}
+.nlx-home .qs-text-frag { font-size: 15.5px; font-weight: 600; color: #3a3d44; line-height: 1.5;
+}
+.nlx-home .qs-text-frag.small { font-size: 13.5px; color: #6e6b63;
+}
+.nlx-home .qs-line { display: block; height: 11px; border-radius: 5px; background: #e3dfd4;
+}
+.nlx-home .qs-line.seg { display: inline-block; vertical-align: middle;
+}
+.nlx-home .qs-drag-row { display: flex; align-items: center; gap: 14px; background: #f4f2eb; border: 1.5px solid #e3dfd4; border-radius: 10px; padding: 12px 16px;
+}
+.nlx-home .qs-drag-handle { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0;
+}
+.nlx-home .qs-drag-handle span { width: 14px; height: 2px; border-radius: 2px; background: #6e6b63;
+}
+.nlx-home .qs-drag-badge { width: 22px; height: 22px; border-radius: 50%; background: #0b6b62; color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.nlx-home .qs-blank-para { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 6px;
+}
+.nlx-home .qs-pill { display: inline-flex; align-items: center; background: #f4f2eb; border: 1.5px solid #0b6b62; border-radius: 8px; padding: 6px 14px; color: #084f49; font-size: 12px; font-weight: 800;
+}
+.nlx-home .qs-pill.sm { padding: 4px 10px; font-size: 10.5px;
+}
+.nlx-home .qs-split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 100%; align-items: center;
+}
+.nlx-home .qs-split-col { display: flex; flex-direction: column; gap: 12px;
+}
+.nlx-home .qs-split-col:first-child { border-right: 1px dashed #e3dfd4; padding-right: 22px;
+}
+.nlx-home .qs-numeric-row { display: flex; align-items: center; gap: 10px;
+}
+.nlx-home .qs-numeric-box { width: 90px; height: 34px; border-radius: 8px; border: 1.5px solid #0b6b62; background: #f4f2eb;
+}
+.nlx-home .qs-unit { font-size: 14px; font-weight: 700; color: #6e6b63;
+}
+.nlx-home .qs-dropdown-panel { display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1.5px solid #e3dfd4; border-radius: 10px; padding: 10px;
+}
+.nlx-home .qs-dropdown-opt { padding: 8px 10px; border-radius: 6px;
+}
+.nlx-home .qs-dropdown-opt.sel { background: #f4f2eb;
+}
+.nlx-home .qs-dropdown-opt .qs-opt-text { font-weight: 600;
+}
+.nlx-home .qs-dropdown-opt.sel .qs-opt-text { color: #084f49; font-weight: 800;
+}
+.nlx-home .qs-columns { display: flex; gap: 16px; height: 100%;
+}
+.nlx-home .qs-column { flex: 1; display: flex; flex-direction: column; gap: 10px; background: #f4f2eb; border: 1px solid #e3dfd4; border-radius: 10px; padding: 12px;
+}
+.nlx-home .qs-col-head { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: #6e6b63; margin-bottom: 2px;
+}
+.nlx-home .qs-chip { border-radius: 8px; background: #fff; border: 1.5px solid #e3dfd4; padding: 9px 10px; font-size: 13.5px; font-weight: 600; color: #3a3d44; line-height: 1.3;
+}
+.nlx-home .qs-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 14px;
+}
+.nlx-home .qs-toggle-pill { display: flex; gap: 6px; flex-shrink: 0;
+}
+.nlx-home .qs-toggle-pill span { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #e3dfd4;
+}
+.nlx-home .qs-toggle-pill span.on { border-color: #0b6b62; background: #0b6b62;
+}
+.nlx-home .qs-chart { flex: 1; display: flex; align-items: flex-end; gap: 10px; padding: 6px 4px 0; min-height: 90px;
+}
+.nlx-home .qs-chart b { display: block; flex: 1; border-radius: 5px 5px 0 0; background: linear-gradient(180deg, #0b6b62, #0b6b62);
+}
+/* bowtie */
+.nlx-home .qs-bowtie { position: relative; height: 140px;
+}
+.nlx-home .qs-bowtie-lines { position: absolute; inset: 0; width: 100%; height: 100%;
+}
+.nlx-home .qs-bt-box {
+    position: absolute;
+    width: 148px;
+    padding: 9px 11px;
+    background: #fff;
+    border: 1.5px solid #e3dfd4;
+    border-radius: 10px;
+    font-size: 9.5px;
+    font-weight: 800;
+    color: #6e6b63;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+}
+.nlx-home .qs-bt-tl { top: 0; left: 0;
+}
+.nlx-home .qs-bt-tr { top: 0; right: 0;
+}
+.nlx-home .qs-bt-bl { bottom: 0; left: 0;
+}
+.nlx-home .qs-bt-br { bottom: 0; right: 0;
+}
+.nlx-home .qs-bt-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 164px;
+    padding: 13px;
+    background: #14161a;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+.nlx-home .qs-bt-columns { display: flex; gap: 12px;
+}
+.nlx-home .qs-bt-col { flex: 1; display: flex; flex-direction: column; gap: 5px;
+}
+.nlx-home .qs-bt-col-head { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: #6e6b63; margin-bottom: 2px;
+}
+.nlx-home .qs-bt-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 7px;
+    background: #fff;
+    border: 1.5px solid #e3dfd4;
+    padding: 6px 9px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #3a3d44;
+    line-height: 1.25;
+}
+.nlx-home .qs-bt-chip .qs-drag-handle { flex-shrink: 0;
+}
+.nlx-home .qs-bt-chip .qs-drag-handle span { width: 10px; background: #6e6b63;
+}
+/* grid table (toggle) */
+.nlx-home .qs-grid-table { border: 1px solid #e3dfd4; border-radius: 10px; overflow: hidden;
+}
+.nlx-home .qs-grid-row { display: grid; grid-template-columns: 1fr 92px 92px; align-items: center;
+}
+.nlx-home .qs-grid-row + .qs-grid-row { border-top: 1px solid #e3dfd4;
+}
+.nlx-home .qs-grid-head { background: #f4f2eb;
+}
+.nlx-home .qs-grid-head .qs-grid-cell { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: #6e6b63;
+}
+.nlx-home .qs-grid-cell { padding: 11px 14px; font-size: 13.5px; font-weight: 600; color: #3a3d44;
+}
+.nlx-home .qs-grid-cell.center { display: flex; justify-content: center; padding: 11px 8px;
+}
+.nlx-home .qs-grid-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #cdc7b6; display: inline-block;
+}
+.nlx-home .qs-grid-radio.on { border-color: #0b6b62; background: #0b6b62; box-shadow: inset 0 0 0 3px #fff;
+}
+/* real-looking line chart */
+.nlx-home .qs-linechart svg { width: 100%; height: 100px; display: block;
+}
+.nlx-home .qs-linechart-labels { display: flex; justify-content: space-between; padding: 2px 42px 0 42px;
+}
+.nlx-home .qs-linechart-labels span { font-size: 9.5px; color: #6e6b63; font-weight: 600;
+}
+.nlx-home .qtype-stack-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+}
+.nlx-home .qsdot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e3dfd4;
+    cursor: pointer;
+    transition: background 0.2s, width 0.2s;
+}
+.nlx-home .qsdot.active { background: #d8692a; width: 20px; border-radius: 100px;
+}
+/* ---------- FOOTER CTA STRIP ---------- */
+.nlx-home .section-cta-strip {
+    background-color: #f4f2eb;
+    background-image: radial-gradient(rgba(11,107,98,0.09) 1px, transparent 1px);
+    background-size: 22px 22px;
+    border-top: 1px solid #e3dfd4;
+    border-bottom: 1px solid #e3dfd4;
+}
+.nlx-home .cta-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 32px 32px;
+}
+.nlx-home .cta-strip-heading {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #14161a;
+    margin: 0;
+}
+.nlx-home .cta-strip-action {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+.nlx-home .cta-strip-note {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6e6b63;
+}
+/* ---------- PREPARE FROM ANYWHERE ---------- */
+.nlx-home .section-anywhere {
+    padding: 90px 0 80px;
+    background-color: #fff;
+    background-image: radial-gradient(rgba(11,107,98,0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -8px 0;
+    overflow: hidden;
+}
+.nlx-home .anywhere-top { display: flex; align-items: center; gap: 56px; margin-bottom: 64px;
+}
+.nlx-home .anywhere-copy { flex: 1 1 560px; max-width: 640px;
+}
+.nlx-home .anywhere-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #5a3fd6;
+    background: #f4f2eb;
+    padding: 9px 18px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+}
+.nlx-home .anywhere-heading {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    color: #14161a;
+    margin: 0 0 20px;
+}
+.nlx-home .anywhere-heading-sub { display: inline-block; font-size: 0.58em; margin-top: 6px;
+}
+.nlx-home .anywhere-sub {
+    font-size: 17px;
+    color: #3a3d44;
+    line-height: 1.6;
+    max-width: 520px;
+    margin-bottom: 36px;
+}
+.nlx-home .anywhere-features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+.nlx-home .anywhere-features-bottom { grid-template-columns: repeat(3, 1fr); max-width: 760px; margin: 0 auto 40px; gap: 28px;
+}
+.nlx-home .af-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: #f4f2eb;
+    border: 1.5px solid #e3dfd4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+.nlx-home .af-title { font-size: 14px; font-weight: 800; color: #14161a; margin-bottom: 4px; line-height: 1.3;
+}
+.nlx-home .af-desc { font-size: 12px; color: #6e6b63; line-height: 1.5;
+}
+.nlx-home .anywhere-photo { flex: 1 1 380px; max-width: 400px;
+}
+.nlx-home .anywhere-photo img { width: 100%; height: auto; border-radius: 20px; display: block; box-shadow: 0 24px 50px rgba(20,22,26,0.12);
+}
+/* device row */
+.nlx-home .anywhere-devices { display: flex; align-items: flex-end; justify-content: center; gap: 30px; margin-bottom: 44px;
+}
+.nlx-home .dv-ring { border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.nlx-home .dv-ring-lg { width: 108px; height: 108px;
+}
+.nlx-home .dv-ring-md { width: 84px; height: 84px;
+}
+.nlx-home .dv-ring-inner { width: 76%; height: 76%; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.nlx-home .dv-ring-pct { font-size: 19px; font-weight: 800; color: #14161a; line-height: 1.1;
+}
+.nlx-home .dv-ring-pct.sm { font-size: 15px;
+}
+.nlx-home .dv-ring-sub { font-size: 9.5px; font-weight: 700; color: #157f52;
+}
+/* phone */
+.nlx-home .dv-phone { width: 190px; background: #14161a; border-radius: 32px; padding: 8px; box-shadow: 0 24px 48px rgba(20,22,26,0.18);
+}
+.nlx-home .dv-phone-screen { background: #fff; border-radius: 25px; padding: 26px 16px 18px; position: relative; text-align: center;
+}
+.nlx-home .dv-phone-island { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 46px; height: 13px; background: #14161a; border-radius: 100px;
+}
+.nlx-home .dv-phone-title { font-size: 11px; font-weight: 800; color: #6e6b63; margin-bottom: 12px;
+}
+.nlx-home .dv-ring-lg { margin: 0 auto 12px;
+}
+.nlx-home .dv-note { font-size: 10px; color: #6e6b63; line-height: 1.4; margin-bottom: 14px;
+}
+.nlx-home .dv-weak-label { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: #6e6b63; text-align: left; margin-bottom: 6px;
+}
+.nlx-home .dv-weak-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 10.5px; font-weight: 700; color: #14161a; text-align: left;
+}
+.nlx-home .dv-tag-red { font-size: 8.5px; font-weight: 800; color: #b23a2e; background: #fdf5f3; padding: 3px 7px; border-radius: 100px; white-space: nowrap;
+}
+/* laptop */
+.nlx-home .dv-laptop { width: 460px;
+}
+.nlx-home .dv-laptop-top { background: #14161a; border-radius: 16px 16px 0 0; padding: 12px 12px 0;
+}
+.nlx-home .dv-laptop-cam { display: block; width: 5px; height: 5px; border-radius: 50%; background: #3a3d44; margin: 0 auto 10px;
+}
+.nlx-home .dv-laptop-screen { background: #fff; border-radius: 8px 8px 0 0; padding: 18px 20px 20px;
+}
+.nlx-home .dv-laptop-hinge { height: 4px; background: #0a0b0d; margin: 0 4px;
+}
+.nlx-home .dv-laptop-deck {
+    height: 16px;
+    background: linear-gradient(180deg, #3a3d44, #14161a);
+    margin: 0 -12px;
+    clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
+    border-radius: 0 0 4px 4px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(20,22,26,0.18);
+}
+.nlx-home .dv-laptop-deck::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.10);
+}
+.nlx-home .dv-laptop-deck::after { content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 90px; height: 5px; background: #0a0a10; border-radius: 0 0 5px 5px;
+}
+.nlx-home .dv-dash-head { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #14161a; margin-bottom: 14px;
+}
+.nlx-home .dv-dash-home { font-size: 13px;
+}
+.nlx-home .dv-dash-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 12px; margin-bottom: 12px;
+}
+.nlx-home .dv-dash-grid.two { grid-template-columns: 1fr 1fr;
+}
+.nlx-home .dv-dash-card { background: #f4f2eb; border: 1px solid #e3dfd4; border-radius: 10px; padding: 12px 14px;
+}
+.nlx-home .dv-dash-label { font-size: 10px; font-weight: 800; color: #6e6b63; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 8px;
+}
+.nlx-home .dv-dash-grid .dv-ring-md { margin: 0 auto 6px;
+}
+.nlx-home .dv-dash-grid .dv-dash-card:first-child { text-align: center;
+}
+.nlx-home .dv-ring-delta { font-size: 9.5px; font-weight: 800; color: #157f52; text-align: center;
+}
+.nlx-home .area-row.sm .area-name { font-size: 10.5px;
+}
+.nlx-home .area-row.sm .area-pct { font-size: 10.5px; min-width: 30px;
+}
+.nlx-home .area-row.sm { margin-bottom: 7px; gap: 4px;
+}
+.nlx-home .area-row.sm .area-track { height: 5px; margin-top: 2px;
+}
+.nlx-home .dv-plan-time { font-size: 16px; font-weight: 800; color: #14161a; margin-bottom: 10px;
+}
+.nlx-home .dv-plan-time span { display: block; font-size: 9.5px; font-weight: 600; color: #6e6b63; margin-top: 2px;
+}
+.nlx-home .dv-plan-btn { display: inline-block; background: #0b6b62; color: #fff; font-size: 10.5px; font-weight: 800; padding: 8px 14px; border-radius: 8px;
+}
+.nlx-home .dv-continue-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 700; color: #14161a;
+}
+.nlx-home .dv-continue-row small { font-weight: 600; color: #6e6b63; font-size: 9.5px;
+}
+.nlx-home .dv-continue-frac { font-size: 11px; font-weight: 800; color: #0b6b62;
+}
+/* tablet */
+.nlx-home .dv-tablet { width: 400px;
+}
+.nlx-home .dv-tablet-frame { background: #14161a; border-radius: 20px; padding: 12px; box-shadow: 0 24px 48px rgba(20,22,26,0.16);
+}
+.nlx-home .dv-tablet-screen { background: #fff; border-radius: 10px; padding: 14px 16px;
+}
+.nlx-home .dv-q-head { display: flex; align-items: center; gap: 12px; font-size: 9.5px; font-weight: 700; color: #6e6b63; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e3dfd4;
+}
+.nlx-home .dv-q-timer { margin-right: auto;
+}
+.nlx-home .dv-q-body { display: grid; grid-template-columns: 1.15fr 1fr; gap: 12px;
+}
+.nlx-home .dv-q-main .qs-stem { font-size: 11px; margin-bottom: 8px;
+}
+.nlx-home .dv-q-main .qs-opts { gap: 6px;
+}
+.nlx-home .dv-q-main .qs-opt-row { padding: 7px 9px; gap: 8px;
+}
+.nlx-home .dv-q-main .qs-opt-text { font-size: 10px; line-height: 1.3;
+}
+.nlx-home .dv-letter { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid #cdc7b6; font-size: 8.5px; font-weight: 800; color: #6e6b63; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.nlx-home .qs-opt-row.correct { border-color: #157f52; background: #f3faf5;
+}
+.nlx-home .qs-opt-row.correct .dv-letter { border-color: #157f52; background: #157f52; color: #fff;
+}
+.nlx-home .dv-explain-head { font-size: 11px; font-weight: 800; color: #14161a; margin-bottom: 6px;
+}
+.nlx-home .dv-explain-tabs { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;
+}
+.nlx-home .dv-explain-tabs span { font-size: 8px; font-weight: 700; padding: 4px 8px; border-radius: 100px; background: #f4f2eb; color: #6e6b63;
+}
+.nlx-home .dv-explain-tabs span.on { background: #f4f2eb; color: #084f49;
+}
+.nlx-home .dv-explain-text { font-size: 9.5px; line-height: 1.45; color: #3a3d44; background: #f4f2eb; border-radius: 8px; padding: 9px 10px; margin-bottom: 8px;
+}
+.nlx-home .dv-tip { display: flex; gap: 6px; font-size: 9px; line-height: 1.4; color: #5b4a12; background: #fdf7d2; border: 1px solid #e6d98a; border-radius: 8px; padding: 8px 9px;
+}
+.nlx-home .dv-tip b { font-size: 9px;
+}
+.nlx-home .dv-q-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #e3dfd4;
+}
+.nlx-home .dv-q-footer .qs-btn { padding: 6px 14px; font-size: 10px;
+}
+
+/* ============================================================
+   ADAPTATION LAYER
+   The mock arrived in its own voice: system-font headings,
+   20px corners, gradient text and four flavours of pill
+   button. Everything below re-voices it in the Flowsheet
+   system the rest of the site runs on — Bricolage display,
+   Source Serif for anything read slowly, mono for anything
+   checkable, 3-4px corners, teal as the only action colour,
+   and the highlighter stroke used exactly once.
+   ============================================================ */
+
+/* --- typography -------------------------------------------- */
+.nlx-home {
+  font-family: var(--font-ui);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.nlx-home h1,
+.nlx-home h2,
+.nlx-home h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+}
+.nlx-home .anywhere-heading,
+.nlx-home .loop-fold-head h2,
+.nlx-home .section-head h2 {
+  font-weight: 700;
+}
+.nlx-home .anywhere-heading-sub {
+  font-size: 0.62em;
+  font-weight: 600;
+  color: var(--color-muted);
+  letter-spacing: -0.015em;
+}
+
+/* prose — question rationales and section notes are meant to be
+   read slowly, so they get the text serif like the rest of the site */
+.nlx-home .anywhere-sub,
+.nlx-home .section-head p,
+.nlx-home .readiness-sub,
+.nlx-home .why-card-reason,
+.nlx-home .af-desc,
+.nlx-home .cy-explain,
+.nlx-home .dv-explain-text,
+.nlx-home .dv-note {
+  font-family: var(--font-body);
+  line-height: 1.62;
+}
+
+/* data — anything a candidate could check gets the mono face */
+.nlx-home .readiness-number,
+.nlx-home .area-pct,
+.nlx-home .area-delta,
+.nlx-home .readiness-delta,
+.nlx-home .dv-ring-pct,
+.nlx-home .dv-ring-delta,
+.nlx-home .dv-plan-time,
+.nlx-home .dv-continue-frac,
+.nlx-home .dv-letter,
+.nlx-home .dv-q-head,
+.nlx-home .qs-topbar-counter,
+.nlx-home .qs-drag-badge,
+.nlx-home .qs-linechart-labels span,
+.nlx-home .qs-unit,
+.nlx-home .cy-counter,
+.nlx-home .cy-readiness-score,
+.nlx-home .cy-readiness-delta,
+.nlx-home .cy-retest-ring,
+.nlx-home .cy-growth-delta,
+.nlx-home .cy-growth-stat .val,
+.nlx-home .cy-opt .letter {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+.nlx-home .readiness-number {
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+/* labels — the site's eyebrow: mono, tracked out, never bold */
+.nlx-home .section-eyebrow,
+.nlx-home .anywhere-badge,
+.nlx-home .readiness-label,
+.nlx-home .dv-dash-label,
+.nlx-home .dv-weak-label,
+.nlx-home .qs-bt-col-head,
+.nlx-home .qs-col-head,
+.nlx-home .qs-grid-head .qs-grid-cell,
+.nlx-home .cy-growth-stat .lbl,
+.nlx-home .dv-phone-title {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.nlx-home .section-eyebrow {
+  font-size: 11px;
+  margin-bottom: 14px;
+  color: var(--color-muted);
+}
+/* the badge loses its pill and becomes a plain eyebrow */
+.nlx-home .anywhere-badge {
+  display: block;
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 11px;
+  margin-bottom: 18px;
+}
+.nlx-home .readiness-label {
+  color: #a29d90;
+  font-size: 11px;
+}
+
+/* the one flourish: the highlighter stroke, used once on the page */
+.nlx-home .accent {
+  background-image: linear-gradient(var(--color-highlight), var(--color-highlight));
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 100% 0.42em;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: var(--color-ink);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* --- section grounds --------------------------------------- */
+/* five pastel dot-and-grid washes became one alternating paper
+   rhythm, separated by the same hairline rule used site-wide */
+.nlx-home .section-anywhere,
+.nlx-home .section-readiness,
+.nlx-home .section-qtypes {
+  background: var(--color-paper);
+  background-image: none;
+}
+.nlx-home .loop-fold,
+.nlx-home .section-why {
+  background: var(--color-paper-2);
+  background-image: none;
+}
+.nlx-home .loop-fold,
+.nlx-home .section-readiness,
+.nlx-home .section-why,
+.nlx-home .section-qtypes {
+  border-top: 1px solid var(--color-rule);
+}
+
+
+/* --- surfaces: 20px marketing corners -> the site's 4px ----- */
+.nlx-home .readiness-card,
+.nlx-home .readiness-areas,
+.nlx-home .why-panel {
+  border-radius: 4px;
+}
+.nlx-home .readiness-areas,
+.nlx-home .why-panel {
+  border: 1px solid var(--color-rule);
+  box-shadow:
+    0 1px 0 rgba(20, 22, 26, 0.04),
+    0 10px 24px -18px rgba(20, 22, 26, 0.35);
+}
+.nlx-home .why-card,
+.nlx-home .qs-opt-row,
+.nlx-home .qs-drag-row,
+.nlx-home .qs-dropdown-panel,
+.nlx-home .qs-grid-table,
+.nlx-home .qs-bt-box,
+.nlx-home .qs-bt-center,
+.nlx-home .qs-bt-chip,
+.nlx-home .qs-pill,
+.nlx-home .qs-numeric-box,
+.nlx-home .cy-opt,
+.nlx-home .cy-explain,
+.nlx-home .cy-status,
+.nlx-home .cy-growth-stats,
+.nlx-home .dv-dash-card,
+.nlx-home .dv-tip,
+.nlx-home .dv-explain-text {
+  border-radius: 3px;
+}
+.nlx-home .qtype-stack-front,
+.nlx-home .qtype-deck,
+.nlx-home .cycle-screen,
+.nlx-home .cycle-deck,
+.nlx-home .loop-icon,
+.nlx-home .af-icon {
+  border-radius: 4px;
+}
+/* tags stop being lozenges */
+.nlx-home .why-tag,
+.nlx-home .area-delta,
+.nlx-home .readiness-delta,
+.nlx-home .cy-readiness-delta,
+.nlx-home .cy-growth-delta,
+.nlx-home .cy-counter,
+.nlx-home .dv-tag-red,
+.nlx-home .qs-topbar-counter,
+.nlx-home .dv-explain-tabs span {
+  border-radius: 2px;
+}
+.nlx-home .why-tag,
+.nlx-home .dv-tag-red,
+.nlx-home .cy-counter {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+/* the why panel is a question card, so it inherits the qcard look */
+.nlx-home .why-panel {
+  background: #fff;
+}
+.nlx-home .why-card.right {
+  background: #f3faf5;
+  border-color: #c4ddcd;
+}
+.nlx-home .why-card.wrong {
+  background: var(--color-paper);
+  border-color: var(--color-rule);
+}
+.nlx-home .why-card {
+  border-width: 1px;
+}
+.nlx-home .why-card.wrong .why-tag {
+  background: none;
+  color: var(--color-wrong);
+  padding: 0;
+}
+.nlx-home .why-card.right .why-tag {
+  background: none;
+  color: var(--color-correct);
+  padding: 0;
+}
+.nlx-home .why-priority {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+/* --- buttons ------------------------------------------------ */
+/* one real button on the page: it is the site's button, verbatim */
+.nlx-home .btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.8125rem 1.375rem;
+  border-radius: 3px;
+  background: var(--color-highlight);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: background-color 0.16s ease;
+}
+.nlx-home .btn-pill:hover {
+  background: #efe04a;
+}
+
+/* buttons drawn inside the product mock-ups: same geometry as the
+   real thing, scaled down, so the screenshots look like this site */
+.nlx-home .qs-btn,
+.nlx-home .cy-btn,
+.nlx-home .dv-plan-btn {
+  border-radius: 3px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.nlx-home .qs-btn-solid,
+.nlx-home .cy-btn-solid,
+.nlx-home .dv-plan-btn {
+  background: var(--color-teal);
+  color: #fff;
+}
+.nlx-home .qs-btn-outline,
+.nlx-home .cy-btn-outline {
+  background: #fff;
+  border: 1px solid var(--color-rule);
+  color: var(--color-ink-2);
+}
+.nlx-home .qs-btn {
+  padding: 9px 18px;
+}
+
+/* selection vs. correctness must never be confusable on a page
+   whose whole job is right-and-wrong: picked = ink outline, exactly
+   like .qopt[data-state="picked"]; correct stays clinical green */
+.nlx-home .qs-opt-row.selected,
+.nlx-home .cy-opt.selected {
+  border-color: var(--color-ink);
+  background: var(--color-paper-2);
+}
+.nlx-home .qs-opt-row.selected .qs-radio,
+.nlx-home .cy-opt.selected .c {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+}
+.nlx-home .qs-opt-row.selected .qs-radio {
+  box-shadow: inset 0 0 0 3px var(--color-paper-2);
+}
+.nlx-home .qs-dropdown-opt.sel {
+  background: var(--color-paper-2);
+}
+.nlx-home .qs-dropdown-opt.sel .qs-opt-text {
+  color: var(--color-ink);
+}
+.nlx-home .qs-grid-radio.on {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+}
+
+/* --- product chrome ---------------------------------------- */
+.nlx-home .cycle-topbar,
+.nlx-home .qs-topbar {
+  background: var(--color-teal);
+}
+.nlx-home .area-fill,
+.nlx-home .cy-area-fill {
+  background: var(--color-teal);
+}
+.nlx-home .cycle-subheader .fill,
+.nlx-home .qs-subbar-fill {
+  background: var(--color-teal);
+}
+.nlx-home .cdot.active,
+.nlx-home .qsdot.active {
+  background: var(--color-teal);
+  border-radius: 2px;
+}
+.nlx-home .cdot,
+.nlx-home .qsdot {
+  background: var(--color-rule);
+}
+.nlx-home .loop-icon {
+  background: var(--color-paper-2);
+  border-color: var(--color-rule);
+}
+.nlx-home .loop-step:hover {
+  background: rgba(11, 107, 98, 0.06);
+}
+.nlx-home .af-icon {
+  background: var(--color-paper-2);
+  border-color: var(--color-rule);
+}
+
+/* --- the closing band: the site's dark CTA, texture and all -- */
+.nlx-home .section-cta-strip {
+  background-color: var(--color-ink);
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 28px 28px;
+  border-top: 0;
+  border-bottom: 0;
+}
+.nlx-home .cta-strip {
+  padding: 56px 32px;
+  align-items: flex-end;
+}
+.nlx-home .cta-strip-heading {
+  color: #fff;
+  max-width: 20ch;
+  line-height: 1.08;
+}
+.nlx-home .cta-strip-note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ============================================================
+   DEVICE PROPORTIONS
+   In the mock the laptop (460px) and the tablet (400px) were
+   near enough the same width, with identical bezel weight, so
+   the row read as two iPads. Three devices now differ on both
+   axes that matter: overall width, and bezel thickness — plus
+   the laptop actually reads as a laptop, with a base wider and
+   heavier than its lid.
+   ============================================================ */
+
+.nlx-home .anywhere-devices {
+  max-width: 1200px;
+  padding: 0 24px;
+  gap: 22px;
+}
+
+/* phone — thickest bezel relative to size, smallest of the three */
+.nlx-home .dv-phone {
+  width: 168px;
+  border-radius: 26px;
+  padding: 7px;
+}
+.nlx-home .dv-phone-screen {
+  border-radius: 20px;
+  padding: 24px 13px 16px;
+}
+.nlx-home .dv-phone-island {
+  width: 40px;
+  height: 11px;
+}
+
+/* laptop — widest by a clear margin, and the base sells it */
+.nlx-home .dv-laptop {
+  width: 600px;
+}
+.nlx-home .dv-laptop-top {
+  border-radius: 12px 12px 0 0;
+  padding: 11px 11px 0;
+}
+.nlx-home .dv-laptop-screen {
+  border-radius: 4px 4px 0 0;
+  padding: 16px 18px 18px;
+}
+.nlx-home .dv-laptop-hinge {
+  height: 5px;
+  margin: 0 3px;
+}
+.nlx-home .dv-laptop-deck {
+  height: 22px;
+  margin: 0 -22px;
+  clip-path: polygon(3.5% 0, 96.5% 0, 100% 100%, 0 100%);
+  border-radius: 0 0 6px 6px;
+}
+.nlx-home .dv-laptop-deck::after {
+  width: 108px;
+  height: 6px;
+}
+
+/* tablet — two thirds of the laptop, and the thinnest bezel of
+   the three, which is what actually distinguishes a slab on sight */
+.nlx-home .dv-tablet {
+  width: 330px;
+}
+.nlx-home .dv-tablet-frame {
+  border-radius: 16px;
+  padding: 9px;
+}
+.nlx-home .dv-tablet-screen {
+  border-radius: 7px;
+  padding: 12px 13px;
+}
+.nlx-home .dv-q-head {
+  font-size: 9px;
+  gap: 8px;
+}
+.nlx-home .dv-q-body {
+  gap: 10px;
+}
+
+/* ============================================================
+   CLOSING BAND
+   Section padding and strip padding were stacking to ~290px of
+   air around two lines of text. The band owns its own rhythm.
+   ============================================================ */
+
+.nlx-home .section-cta-strip {
+  padding: 0;
+}
+.nlx-home .cta-strip {
+  padding: 44px 32px;
+  gap: 20px 40px;
+  align-items: center;
+}
+.nlx-home .cta-strip-heading {
+  max-width: 22ch;
+}
+
+/* ============================================================
+   HERO
+   The page used to open on "prepare from anywhere" — a feature,
+   not an argument. The opener now carries the thesis, and the
+   photograph is a cut-out multiplied straight onto the paper:
+   no card, no shadow, no radius, so the desk she is working at
+   and the rule closing the section are the same line.
+   ============================================================ */
+
+.nlx-home .hero {
+  padding: clamp(36px, 5vw, 64px) 0 0;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-rule);
+}
+.nlx-home .hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
+  gap: clamp(20px, 4vw, 48px);
+  align-items: end;
+}
+.nlx-home .hero-copy {
+  padding-bottom: clamp(40px, 5vw, 68px);
+}
+.nlx-home .hero-heading {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5.4vw, 57px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  margin-bottom: 18px;
+  max-width: 13ch;
+}
+.nlx-home .hero-sub {
+  font-family: var(--font-body);
+  font-size: clamp(15.5px, 1.5vw, 17.5px);
+  line-height: 1.62;
+  color: var(--color-ink-2);
+  max-width: 46ch;
+  margin-bottom: 26px;
+}
+.nlx-home .hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 32px;
+}
+.nlx-home .hero-note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+/* the fact rail: the three claims the site can be held to, set
+   as a ruled list because that is how the rest of the site
+   presents anything checkable */
+.nlx-home .hero-stats {
+  border-top: 1px solid var(--color-rule);
+  max-width: 30rem;
+}
+.nlx-home .hero-stats > div {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+.nlx-home .hero-stats dt {
+  flex: none;
+  width: 5.25rem;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+.nlx-home .hero-stats dd {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-ink-2);
+}
+
+.nlx-home .hero-photo {
+  align-self: end;
+}
+.nlx-home .hero-photo img {
+  width: 100%;
+  height: auto;
+  /* the shot is on white; multiply dissolves that into the paper
+     so she is standing on the page rather than in a box on it */
+  mix-blend-mode: multiply;
+}
+
+/* ---- the anywhere band's photo is environmental, not a cut-out,
+        so it keeps a frame — just the site's frame, not the mock's */
+.nlx-home .anywhere-photo {
+  flex: 0 1 380px;
+  max-width: 380px;
+}
+.nlx-home .anywhere-photo img {
+  border-radius: 4px;
+  border: 1px solid var(--color-rule);
+  box-shadow: none;
+  aspect-ratio: 76 / 81;
+  object-fit: cover;
+}
+.nlx-home .anywhere-top {
+  align-items: center;
+}
+
+/* ============================================================
+   FILLING THE TWO COLUMNS
+   Both photographs were shorter than the text beside them and
+   bottom-aligned, which left a large void at the top of each
+   image column. Both now stretch to the row and cover-crop,
+   so the columns end on the same line.
+   ============================================================ */
+
+.nlx-home .hero-grid {
+  align-items: stretch;
+}
+.nlx-home .hero-copy {
+  align-self: end;
+}
+.nlx-home .hero-photo {
+  align-self: stretch;
+  display: flex;
+  min-height: 420px;
+}
+.nlx-home .hero-photo img {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  object-fit: cover;
+  /* held to the bottom-right: keeps the desk on the section rule and
+     the NCLEX titles in frame when the column crops in */
+  object-position: 58% 100%;
+  mix-blend-mode: multiply;
+}
+
+/* --- the anywhere band -------------------------------------- */
+.nlx-home .anywhere-top {
+  align-items: stretch;
+  gap: clamp(28px, 4vw, 56px);
+}
+.nlx-home .anywhere-copy {
+  display: flex;
+  flex-direction: column;
+}
+.nlx-home .anywhere-sub {
+  margin-bottom: 28px;
+  max-width: 42ch;
+}
+.nlx-home .anywhere-photo {
+  display: flex;
+  flex: 0 1 400px;
+  max-width: 400px;
+  align-self: stretch;
+}
+.nlx-home .anywhere-photo img {
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  aspect-ratio: auto;
+  object-fit: cover;
+  object-position: 50% 22%;
+  border-radius: 4px;
+  border: 1px solid var(--color-rule);
+}
+
+/* the promises become a ruled list — same device as the hero's fact
+   rail, so the two photo-and-list blocks rhyme across the page */
+.nlx-home .anywhere-features-list {
+  display: block;
+  margin-top: auto;
+  max-width: 30rem;
+  border-top: 1px solid var(--color-rule);
+}
+.nlx-home .anywhere-features-list .af-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  column-gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+.nlx-home .anywhere-features-list .af-icon {
+  grid-row: span 2;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 0;
+  align-self: center;
+}
+.nlx-home .anywhere-features-list .af-icon svg {
+  width: 17px;
+  height: 17px;
+}
+.nlx-home .anywhere-features-list .af-title {
+  font-size: 14px;
+  margin-bottom: 1px;
+}
+.nlx-home .anywhere-features-list .af-desc {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* --- one yellow per screen ---------------------------------- */
+/* the hero already spends the highlighter on "why", so its button
+   is the site's teal primary; the yellow one belongs on the dark
+   band where it is the only bright thing */
+.nlx-home .btn-pill {
+  background: var(--color-teal);
+  color: #fff;
+}
+.nlx-home .btn-pill:hover {
+  background: var(--color-teal-dark);
+}
+.nlx-home .section-cta-strip .btn-pill {
+  background: var(--color-highlight);
+  color: var(--color-ink);
+}
+.nlx-home .section-cta-strip .btn-pill:hover {
+  background: #efe04a;
+}
+
+/* ============================================================
+   PHOTOGRAPHY
+   The first pass used a white-background stock cut-out, which
+   multiply could dissolve into the paper. These frames are
+   environmental, so they get the opposite treatment: they run
+   to the edge of the viewport and carry their own light.
+   ============================================================ */
+
+/* --- hero: the photograph bleeds off the right of the screen -- */
+.nlx-home .hero {
+  padding: 0;
+}
+.nlx-home .hero-grid {
+  max-width: none;
+  padding: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: stretch;
+}
+.nlx-home .hero-copy {
+  align-self: center;
+  padding-top: clamp(40px, 5vw, 72px);
+  padding-bottom: clamp(40px, 5vw, 72px);
+  /* holds the copy's left edge on the same line as every other
+     section, while the photo column runs past the measure */
+  padding-left: max(24px, calc((100vw - 1120px) / 2 + 32px));
+  padding-right: 8px;
+}
+.nlx-home .hero-photo {
+  align-self: stretch;
+  display: flex;
+  min-height: 480px;
+}
+.nlx-home .hero-photo img {
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  object-fit: cover;
+  /* biased left so the study plan on the whiteboard survives the crop */
+  object-position: 42% 50%;
+  mix-blend-mode: normal;
+  border-radius: 0;
+}
+
+/* --- anywhere: three places instead of one sofa -------------- */
+.nlx-home .anywhere-places {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 0 1 360px;
+  max-width: 360px;
+  align-self: center;
+}
+.nlx-home .anywhere-places figure {
+  margin: 0;
+}
+.nlx-home .anywhere-places img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  border: 1px solid var(--color-rule);
+}
+.nlx-home .anywhere-places figcaption {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding-top: 7px;
+}
+
+/* --- closing band: the late-night desk ----------------------- */
+.nlx-home .section-cta-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.52fr);
+  align-items: stretch;
+}
+.nlx-home .cta-strip {
+  max-width: none;
+  padding: clamp(44px, 5vw, 64px) 40px clamp(44px, 5vw, 64px)
+    max(24px, calc((100vw - 1120px) / 2 + 32px));
+  align-items: flex-start;
+  align-content: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+.nlx-home .cta-photo {
+  position: relative;
+  display: flex;
+  min-height: 260px;
+  overflow: hidden;
+}
+.nlx-home .cta-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 35%;
+}
+/* the photograph fades into the band rather than butting against it */
+.nlx-home .cta-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--color-ink) 0%, rgba(20, 22, 26, 0) 42%);
+}
+
+/* ============================================================
+   RESPONSIVE
+   The original mock was fixed-width desktop only. Everything
+   below is new: fluid type, stacking grids, and controlled
+   down-scaling for the pixel-sized device / card mock-ups.
+   ============================================================ */
+
+/* --- fluid type & rhythm, all viewports -------------------- */
+.nlx-home section {
+  padding: clamp(48px, 7vw, 88px) 0;
+}
+.nlx-home .section-why {
+  padding: clamp(40px, 6vw, 60px) 0;
+}
+.nlx-home .section-anywhere {
+  padding: clamp(48px, 7vw, 90px) 0 clamp(44px, 6vw, 80px);
+}
+.nlx-home .loop-fold {
+  padding: clamp(48px, 7vw, 88px) 0 clamp(44px, 6vw, 64px);
+}
+.nlx-home .anywhere-heading {
+  font-size: clamp(28px, 4.6vw, 42px);
+}
+.nlx-home .anywhere-sub {
+  font-size: clamp(15px, 1.6vw, 17px);
+}
+.nlx-home .section-head h2 {
+  font-size: clamp(24px, 3.9vw, 36px);
+}
+.nlx-home .section-head p {
+  font-size: clamp(14.5px, 1.7vw, 16px);
+}
+.nlx-home .loop-fold-head h2 {
+  font-size: clamp(23px, 3.7vw, 34px);
+}
+.nlx-home .readiness-number {
+  font-size: clamp(52px, 8vw, 76px);
+}
+.nlx-home .cta-strip-heading {
+  font-size: clamp(21px, 3vw, 26px);
+}
+
+/* the mock-ups are fixed pixel art — never let them push the page wide */
+.nlx-home .anywhere-devices,
+.nlx-home .qtype-stack-wrap,
+.nlx-home .cycle-wrap {
+  max-width: 100%;
+}
+.nlx-home .cycle-stack {
+  width: min(420px, 100%);
+}
+
+/* ---------------------------------------------- <= 1180px */
+@media (max-width: 1180px) {
+  .nlx-home .cycle-wrap {
+    zoom: 1.25;
+  }
+  .nlx-home .anywhere-devices {
+    gap: 20px;
+  }
+}
+
+/* ---------------------------------------------- <= 1200px */
+@media (max-width: 1200px) {
+  .nlx-home .wrap {
+    padding: 0 24px;
+  }
+  .nlx-home .qtype-section-head {
+    white-space: normal;
+  }
+  /* three devices no longer fit side by side: laptop on top,
+     phone + tablet beneath it */
+  .nlx-home .anywhere-devices {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 28px;
+  }
+  .nlx-home .anywhere-devices {
+    padding: 0 24px;
+  }
+  .nlx-home .dv-laptop {
+    order: -1;
+    width: min(600px, 100%);
+  }
+  .nlx-home .dv-tablet {
+    width: min(360px, 100%);
+  }
+  .nlx-home .qtype-stack {
+    width: 100%;
+    max-width: 700px;
+  }
+}
+
+/* ---------------------------------------------- <= 900px  */
+@media (max-width: 900px) {
+  .nlx-home .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .nlx-home .hero-copy {
+    padding-bottom: 28px;
+  }
+  .nlx-home .hero-heading {
+    max-width: 16ch;
+  }
+  .nlx-home .hero-copy {
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 32px;
+  }
+  .nlx-home .hero-photo {
+    width: 100%;
+    min-height: 0;
+  }
+  .nlx-home .hero-photo img {
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 3 / 2;
+  }
+  .nlx-home .anywhere-places {
+    flex-direction: row;
+    flex: 1 1 auto;
+    max-width: 100%;
+    gap: 12px;
+  }
+  .nlx-home .anywhere-places figure {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .nlx-home .anywhere-features-list {
+    margin-top: 24px;
+    max-width: 100%;
+  }
+  .nlx-home .anywhere-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+    margin-bottom: 44px;
+  }
+  .nlx-home .anywhere-copy,
+  .nlx-home .anywhere-photo {
+    flex: 1 1 auto;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .nlx-home .loop-body {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    justify-items: center;
+  }
+  /* the loop turns from a vertical rail into a scrollable chip row */
+  .nlx-home .loop {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+  .nlx-home .loop::-webkit-scrollbar {
+    display: none;
+  }
+  .nlx-home .loop-step {
+    flex-direction: column;
+    gap: 8px;
+    flex: 0 0 auto;
+    text-align: center;
+    padding: 6px 8px;
+    margin: 0;
+  }
+  .nlx-home .loop-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+  }
+  .nlx-home .loop-label {
+    font-size: 12.5px;
+  }
+  .nlx-home .cycle-wrap {
+    zoom: 1;
+    width: 100%;
+  }
+
+  .nlx-home .readiness-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .nlx-home .readiness-card {
+    padding: 32px 26px;
+  }
+  .nlx-home .readiness-areas {
+    padding: 28px 26px;
+  }
+  .nlx-home .why-panel {
+    padding: 22px 20px;
+  }
+}
+
+/* ---------------------------------------------- <= 760px  */
+@media (max-width: 760px) {
+  .nlx-home .why-compare {
+    grid-template-columns: 1fr;
+  }
+  /* the question-type deck: keep the aspect sane and give the
+     taller layouts (bowtie, split blanks) room to breathe */
+  .nlx-home .qtype-stack {
+    height: 500px;
+  }
+  .nlx-home .qs-body {
+    padding: 20px 18px;
+    gap: 12px;
+  }
+  .nlx-home .qs-split {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .nlx-home .qs-split-col:first-child {
+    border-right: 0;
+    border-bottom: 1px dashed #e3dfd4;
+    padding-right: 0;
+    padding-bottom: 12px;
+  }
+  .nlx-home .qs-grid-row {
+    grid-template-columns: 1fr 66px 66px;
+  }
+  .nlx-home .qs-grid-cell {
+    padding: 10px;
+    font-size: 12px;
+  }
+  .nlx-home .qs-bt-box {
+    width: 120px;
+    font-size: 8.5px;
+    padding: 7px 8px;
+  }
+  .nlx-home .qs-bt-center {
+    width: 130px;
+    padding: 10px;
+    font-size: 9.5px;
+  }
+  .nlx-home .qs-bt-chip {
+    font-size: 11px;
+    padding: 5px 7px;
+  }
+  .nlx-home .qs-bt-columns {
+    gap: 8px;
+  }
+  .nlx-home .qs-opt-row {
+    padding: 11px 12px;
+    gap: 10px;
+  }
+  .nlx-home .qs-opt-text {
+    font-size: 12.5px;
+  }
+  .nlx-home .qs-stem {
+    font-size: 13.5px;
+  }
+
+  /* tablet mock: explanation panel drops under the question */
+  .nlx-home .dv-q-body {
+    grid-template-columns: 1fr;
+  }
+  .nlx-home .dv-q-head {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+}
+
+/* ---------------------------------------------- <= 560px  */
+@media (max-width: 560px) {
+  .nlx-home .wrap {
+    padding: 0 18px;
+  }
+  .nlx-home .anywhere-badge {
+    font-size: 11px;
+    padding: 8px 14px;
+  }
+  .nlx-home .readiness-score-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nlx-home .area-row {
+    grid-template-columns: 1fr auto;
+    row-gap: 6px;
+  }
+  .nlx-home .area-name {
+    grid-column: 1 / -1;
+    font-size: 13.5px;
+  }
+  .nlx-home .area-pct {
+    text-align: left;
+    justify-self: start;
+  }
+  .nlx-home .why-question {
+    font-size: 13.5px;
+  }
+  .nlx-home .why-card {
+    padding: 12px 13px;
+  }
+
+  /* card decks shrink with the viewport instead of clipping */
+  .nlx-home .cycle-stack {
+    height: 300px;
+  }
+  .nlx-home .qtype-stack {
+    height: 470px;
+  }
+  .nlx-home .qtype-deck-3 {
+    transform: translate(18px, -18px) scale(0.92);
+  }
+  .nlx-home .qtype-deck-2 {
+    transform: translate(11px, -11px) scale(0.955);
+  }
+  .nlx-home .qtype-deck-1 {
+    transform: translate(5px, -5px) scale(0.98);
+  }
+  .nlx-home .qs-topbar {
+    padding: 13px 15px;
+    gap: 8px;
+  }
+  .nlx-home .qs-topbar-title {
+    font-size: 13px;
+  }
+  .nlx-home .qs-topbar-counter {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+  .nlx-home .qs-footer {
+    padding: 12px 15px;
+  }
+  .nlx-home .qs-opts {
+    gap: 9px;
+  }
+  .nlx-home .qs-bowtie {
+    height: 120px;
+  }
+  .nlx-home .qs-bt-box {
+    width: 96px;
+    font-size: 7.5px;
+  }
+  .nlx-home .qs-bt-center {
+    width: 108px;
+    font-size: 8.5px;
+    padding: 8px;
+  }
+  .nlx-home .qs-linechart-labels {
+    padding: 2px 20px 0;
+  }
+
+  .nlx-home .section-cta-strip {
+    grid-template-columns: 1fr;
+  }
+  .nlx-home .cta-strip {
+    padding: 32px 18px;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  .nlx-home .cta-photo {
+    min-height: 200px;
+    max-height: 240px;
+  }
+  .nlx-home .cta-photo::after {
+    background: linear-gradient(0deg, rgba(20, 22, 26, 0) 40%, var(--color-ink) 100%);
+  }
+  .nlx-home .cta-strip-action {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .nlx-home .btn-pill {
+    padding: 14px 26px;
+    font-size: 14.5px;
+  }
+  .nlx-home .qtype-stack-dots,
+  .nlx-home .cycle-dots {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 6px;
+  }
+}
+
+/* the auto-play carousels stop themselves under reduced-motion;
+   this kills the cross-fade for the same audience */
+@media (prefers-reduced-motion: reduce) {
+  .nlx-home .cycle-body,
+  .nlx-home .qs-body {
+    transition: none;
+  }
+  .nlx-home .cycle-body.fade,
+  .nlx-home .qs-body.fade {
+    opacity: 1;
+  }
+}
