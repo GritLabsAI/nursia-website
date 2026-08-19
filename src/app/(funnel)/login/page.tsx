@@ -19,7 +19,7 @@ export default function LoginPage() {
           href="/signup"
           className="ml-auto text-[0.9375rem] font-medium text-ink-2 transition-colors hover:text-teal"
         >
-          Sign up free
+          Start free
         </Link>
       </header>
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
         <p className="mt-6 text-center text-[0.875rem] text-ink-2">
           No account yet?{" "}
           <Link href="/signup" className="text-teal underline underline-offset-4">
-            Sign up free
+            Start free
           </Link>
         </p>
       </div>

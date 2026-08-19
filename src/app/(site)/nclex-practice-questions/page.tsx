@@ -109,7 +109,7 @@ export default function HubPage() {
                     eyebrow: "End of the free set",
                     headline: "Keep going",
                     body: "A free account adds 50 more questions and tells you which category is costing you the most marks. Email and password, no card.",
-                    cta: { label: "Sign up free →", href: "/signup" },
+                    cta: { label: "Start free →", href: "/signup" },
                     exits: [
                       { label: "See pricing", href: "/pricing" },
                       { label: "Practise a single topic", href: "#by-topic" },
@@ -271,7 +271,7 @@ export default function HubPage() {
                   more questions with a free account. No card.
                 </p>
                 <Link href="/signup" className="btn btn-primary mt-4 w-full !py-2.5 !text-sm">
-                  Sign up free →
+                  Start free →
                 </Link>
               </div>
             </div>

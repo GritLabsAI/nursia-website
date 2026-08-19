@@ -5,7 +5,7 @@ import { Wordmark } from "@/components/Wordmark";
 import { SITE } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Sign up free — 50 NCLEX questions, no card",
+  title: "Start free — 50 NCLEX questions, no card",
   description:
     "Make a free Nursia account with an email and a password. 50 NCLEX questions, full rationales, and your weak topics. No card, ever.",
   alternates: { canonical: "/signup" },

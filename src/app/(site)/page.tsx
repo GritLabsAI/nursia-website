@@ -59,7 +59,7 @@ export default function HomePage() {
                 eyebrow: "That is the whole product",
                 headline: "Keep going",
                 body: "A free account adds 50 more questions, every rationale, and a ranked list of the topics costing you marks. Email and password — no card, ever.",
-                cta: { label: "Sign up free →", href: "/signup" },
+                cta: { label: "Start free →", href: "/signup" },
                 exits: [
                   { label: "10 more questions, still no account", href: "/nclex-practice-questions" },
                   { label: "See pricing", href: "/pricing" },
@@ -176,7 +176,7 @@ export default function HomePage() {
               ))}
             </ul>
             <Link href="/signup" className="btn btn-ghost mt-7 w-full">
-              Sign up free
+              Start free
             </Link>
           </div>
           <div className="rounded-sm border-2 border-ink bg-white p-7">
@@ -205,7 +205,7 @@ export default function HomePage() {
               ))}
             </ul>
             <Link href="/signup" className="btn btn-primary mt-7 w-full">
-              Sign up free →
+              Start free →
             </Link>
             <p className="mt-3 text-center font-mono text-[11px] text-muted">
               Start on the free tier — you are never asked for a card to begin

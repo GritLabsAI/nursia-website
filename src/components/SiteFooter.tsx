@@ -95,7 +95,7 @@ export function SiteFooter() {
             <p className="text-[0.875rem] text-white/55">No card. Cancel anytime.</p>
           </div>
           <Link href="/signup" className="btn btn-invert sm:ml-auto">
-            Sign up free →
+            Start free →
           </Link>
         </div>
 

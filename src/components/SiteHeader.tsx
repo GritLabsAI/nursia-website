@@ -10,7 +10,7 @@ const NAV = [
 ];
 
 /**
- * Five links, "Log in" as plain text, "Sign up free" as the only solid button.
+ * Five links, "Log in" as plain text, "Start free" as the only solid button.
  * The wording of that button never changes anywhere on the site.
  */
 export function SiteHeader() {
@@ -46,7 +46,7 @@ export function SiteHeader() {
             href="/signup"
             className="btn btn-primary !px-3.5 !py-2 !text-[0.8125rem] sm:!px-[1.375rem] sm:!py-2.5 sm:!text-sm"
           >
-            Sign up free
+            Start free
           </Link>
         </div>
       </div>

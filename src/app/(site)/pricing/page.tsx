@@ -71,7 +71,7 @@ export default function PricingPage() {
                 ))}
               </ul>
               <Link href="/signup" className="btn btn-ghost mt-8 w-full">
-                Sign up free
+                Start free
               </Link>
             </div>
 
@@ -130,7 +130,7 @@ export default function PricingPage() {
       </Section>
 
       <CtaBand
-        heading="Sign up free — 10 questions to start."
+        heading="Start free — 10 questions, no card."
         sub="Free tier first, price later. You will know whether the questions are worth paying for before we ask."
       />
     </>

@@ -38,7 +38,7 @@ export function StickyCta() {
           tabIndex={shown ? 0 : -1}
           className="btn btn-primary ml-auto !py-2.5 !text-sm"
         >
-          Sign up free →
+          Start free →
         </Link>
       </div>
     </div>

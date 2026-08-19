@@ -39,7 +39,7 @@ channel.
 Every page uses the same five slots and the same three words, and every CTA lands on
 `/signup` — never on pricing.
 
-1. Nav — `Sign up free`, persistent, top right
+1. Nav — `Start free`, persistent, top right
 2. Above the fold — `PrimaryCta`, plus "no card needed"
 3. Inline mid-content — `InlineCta`, phrased as a question, long pages only
 4. End of content — `CtaBand`, full-width dark band

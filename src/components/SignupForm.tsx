@@ -29,7 +29,7 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
     router.push("/try");
   }
 
-  const cta = mode === "signup" ? "Sign up free →" : "Log in →";
+  const cta = mode === "signup" ? "Start free →" : "Log in →";
 
   return (
     <div className="rounded-sm border border-rule bg-white p-7 sm:p-8">

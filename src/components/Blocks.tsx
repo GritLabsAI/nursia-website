@@ -72,7 +72,7 @@ export function PrimaryCta({ className = "" }: { className?: string }) {
   return (
     <div className={`flex flex-wrap items-center gap-x-5 gap-y-3 ${className}`}>
       <Link href="/signup" className="btn btn-primary">
-        Sign up free →
+        Start free →
       </Link>
       <span className="font-mono text-[11px] text-muted">No card needed</span>
     </div>
@@ -116,7 +116,7 @@ export function CtaBand({
         </div>
         <div className="md:ml-auto md:shrink-0">
           <Link href="/signup" className="btn btn-invert">
-            Sign up free →
+            Start free →
           </Link>
           <p className="mt-3 font-mono text-[11px] text-white/45">
             Cancel anytime · 14-day refund

@@ -42,7 +42,7 @@ export function TryClient() {
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-4">
             <Link href="/signup" className="btn btn-primary">
-              Sign up free →
+              Start free →
             </Link>
             <Link href="/nclex-practice-questions" className="btn btn-ghost">
               10 questions with no account

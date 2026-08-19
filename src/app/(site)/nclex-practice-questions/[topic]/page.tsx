@@ -101,7 +101,7 @@ export default async function TopicPage({ params }: Params) {
                   eyebrow: "End of the free set",
                   headline: "Keep going",
                   body: `A free account opens 50 questions across every category, including more ${t.name.toLowerCase()}. No card.`,
-                  cta: { label: "Sign up free →", href: "/signup" },
+                  cta: { label: "Start free →", href: "/signup" },
                   exits: [
                     { label: "All 8 topics", href: "/nclex-practice-questions" },
                     { label: "See pricing", href: "/pricing" },
