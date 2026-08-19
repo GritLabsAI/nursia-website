@@ -1,26 +1,344 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   Nursia — "Flowsheet"
+   Clinical paper ground, ink type, scrub-teal actions, and one
+   highlighter stroke reserved for the single thing that matters
+   on a page: the correct answer.
+   ============================================================ */
+
+@theme {
+  --color-paper: #fbfaf6;
+  --color-paper-2: #f4f2eb;
+  --color-ink: #14161a;
+  --color-ink-2: #3a3d44;
+  --color-muted: #6e6b63;
+  --color-rule: #e3dfd4;
+  --color-teal: #0b6b62;
+  --color-teal-dark: #084f49;
+  --color-highlight: #f5e85c;
+  --color-correct: #157f52;
+  --color-wrong: #b23a2e;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-ui: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-source-serif), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-ui);
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--color-highlight);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-teal);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    line-height: 1.06;
+    text-wrap: balance;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* --- structural devices ------------------------------------ */
+
+  /* mono eyebrow: only ever labels a section or carries data */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* reading measure + rhythm for long-form guide bodies */
+  .prose-ns {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.72;
+    color: var(--color-ink-2);
+  }
+  .prose-ns p {
+    margin: 0 0 1.15em;
+  }
+  .prose-ns strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .prose-ns a {
+    color: var(--color-teal);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .prose-ns a:hover {
+    color: var(--color-teal-dark);
+  }
+  .prose-ns h2 {
+    font-size: 1.5rem;
+    margin: 2.25em 0 0.6em;
+    color: var(--color-ink);
+  }
+  .prose-ns h3 {
+    font-size: 1.125rem;
+    margin: 1.8em 0 0.5em;
+    color: var(--color-ink);
+  }
+  .prose-ns ul {
+    margin: 0 0 1.15em;
+    padding-left: 1.1em;
+    list-style: none;
+  }
+  .prose-ns li {
+    position: relative;
+    margin: 0 0 0.5em;
+  }
+  .prose-ns li::before {
+    content: "";
+    position: absolute;
+    left: -1.1em;
+    top: 0.72em;
+    width: 0.5em;
+    height: 1px;
+    background: var(--color-teal);
+  }
+
+  /* --- the highlighter stroke: the one flourish on the site --- */
+  .mark {
+    display: inline;
+    background-image: linear-gradient(
+      var(--color-highlight),
+      var(--color-highlight)
+    );
+    background-repeat: no-repeat;
+    background-position: 0 88%;
+    background-size: 100% 0.42em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .mark-draw {
+    background-size: 0% 0.42em;
+    animation: mark-swipe 620ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  }
+  @keyframes mark-swipe {
+    to {
+      background-size: 100% 0.42em;
+    }
+  }
+
+  /* --- buttons ------------------------------------------------ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    letter-spacing: -0.01em;
+    padding: 0.8125rem 1.375rem;
+    border-radius: 3px;
+    border: 1px solid transparent;
+    transition:
+      background-color 0.16s ease,
+      color 0.16s ease,
+      border-color 0.16s ease;
+    cursor: pointer;
+    min-height: 44px;
+  }
+  .btn-primary {
+    background: var(--color-teal);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: var(--color-teal-dark);
+  }
+  .btn-invert {
+    background: var(--color-highlight);
+    color: var(--color-ink);
+  }
+  .btn-invert:hover {
+    background: #efe04a;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+  .btn-ghost:hover {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  /* --- the question card: the signature object ---------------- */
+  .qcard {
+    background: #fff;
+    border: 1px solid var(--color-rule);
+    border-radius: 4px;
+    box-shadow:
+      0 1px 0 rgba(20, 22, 26, 0.04),
+      0 10px 24px -18px rgba(20, 22, 26, 0.35);
+  }
+  .qopt {
+    display: flex;
+    gap: 0.875rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--color-rule);
+    border-radius: 3px;
+    background: #fff;
+    min-height: 44px;
+    align-items: flex-start;
+    transition:
+      border-color 0.14s ease,
+      background-color 0.14s ease;
+    cursor: pointer;
+  }
+  .qopt:hover:not(:disabled) {
+    border-color: var(--color-ink-2);
+    background: var(--color-paper);
+  }
+  .qopt:disabled {
+    cursor: default;
+  }
+  .qkey {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--color-rule);
+    border-radius: 2px;
+    color: var(--color-muted);
+    margin-top: 0.1rem;
+  }
+  .qopt[data-state="correct"] {
+    border-color: var(--color-correct);
+    background: #f3faf5;
+  }
+  .qopt[data-state="correct"] .qkey {
+    border-color: var(--color-correct);
+    color: var(--color-correct);
+  }
+  .qopt[data-state="wrong"] {
+    border-color: var(--color-wrong);
+    background: #fdf5f3;
+  }
+  .qopt[data-state="wrong"] .qkey {
+    border-color: var(--color-wrong);
+    color: var(--color-wrong);
+  }
+  .qopt[data-state="picked"] {
+    border-color: var(--color-ink);
+    background: var(--color-paper-2);
+  }
+  .qopt[data-state="picked"] .qkey {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .reveal {
+    animation: reveal 380ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* --- coverage map / index cell ------------------------------ */
+  .cell {
+    display: block;
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid var(--color-rule);
+    border-radius: 3px;
+    transition: border-color 0.14s ease;
+  }
+  a.cell:hover {
+    border-color: var(--color-ink);
+  }
+
+  /* --- accordion (static HTML, crawlable) --------------------- */
+  .acc {
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .acc > summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 1.0625rem 0;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: -0.012em;
+  }
+  .acc > summary::-webkit-details-marker {
+    display: none;
+  }
+  .acc > summary::after {
+    content: "+";
+    font-family: var(--font-mono);
+    font-weight: 400;
+    color: var(--color-muted);
+    flex: none;
+  }
+  .acc[open] > summary::after {
+    content: "\2212";
+  }
+  .acc > summary:hover {
+    color: var(--color-teal);
+  }
+}
+
+/* faint chart-paper grid, for dark bands only */
+.flowsheet {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
