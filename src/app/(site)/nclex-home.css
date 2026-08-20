@@ -2305,19 +2305,43 @@
   .nlx-home .hero-photo::after {
     background: linear-gradient(0deg, rgba(20, 22, 26, 0.45) 0%, rgba(20, 22, 26, 0) 45%);
   }
-    .nlx-home .anywhere-places {
+  /* Three-across put each photograph at 110px — too small to read as a
+     place. A snapping rail gives each one real width and borrows the
+     idiom the loop row already uses on this breakpoint. */
+  .nlx-home .anywhere-places {
     flex-direction: row;
     flex: 1 1 auto;
     max-width: 100%;
     gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    /* bleed to the screen edge so the rail reads as scrollable */
+    margin-inline: -18px;
+    padding-inline: 18px;
+  }
+  .nlx-home .anywhere-places::-webkit-scrollbar {
+    display: none;
   }
   .nlx-home .anywhere-places figure {
-    flex: 1 1 0;
+    flex: 0 0 62%;
     min-width: 0;
+    scroll-snap-align: start;
+  }
+  .nlx-home .anywhere-places figcaption {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .nlx-home .anywhere-features-list {
-    margin-top: 24px;
+    margin-top: 8px;
     max-width: 100%;
+  }
+  .nlx-home .anywhere-sub {
+    margin-bottom: 20px;
   }
   .nlx-home .anywhere-top {
     flex-direction: column;

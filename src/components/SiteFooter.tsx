@@ -42,8 +42,10 @@ export function SiteFooter() {
   return (
     <footer className="flowsheet border-t border-white/12 bg-ink text-white">
       <div className="mx-auto max-w-[1140px] px-5 py-16 sm:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div className="max-w-xs">
+        {/* Three stacked link columns ran ~1500px on a phone. Two-up from the
+            smallest screen halves that; the brand block keeps the full width. */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="col-span-2 max-w-xs lg:col-span-1">
             <Wordmark tone="paper" />
             <p className="mt-3 text-[0.875rem] leading-relaxed text-white/60">{SITE.tagline}</p>
             <div className="mt-5 flex gap-4">
