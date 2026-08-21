@@ -12,7 +12,7 @@ import {
 } from "@/components/Blocks";
 import { QuestionSet } from "@/components/QuestionSet";
 import { StickyCta } from "@/components/StickyCta";
-import { GUIDES, QUESTIONS, guideBySlug, topicBySlug } from "@/lib/content";
+import { GUIDES, QUESTIONS, guideBySlug, playableCount, topicBySlug } from "@/lib/content";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -45,6 +45,9 @@ export default async function GuidePage({ params }: Params) {
     { label: g.title },
   ];
   const topic = topicBySlug(g.topic)!;
+  /* Subject topics carry no hand-written set — they draw on the bank instead. */
+  const sample = topic.questions?.[0] ? QUESTIONS[topic.questions[0]] : null;
+  const topicCount = topic.count ?? playableCount(topic.slug);
   const next = g.readNext.map((s) => guideBySlug(s)!).filter(Boolean);
 
   const articleSchema = {
@@ -122,12 +125,14 @@ export default async function GuidePage({ params }: Params) {
 
             {/* one question, in the article, because the argument of this whole
                 site is that a question beats a paragraph */}
-            <div className="mt-14 border-t border-rule pt-8">
-              <p className="eyebrow">One question from the {topic.name.toLowerCase()} set</p>
-              <div className="mt-5">
-                <QuestionSet questions={[QUESTIONS[topic.questions[0]]]} />
+            {sample && (
+              <div className="mt-14 border-t border-rule pt-8">
+                <p className="eyebrow">One question from the {topic.name.toLowerCase()} set</p>
+                <div className="mt-5">
+                  <QuestionSet questions={[sample]} />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="mt-14 border-t border-rule pt-5">
               <p className="eyebrow">Read next</p>
@@ -154,7 +159,7 @@ export default async function GuidePage({ params }: Params) {
               <div className="mt-8 border-t border-rule pt-4">
                 <p className="eyebrow">Practise this</p>
                 <p className="mt-3 text-[0.9375rem] leading-snug text-ink-2">
-                  {topic.count} {topic.name.toLowerCase()} questions, five of them free.
+                  {topicCount} {topic.name.toLowerCase()} questions, five of them free.
                 </p>
                 <Link
                   href={`/nclex-practice-questions/${topic.slug}`}

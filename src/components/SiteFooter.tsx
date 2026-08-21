@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GUIDES, SITE, TOPICS } from "@/lib/content";
+import { GUIDES, SITE, topicsIn } from "@/lib/content";
 import { Wordmark } from "./Wordmark";
 
 const LEGAL = [
@@ -62,11 +62,12 @@ export function SiteFooter() {
           </div>
 
           <Col title="Practice by topic">
-            {TOPICS.map((t) => (
+            {[...topicsIn("category"), ...topicsIn("format")].map((t) => (
               <FootLink key={t.slug} href={`/nclex-practice-questions/${t.slug}`}>
                 {t.name}
               </FootLink>
             ))}
+            <FootLink href="/practice">Every topic →</FootLink>
           </Col>
 
           <Col title="Guides">

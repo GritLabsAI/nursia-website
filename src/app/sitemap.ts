@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     at("/", 1),
     at("/nclex-practice-questions", 0.9),
+    at("/practice", 0.9),
     ...TOPICS.map((t) => at(`/nclex-practice-questions/${t.slug}`, 0.8)),
     at("/guides", 0.7),
     ...GUIDES.map((g) => at(`/guides/${g.slug}`, 0.6)),

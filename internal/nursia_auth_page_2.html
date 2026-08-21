@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nursia — Sign up</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1a1a2e;
+    -webkit-font-smoothing: antialiased;
+  }
+  img, svg { display: block; }
+  a { text-decoration: none; color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ---------- BACKDROP (page behind the popup) ---------- */
+  body {
+    min-height: 100vh;
+    background-color: #fdfcff;
+    background-image:
+      radial-gradient(circle at 88% 8%, rgba(123,47,247,0.10), transparent 42%),
+      radial-gradient(circle at 4% 92%, rgba(41,182,246,0.10), transparent 40%),
+      radial-gradient(rgba(123,47,247,0.06) 1px, transparent 1px);
+    background-size: auto, auto, 24px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  /* faux nav peeking behind the dimmed backdrop, for context */
+  .backdrop-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 26px 32px;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+  .backdrop-nav .nav-logo {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .backdrop-nav .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7b2ff7, #29b6f6);
+  }
+  .backdrop-nav .nav-links {
+    display: flex;
+    gap: 36px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #cfcfe6;
+  }
+  .backdrop-nav .nav-cta {
+    background: rgba(26,26,46,0.5);
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .backdrop-dim {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 18, 34, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  /* ---------- MODAL CARD ---------- */
+  .auth-modal {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    max-width: 940px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 40px 90px rgba(18, 14, 40, 0.35);
+    display: flex;
+    overflow: hidden;
+    max-height: 92vh;
+  }
+
+  .auth-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #f5f5fa;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b6b7c;
+    z-index: 3;
+  }
+  .auth-close svg { width: 15px; height: 15px; }
+
+  /* ---- left: form ---- */
+  .auth-form-col {
+    flex: 1 1 56%;
+    padding: 40px 48px 36px;
+    overflow-y: auto;
+  }
+
+  .auth-logo {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 26px;
+  }
+  .auth-logo .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7b2ff7, #29b6f6);
+  }
+
+  .auth-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #5a3fd6;
+    background: #eef0fd;
+    padding: 7px 14px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  .auth-heading {
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: 26px;
+  }
+  .auth-heading .accent {
+    background: linear-gradient(90deg, #7b2ff7, #29b6f6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .auth-sub {
+    font-size: 14px;
+    color: #6b6b7c;
+    line-height: 1.55;
+    margin-bottom: 24px;
+    max-width: 380px;
+  }
+
+  /* method tabs */
+  .auth-tabs {
+    display: inline-flex;
+    background: #f5f5fa;
+    border-radius: 11px;
+    padding: 4px;
+    margin-bottom: 22px;
+    gap: 2px;
+  }
+  .auth-tab {
+    border: none;
+    background: transparent;
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #6b6b7c;
+  }
+  .auth-tab.active {
+    background: #fff;
+    color: #1a1a2e;
+    box-shadow: 0 3px 10px rgba(20,20,40,0.10);
+  }
+
+  .auth-field { margin-bottom: 16px; }
+  .auth-field label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #44445a;
+    margin-bottom: 7px;
+  }
+  .auth-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #ececf2;
+    border-radius: 10px;
+    background: #fff;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .auth-input-wrap:focus-within {
+    border-color: #7b2ff7;
+    box-shadow: 0 0 0 3px rgba(123,47,247,0.12);
+  }
+  .auth-input-wrap input, .auth-input-wrap select {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+    padding: 12px 14px;
+  }
+  .auth-input-wrap .ic {
+    padding-left: 14px;
+    display: flex;
+    color: #9797a8;
+  }
+  .auth-input-wrap .ic svg { width: 17px; height: 17px; }
+  .auth-input-wrap.has-icon input { padding-left: 10px; }
+
+  .auth-phone-code-select {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 26px 0 14px;
+    border-right: 1.5px solid #ececf2;
+    white-space: nowrap;
+  }
+  .auth-phone-code-select select {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a2e;
+    padding: 12px 0;
+    cursor: pointer;
+  }
+  .auth-phone-code-select svg {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 13px;
+    height: 13px;
+    color: #9797a8;
+    pointer-events: none;
+  }
+
+  .auth-forgot {
+    display: flex;
+    justify-content: flex-end;
+    margin: -8px 0 18px;
+  }
+  .auth-forgot a { font-size: 12.5px; font-weight: 700; color: #7b2ff7; }
+
+  .auth-btn-primary {
+    display: block;
+    width: 100%;
+    border: none;
+    background: linear-gradient(90deg, #7b2ff7, #29b6f6);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    padding: 14px;
+    border-radius: 11px;
+    text-align: center;
+    box-shadow: 0 12px 24px rgba(123,47,247,0.25);
+    margin-top: 4px;
+  }
+
+  .auth-panel { display: none; }
+  .auth-panel.active { display: block; }
+
+  /* OTP step */
+  .auth-otp-sent {
+    font-size: 13px;
+    color: #6b6b7c;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+  .auth-otp-sent b { color: #1a1a2e; }
+  .auth-otp-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .auth-otp-box {
+    width: 46px;
+    height: 54px;
+    border: 1.5px solid #ececf2;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .auth-otp-box:focus {
+    border-color: #7b2ff7;
+    box-shadow: 0 0 0 3px rgba(123,47,247,0.12);
+  }
+  .auth-otp-resend {
+    font-size: 12.5px;
+    color: #6b6b7c;
+    margin-bottom: 4px;
+  }
+  .auth-otp-resend a { font-weight: 700; color: #7b2ff7; }
+  .auth-otp-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #6b6b7c;
+    margin-bottom: 16px;
+  }
+  .auth-otp-back svg { width: 12px; height: 12px; }
+
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 22px 0 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #9797a8;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #ececf2;
+  }
+
+  .auth-btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    border: 1.5px solid #ececf2;
+    background: #fff;
+    color: #1a1a2e;
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 13px;
+    border-radius: 11px;
+  }
+  .auth-btn-google svg { width: 18px; height: 18px; }
+
+  .auth-switch {
+    text-align: center;
+    font-size: 13.5px;
+    color: #6b6b7c;
+    margin-top: 22px;
+  }
+  .auth-switch a { font-weight: 800; color: #1a1a2e; }
+
+  .auth-terms {
+    text-align: center;
+    font-size: 11.5px;
+    color: #9797a8;
+    line-height: 1.5;
+    margin-top: 14px;
+  }
+  .auth-terms a { color: #6b6b7c; font-weight: 700; text-decoration: underline; }
+
+  /* ---- right: image ---- */
+  .auth-image-col {
+    flex: 0 0 44%;
+    position: relative;
+    background: linear-gradient(165deg, #1a1a2e 0%, #3a2264 55%, #7b2ff7 100%);
+    overflow: hidden;
+  }
+  .auth-image-col::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.6;
+  }
+  .auth-nurse-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 208px;
+  }
+  .auth-nurse-wrap svg {
+    height: 92%;
+    width: auto;
+    filter: drop-shadow(0 18px 26px rgba(10,6,26,0.35));
+  }
+  .auth-image-fade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(26,26,46,0.55) 0%, rgba(26,26,46,0.0) 30%, rgba(26,26,46,0.0) 100%);
+  }
+  .auth-image-copy {
+    position: absolute;
+    left: 30px;
+    right: 26px;
+    bottom: 30px;
+    z-index: 2;
+  }
+  .auth-image-quote {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+  .auth-image-stats {
+    display: flex;
+    gap: 18px;
+  }
+  .auth-image-stat {
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+  .auth-image-stat b {
+    display: block;
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .auth-image-stat span {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .auth-freecard {
+    position: absolute;
+    left: 26px;
+    right: 26px;
+    bottom: 28px;
+    z-index: 2;
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.28);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 20px 22px 22px;
+    box-shadow: 0 18px 40px rgba(10,6,26,0.28);
+  }
+  .auth-freecard-title {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.72);
+    margin-bottom: 14px;
+  }
+  .auth-freecard-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .auth-freecard-list li {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.35;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.20);
+  }
+  .auth-freecard-list .fc-check {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.20);
+    border: 1px solid rgba(255,255,255,0.38);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .auth-freecard-list .fc-check svg {
+    width: 10px;
+    height: 10px;
+    stroke: #fff;
+    stroke-width: 3.2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (max-width: 820px) {
+    .auth-image-col { display: none; }
+    .auth-modal { max-width: 460px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="backdrop-nav">
+    <a href="#" class="nav-logo"><span class="dot"></span> Nursia</a>
+    <div class="nav-links">
+      <a href="#">How it works</a>
+      <a href="#">Readiness Score</a>
+      <a href="#">Question Types</a>
+      <a href="#">Pricing</a>
+    </div>
+    <a href="#" class="nav-cta">Start Free Trial</a>
+  </div>
+  <div class="backdrop-dim"></div>
+
+  <div class="auth-modal">
+    <button class="auth-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 4l16 16M20 4L4 20"/></svg>
+    </button>
+
+    <div class="auth-form-col">
+      <div class="auth-logo"><span class="dot"></span> Nursia</div>
+
+      <span class="auth-eyebrow">🎓 Free NCLEX practice</span>
+      <h1 class="auth-heading">Sign up to start <span class="accent">practicing for free</span></h1>
+      
+
+      <!-- PHONE / OTP PANEL -->
+      <div class="auth-panel active" id="panelPhone">
+        <div id="phoneStep">
+          <div class="auth-field">
+            <label for="phone">Mobile number</label>
+            <div class="auth-input-wrap">
+              <div class="auth-phone-code-select">
+                <select id="countryCode" aria-label="Country code">
+                  <option value="+1" data-flag="🇺🇸" selected>🇺🇸 +1</option>
+                  <option value="+44" data-flag="🇬🇧">🇬🇧 +44</option>
+                  <option value="+91" data-flag="🇮🇳">🇮🇳 +91</option>
+                  <option value="+61" data-flag="🇦🇺">🇦🇺 +61</option>
+                  <option value="+1" data-flag="🇨🇦">🇨🇦 +1</option>
+                  <option value="+353" data-flag="🇮🇪">🇮🇪 +353</option>
+                  <option value="+64" data-flag="🇳🇿">🇳🇿 +64</option>
+                  <option value="+27" data-flag="🇿🇦">🇿🇦 +27</option>
+                  <option value="+63" data-flag="🇵🇭">🇵🇭 +63</option>
+                </select>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+              <input type="tel" id="phone" placeholder="(555) 123-4567">
+            </div>
+          </div>
+          <button class="auth-btn-primary" type="button" onclick="sendOtp()">Send OTP</button>
+        </div>
+
+        <div id="otpStep" style="display:none;">
+          <span class="auth-otp-back" onclick="backToPhone()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+            Change number
+          </span>
+          <p class="auth-otp-sent">Enter the 6-digit code we sent to <b id="otpPhoneDisplay">+1 (555) 123-4567</b></p>
+          <div class="auth-otp-row">
+            <input class="auth-otp-box" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+            <input class="auth-otp-box" maxlength="1" inputmode="numeric">
+            <input class="auth-otp-box" maxlength="1" inputmode="numeric">
+            <input class="auth-otp-box" maxlength="1" inputmode="numeric">
+            <input class="auth-otp-box" maxlength="1" inputmode="numeric">
+            <input class="auth-otp-box" maxlength="1" inputmode="numeric">
+          </div>
+          <p class="auth-otp-resend">Didn't get a code? <a href="#">Resend</a></p>
+          <button class="auth-btn-primary" type="button" style="margin-top:14px;">Verify &amp; continue</button>
+        </div>
+      </div>
+
+      <div class="auth-divider">or continue with</div>
+
+      <button class="auth-btn-google" type="button">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.63h6.47a5.54 5.54 0 0 1-2.4 3.64v3h3.88c2.27-2.09 3.57-5.17 3.57-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.94-2.9l-3.88-3.02c-1.08.72-2.45 1.15-4.06 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.11A11.99 11.99 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.27 14.27a7.2 7.2 0 0 1 0-4.54V6.62H1.26a12 12 0 0 0 0 10.76l4.01-3.11z"/><path fill="#EA4335" d="M12 4.77c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.69 1.26 6.62l4.01 3.11C6.22 6.88 8.87 4.77 12 4.77z"/></svg>
+        Continue with Google
+      </button>
+
+      <p class="auth-switch">Already have an account? <a href="#">Log in</a></p>
+      <p class="auth-terms">By continuing, you agree to Nursia's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+    </div>
+
+    <div class="auth-image-col">
+      <div class="auth-nurse-wrap">
+        <svg viewBox="0 0 340 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7b2ff7"/>
+      <stop offset="100%" stop-color="#29b6f6"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="170" cy="666" rx="98" ry="15" fill="rgba(8,4,22,0.30)"/>
+
+  <!-- legs -->
+  <rect x="108" y="428" width="52" height="212" rx="24" fill="#eaf3fb" stroke="#d7e3f0" stroke-width="2"/>
+  <rect x="180" y="428" width="52" height="212" rx="24" fill="#eaf3fb" stroke="#d7e3f0" stroke-width="2"/>
+
+  <!-- shoes -->
+  <rect x="98" y="628" width="68" height="28" rx="14" fill="#ffffff"/>
+  <rect x="98" y="648" width="68" height="10" rx="5" fill="#1a1a2e"/>
+  <rect x="174" y="628" width="68" height="28" rx="14" fill="#ffffff"/>
+  <rect x="174" y="648" width="68" height="10" rx="5" fill="#1a1a2e"/>
+
+  <!-- torso -->
+  <rect x="100" y="168" width="140" height="270" rx="38" fill="#eaf3fb" stroke="#d7e3f0" stroke-width="2"/>
+  <polygon points="150,168 190,168 170,210" fill="#cfe0fb"/>
+
+  <!-- left arm (hanging) -->
+  <rect x="66" y="186" width="30" height="150" rx="15" fill="#eaf3fb" stroke="#d7e3f0" stroke-width="2"/>
+  <circle cx="81" cy="342" r="14" fill="#e3a97a"/>
+
+  <!-- right arm (bent, holding clipboard) -->
+  <rect x="242" y="182" width="30" height="90" rx="15" fill="#eaf3fb" stroke="#d7e3f0" stroke-width="2"/>
+  <line x1="256" y1="266" x2="202" y2="316" stroke="#d7e3f0" stroke-width="34" stroke-linecap="round"/>
+  <line x1="256" y1="266" x2="202" y2="316" stroke="#eaf3fb" stroke-width="30" stroke-linecap="round"/>
+  <circle cx="202" cy="316" r="14" fill="#e3a97a"/>
+
+  <!-- ID badge -->
+  <line x1="170" y1="176" x2="170" y2="204" stroke="#7b2ff7" stroke-width="3"/>
+  <rect x="156" y="204" width="28" height="36" rx="5" fill="#ffffff" stroke="#e2e2ee" stroke-width="2"/>
+  <rect x="156" y="204" width="28" height="9" rx="4" fill="url(#accentGrad)"/>
+  <circle cx="170" cy="226" r="6" fill="#dfe3f0"/>
+
+  <!-- stethoscope -->
+  <path d="M148,142 Q170,176 192,142" stroke="#9aa3b5" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <ellipse cx="148" cy="142" rx="5" ry="8" fill="#9aa3b5"/>
+  <ellipse cx="192" cy="142" rx="5" ry="8" fill="#9aa3b5"/>
+  <path d="M150,148 C144,196 150,246 176,266" stroke="#9aa3b5" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <circle cx="179" cy="270" r="13" fill="#8a93a6" stroke="#5c6376" stroke-width="2"/>
+
+  <!-- clipboard -->
+  <rect x="178" y="298" width="62" height="80" rx="8" fill="#ffffff" stroke="#e2e2ee" stroke-width="2"/>
+  <rect x="198" y="292" width="22" height="14" rx="4" fill="#c7c7da"/>
+  <rect x="188" y="322" width="42" height="6" rx="3" fill="#cfe0fb"/>
+  <rect x="188" y="336" width="42" height="6" rx="3" fill="#cfe0fb"/>
+  <rect x="188" y="350" width="26" height="6" rx="3" fill="url(#accentGrad)"/>
+  <circle cx="225" cy="308" r="9" fill="#34c759"/>
+  <path d="M221,308 l3,4 l7,-8" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- neck -->
+  <rect x="155" y="136" width="30" height="38" rx="10" fill="#e3a97a"/>
+
+  <!-- hair back / bun -->
+  <ellipse cx="170" cy="86" rx="54" ry="56" fill="#241f3d"/>
+  <circle cx="170" cy="36" r="17" fill="#241f3d"/>
+
+  <!-- head -->
+  <circle cx="170" cy="98" r="45" fill="#e3a97a"/>
+
+  <!-- face -->
+  <ellipse cx="154" cy="100" rx="4.2" ry="5.2" fill="#241f3d"/>
+  <ellipse cx="186" cy="100" rx="4.2" ry="5.2" fill="#241f3d"/>
+  <path d="M150,117 Q170,132 190,117" stroke="#241f3d" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="141" cy="112" r="6" fill="#f3a58a" opacity="0.45"/>
+  <circle cx="199" cy="112" r="6" fill="#f3a58a" opacity="0.45"/>
+</svg>
+      </div>
+      <div class="auth-image-fade"></div>
+      <div class="auth-freecard">
+        <h4 class="auth-freecard-title">What you get, free</h4>
+        <ul class="auth-freecard-list">
+          <li><span class="fc-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span> 50 practice questions</li>
+          <li><span class="fc-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span> Full answer rationales</li>
+          <li><span class="fc-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span> Your weak topics identified</li>
+          <li><span class="fc-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span> No credit card needed</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+<script>
+function sendOtp() {
+    var codeVal = document.getElementById('countryCode').value || '+1';
+    var phoneVal = document.getElementById('phone').value || '(555) 123-4567';
+    document.getElementById('otpPhoneDisplay').textContent = codeVal + ' ' + phoneVal;
+    document.getElementById('phoneStep').style.display = 'none';
+    document.getElementById('otpStep').style.display = 'block';
+    var boxes = document.querySelectorAll('.auth-otp-box');
+    if (boxes[0]) boxes[0].focus();
+  }
+  function backToPhone() {
+    document.getElementById('otpStep').style.display = 'none';
+    document.getElementById('phoneStep').style.display = 'block';
+  }
+  document.querySelectorAll('.auth-otp-box').forEach(function(box, idx, list) {
+    box.addEventListener('input', function() {
+      box.value = box.value.replace(/[^0-9]/g, '');
+      if (box.value && list[idx + 1]) list[idx + 1].focus();
+    });
+    box.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' && !box.value && list[idx - 1]) list[idx - 1].focus();
+    });
+  });
+</script>
+</body>
+</html>

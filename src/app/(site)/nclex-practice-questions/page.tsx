@@ -15,7 +15,7 @@ import {
 } from "@/components/Blocks";
 import { QuestionSet } from "@/components/QuestionSet";
 import { StickyCta } from "@/components/StickyCta";
-import { GUIDES, HUB_FAQ, QUESTIONS, SITE, TOPICS } from "@/lib/content";
+import { GUIDES, HUB_FAQ, QUESTIONS, SITE, playableCount, topicsIn } from "@/lib/content";
 
 /* Title under 60 chars, description under 155 — this is the page the whole
    site links to, so it is the one that gets finalised first. */
@@ -43,6 +43,9 @@ const SET = [
   "pharm-212",
   "safe-047",
 ].map((k) => QUESTIONS[k]);
+
+const CATEGORY_TOPICS = [...topicsIn("category"), ...topicsIn("format")];
+const SUBJECT_TOPICS = topicsIn("subject");
 
 const TYPES = [
   {
@@ -124,10 +127,11 @@ export default function HubPage() {
               <SectionHead
                 eyebrow="Section 2"
                 title="Practice questions by topic"
-                note="Eight sets, each weighted the way the NCSBN test plan weights that category. Five questions on every page are free."
+                note="Nine test-plan sets, each weighted the way the NCSBN plan weights that category, and twelve clinical subjects that re-cut the same bank by body system."
               />
+
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {TOPICS.map((t) => (
+                {CATEGORY_TOPICS.map((t) => (
                   <Link
                     key={t.slug}
                     href={`/nclex-practice-questions/${t.slug}`}
@@ -140,11 +144,45 @@ export default function HubPage() {
                       <p className="mt-1 text-[0.8125rem] leading-snug text-ink-2">{t.blurb}</p>
                     </div>
                     <span className="ml-auto shrink-0 font-mono text-[0.8125rem] text-teal">
-                      {t.count} q →
+                      {t.count ?? playableCount(t.slug)} q →
                     </span>
                   </Link>
                 ))}
               </div>
+
+              <p className="eyebrow mt-10">By clinical subject</p>
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {SUBJECT_TOPICS.map((t) => (
+                  <li key={t.slug}>
+                    <Link
+                      href={`/nclex-practice-questions/${t.slug}`}
+                      className="inline-flex items-baseline gap-2 rounded-full border border-rule bg-white px-3.5 py-1.5 text-[0.8125rem] text-ink-2 transition-colors hover:border-ink hover:text-ink"
+                    >
+                      {t.name}
+                      <span className="font-mono text-[10px] text-teal">
+                        {playableCount(t.slug)}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              {/* the app-side surface: every set, answerable without leaving the page */}
+              <Link
+                href="/practice"
+                className="cell mt-6 flex items-center gap-4 !border-ink bg-paper-2"
+              >
+                <div className="min-w-0">
+                  <p className="font-display text-[1.0625rem] font-bold tracking-[-0.02em] text-ink">
+                    Practise any topic on one page
+                  </p>
+                  <p className="mt-1 text-[0.8125rem] leading-snug text-ink-2">
+                    Pick a topic, answer the set in place, and get a scored review with a line on
+                    every option. No account.
+                  </p>
+                </div>
+                <span className="ml-auto shrink-0 font-mono text-[0.8125rem] text-teal">→</span>
+              </Link>
             </div>
 
             {/* CTA slot 3 — curiosity, not a sales pitch */}

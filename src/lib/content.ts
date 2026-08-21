@@ -6,6 +6,9 @@
  * data and get rendered server-side, not fetched.
  */
 
+import type { IconKey } from "@/lib/icons";
+import { BANK_COUNTS } from "@/lib/bank/counts";
+
 export const SITE = {
   name: "Nursia",
   tagline: "NCLEX-RN practice questions, written and reviewed by nurses.",
@@ -186,19 +189,31 @@ export const QUESTIONS: Record<string, Question> = {
 
 /* ------------------------------------------------------------------- topics */
 
+/**
+ * Which shelf a topic sits on. The eight NCSBN client needs are the taxonomy
+ * the exam is written against; the clinical subjects re-cut the same bank the
+ * way nursing school teaches it; "format" is SATA, which is neither.
+ */
+export type TopicGroup = "category" | "subject" | "format";
+
 export type Topic = {
   slug: string;
   name: string;
   h1: string;
   /** NCSBN client-need label, verbatim */
   category: string;
-  count: number;
+  group: TopicGroup;
+  /** line-icon key, drawn by <TopicIcon> */
+  icon: IconKey;
+  /** full set size. Subject topics leave it off and use the bank count. */
+  count?: number;
   /** percentage of the exam, per the NCSBN test plan */
-  share: string;
+  share?: string;
   blurb: string;
   intro: string;
-  subtopics: { name: string; count: number }[];
-  questions: string[];
+  subtopics?: { name: string; count: number }[];
+  /** hand-written items from QUESTIONS, rendered into the static HTML */
+  questions?: string[];
   siblings: string[];
   guides: string[];
 };
@@ -206,6 +221,8 @@ export type Topic = {
 export const TOPICS: Topic[] = [
   {
     slug: "pharmacology",
+    group: "category",
+    icon: "pill",
     name: "Pharmacology",
     h1: "NCLEX pharmacology practice questions",
     category: "Pharmacological and parenteral therapies",
@@ -227,6 +244,8 @@ export const TOPICS: Topic[] = [
   },
   {
     slug: "med-surg",
+    group: "category",
+    icon: "pulse",
     name: "Med-surg",
     h1: "NCLEX med-surg practice questions",
     category: "Physiological adaptation",
@@ -248,6 +267,8 @@ export const TOPICS: Topic[] = [
   },
   {
     slug: "safe-care",
+    group: "category",
+    icon: "shield",
     name: "Safe and effective care",
     h1: "NCLEX safe and effective care practice questions",
     category: "Safe and effective care environment",
@@ -269,6 +290,8 @@ export const TOPICS: Topic[] = [
   },
   {
     slug: "psychosocial",
+    group: "category",
+    icon: "brain",
     name: "Psychosocial integrity",
     h1: "NCLEX psychosocial integrity practice questions",
     category: "Psychosocial integrity",
@@ -290,6 +313,8 @@ export const TOPICS: Topic[] = [
   },
   {
     slug: "basic-care",
+    group: "category",
+    icon: "bed",
     name: "Basic care and comfort",
     h1: "NCLEX basic care and comfort practice questions",
     category: "Basic care and comfort",
@@ -311,6 +336,8 @@ export const TOPICS: Topic[] = [
   },
   {
     slug: "risk-reduction",
+    group: "category",
+    icon: "chart",
     name: "Reduction of risk potential",
     h1: "NCLEX reduction of risk potential practice questions",
     category: "Reduction of risk potential",
@@ -332,6 +359,8 @@ export const TOPICS: Topic[] = [
   },
   {
     slug: "health-promotion",
+    group: "category",
+    icon: "heart",
     name: "Health promotion",
     h1: "NCLEX health promotion and maintenance practice questions",
     category: "Health promotion and maintenance",
@@ -353,6 +382,8 @@ export const TOPICS: Topic[] = [
   },
   {
     slug: "sata",
+    group: "format",
+    icon: "checklist",
     name: "SATA questions",
     h1: "NCLEX select all that apply (SATA) practice questions",
     category: "All categories",
@@ -372,9 +403,173 @@ export const TOPICS: Topic[] = [
     siblings: ["pharmacology", "safe-care", "med-surg"],
     guides: ["how-to-answer-sata", "next-gen-changes-explained"],
   },
-];
+
+  /* ---- clinical subjects: the same bank, cut the way school teaches it ---- */
+
+  {
+    slug: "cardiovascular",
+    group: "subject",
+    icon: "heart",
+    name: "Cardiovascular",
+    h1: "NCLEX cardiovascular practice questions",
+    category: "Physiological adaptation",
+    blurb: "Heart failure, ACS, dysrhythmias, and the vital sign that changes first.",
+    intro:
+      "Cardiac items are rarely about naming the rhythm. They give you a client with a known cardiac problem and a number that has moved, and ask what the nurse does about it. The ten questions below run across heart failure, acute coronary syndrome, dysrhythmias, anticoagulation, and post-catheterisation care, and every rationale names the finding that should have moved you.",
+    siblings: ["respiratory", "med-surg", "risk-reduction"],
+    guides: ["how-hard-is-the-nclex", "next-gen-changes-explained"],
+  },
+  {
+    slug: "respiratory",
+    group: "subject",
+    icon: "lungs",
+    name: "Respiratory",
+    h1: "NCLEX respiratory practice questions",
+    category: "Physiological adaptation",
+    blurb: "COPD, asthma, oxygen targets, and airway before everything else.",
+    intro:
+      "Respiratory is where airway, breathing, circulation stops being a slogan and starts deciding answers. These ten questions cover COPD and its oxygen targets, asthma escalation, chest tubes, tracheostomy care, and pulmonary embolism — the situations where the wrong first action costs the client minutes rather than hours.",
+    siblings: ["cardiovascular", "med-surg", "basic-care"],
+    guides: ["how-hard-is-the-nclex", "four-week-study-plan"],
+  },
+  {
+    slug: "endocrine",
+    group: "subject",
+    icon: "droplet",
+    name: "Endocrine",
+    h1: "NCLEX endocrine practice questions",
+    category: "Physiological adaptation",
+    blurb: "Diabetes, thyroid, adrenal crisis, and insulin you have to time.",
+    intro:
+      "Endocrine items are pattern recognition under a clock: hypoglycaemia and DKA look nothing alike once you know the picture, and insulin questions turn on onset and peak rather than dose. Ten questions across diabetes, thyroid storm and myxoedema, adrenal insufficiency, and the pituitary disorders the exam still asks about.",
+    siblings: ["med-surg", "pharmacology", "dosage-and-labs"],
+    guides: ["dosage-calculations-without-panic", "how-hard-is-the-nclex"],
+  },
+  {
+    slug: "neurological",
+    group: "subject",
+    icon: "brain",
+    name: "Neurological",
+    h1: "NCLEX neurological practice questions",
+    category: "Physiological adaptation",
+    blurb: "Stroke, raised ICP, seizures, and the change in level of consciousness.",
+    intro:
+      "Neuro questions hang on one idea: a falling level of consciousness is the earliest sign of rising intracranial pressure, and it outranks almost everything else in the stem. These ten cover stroke and thrombolytic windows, ICP and positioning, seizure precautions, spinal cord injury, and the myasthenic and cholinergic crises that are told apart by a single detail.",
+    siblings: ["med-surg", "cardiovascular", "risk-reduction"],
+    guides: ["how-hard-is-the-nclex", "next-gen-changes-explained"],
+  },
+  {
+    slug: "gastrointestinal",
+    group: "subject",
+    icon: "stomach",
+    name: "Gastrointestinal",
+    h1: "NCLEX gastrointestinal practice questions",
+    category: "Physiological adaptation",
+    blurb: "Bleeds, obstruction, liver failure, and tubes that have to stay patent.",
+    intro:
+      "GI items are mostly bleeding, obstruction, and the liver failing quietly. Ten questions across upper GI bleed, cirrhosis and hepatic encephalopathy, pancreatitis, bowel obstruction, ostomy care, and nasogastric tube management, with rationales that separate the expected finding from the complication.",
+    siblings: ["med-surg", "basic-care", "renal-genitourinary"],
+    guides: ["how-hard-is-the-nclex", "four-week-study-plan"],
+  },
+  {
+    slug: "renal-genitourinary",
+    group: "subject",
+    icon: "kidney",
+    name: "Renal and genitourinary",
+    h1: "NCLEX renal and genitourinary practice questions",
+    category: "Physiological adaptation",
+    blurb: "Kidney injury, dialysis, electrolytes, and catheters that cause infections.",
+    intro:
+      "Renal questions are electrolyte questions wearing a different coat — potassium is the value that kills, and it shows up in almost every item on this page. Ten questions on acute kidney injury, chronic kidney disease and dialysis, fluid balance, urinary retention, and catheter-associated infection.",
+    siblings: ["med-surg", "dosage-and-labs", "risk-reduction"],
+    guides: ["how-hard-is-the-nclex", "dosage-calculations-without-panic"],
+  },
+  {
+    slug: "maternity-newborn",
+    group: "subject",
+    icon: "baby",
+    name: "Maternity and newborn",
+    h1: "NCLEX maternity and newborn practice questions",
+    category: "Health promotion and maintenance",
+    blurb: "Antepartum warning signs, labour, postpartum haemorrhage, and the newborn assessment.",
+    intro:
+      "Maternity is the densest part of health promotion on the exam, and it is graded on danger signs: preeclampsia, late decelerations, a boggy uterus, a newborn who is not transitioning. Ten questions across the antepartum, intrapartum, postpartum, and newborn periods, each with the finding that decides the answer.",
+    siblings: ["health-promotion", "pediatrics", "med-surg"],
+    guides: ["four-week-study-plan", "whats-on-the-test-plan"],
+  },
+  {
+    slug: "pediatrics",
+    group: "subject",
+    icon: "baby",
+    name: "Pediatrics",
+    h1: "NCLEX pediatrics practice questions",
+    category: "Health promotion and maintenance",
+    blurb: "Growth and development, weight-based dosing, and the sick child who compensates.",
+    intro:
+      "Children compensate until they do not, which is why paediatric items reward you for noticing tachycardia rather than waiting for a blood pressure to fall. Ten questions on developmental milestones, immunisations, weight-based dosing, respiratory illness, dehydration, and the congenital conditions the exam repeats.",
+    siblings: ["health-promotion", "maternity-newborn", "dosage-and-labs"],
+    guides: ["four-week-study-plan", "how-hard-is-the-nclex"],
+  },
+  {
+    slug: "mental-health",
+    group: "subject",
+    icon: "smile",
+    name: "Mental health",
+    h1: "NCLEX mental health practice questions",
+    category: "Psychosocial integrity",
+    blurb: "Therapeutic responses, safety, and medications with a therapeutic window.",
+    intro:
+      "Mental health items give you four polite responses and one that assesses. Ten questions on suicide risk and safety, anxiety and mania, schizophrenia, substance withdrawal, eating disorders, and the psychotropics — lithium, SSRIs, antipsychotics — whose adverse effects are exam staples in their own right.",
+    siblings: ["psychosocial", "pharmacology", "safe-care"],
+    guides: ["how-to-answer-sata", "if-you-failed-what-next"],
+  },
+  {
+    slug: "fundamentals",
+    group: "subject",
+    icon: "book",
+    name: "Fundamentals",
+    h1: "NCLEX fundamentals practice questions",
+    category: "Basic care and comfort",
+    blurb: "Asepsis, positioning, wound care, vital signs, and documentation.",
+    intro:
+      "Fundamentals is the material you learned first and are most likely to answer carelessly. Ten questions on sterile technique, hand hygiene and isolation precautions, body mechanics and positioning, wound care and pressure injury staging, vital signs, and what belongs in a chart.",
+    siblings: ["basic-care", "safe-care", "prioritization-delegation"],
+    guides: ["how-hard-is-the-nclex", "four-week-study-plan"],
+  },
+  {
+    slug: "prioritization-delegation",
+    group: "subject",
+    icon: "list",
+    name: "Prioritization and delegation",
+    h1: "NCLEX prioritization and delegation practice questions",
+    category: "Safe and effective care environment",
+    blurb: "Who to see first, who to hand it to, and what never leaves the RN.",
+    intro:
+      "These items rarely test a fact — they test whether you can rank four true things. Ten questions on which client the nurse assesses first, what can go to a UAP or an LPN, how assignments are made, and the parts of the nursing process that stay with the registered nurse no matter how busy the unit is.",
+    siblings: ["safe-care", "fundamentals", "med-surg"],
+    guides: ["how-hard-is-the-nclex", "test-day-checklist"],
+  },
+  {
+    slug: "dosage-and-labs",
+    group: "subject",
+    icon: "flask",
+    name: "Dosage calculation and lab values",
+    h1: "NCLEX dosage calculation and lab values practice questions",
+    category: "Pharmacological and parenteral therapies",
+    blurb: "Two-step arithmetic and the reference ranges the exam actually repeats.",
+    intro:
+      "Dosage items almost always reduce to two steps, and the distractors are the answers you get from a single misplaced decimal — which is exactly what is being tested. Ten questions mixing calculation with the values the exam returns to: potassium, sodium, INR, creatinine, digoxin, and haemoglobin A1C.",
+    siblings: ["pharmacology", "risk-reduction", "renal-genitourinary"],
+    guides: ["dosage-calculations-without-panic", "how-to-answer-sata"],
+  },];
 
 export const topicBySlug = (slug: string) => TOPICS.find((t) => t.slug === slug);
+
+/** Topics on one shelf, in declaration order. */
+export const topicsIn = (group: Topic["group"]) => TOPICS.filter((t) => t.group === group);
+
+/** How many bank questions a topic can serve, playable right now. */
+export const playableCount = (slug: string) => BANK_COUNTS[slug] ?? 0;
 
 /* ------------------------------------------------------------------- guides */
 

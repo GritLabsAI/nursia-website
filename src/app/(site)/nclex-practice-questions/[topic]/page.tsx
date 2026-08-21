@@ -12,8 +12,17 @@ import {
   SectionHead,
 } from "@/components/Blocks";
 import { QuestionSet } from "@/components/QuestionSet";
+import { TopicDrill } from "@/components/practice/TopicDrill";
 import { StickyCta } from "@/components/StickyCta";
-import { QUESTIONS, SITE, TOPICS, guideBySlug, topicBySlug } from "@/lib/content";
+import { BANK_LOADERS } from "@/lib/bank/loaders";
+import {
+  QUESTIONS,
+  SITE,
+  TOPICS,
+  guideBySlug,
+  playableCount,
+  topicBySlug,
+} from "@/lib/content";
 
 type Params = { params: Promise<{ topic: string }> };
 
@@ -25,13 +34,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { topic } = await params;
   const t = topicBySlug(topic);
   if (!t) return {};
+  const count = t.count ?? playableCount(t.slug);
+  const free = t.questions ? "five of them free with no account" : "all free, with no account";
   return {
     title: { absolute: `${t.name} NCLEX Practice Questions | Nursia` },
     description:
-      `${t.count} NCLEX ${t.name.toLowerCase()} practice questions with rationales, five of them free with no account. ${t.share}, written and reviewed by nurses.`.slice(
-        0,
-        155,
-      ),
+      `${count} NCLEX ${t.name.toLowerCase()} practice questions with rationales, ${free}.${
+        t.share ? ` ${t.share},` : ""
+      } written and reviewed by nurses.`.slice(0, 155),
     alternates: { canonical: `/nclex-practice-questions/${t.slug}` },
   };
 }
@@ -46,7 +56,11 @@ export default async function TopicPage({ params }: Params) {
     { label: "Practice questions", href: "/nclex-practice-questions" },
     { label: t.name },
   ];
-  const questions = t.questions.map((k) => QUESTIONS[k]);
+  /* Hand-written items where a topic has them, the imported bank where it does
+     not. Both render server-side, so the questions are in the static HTML. */
+  const hand = t.questions?.map((k) => QUESTIONS[k]) ?? null;
+  const bank = BANK_LOADERS[t.slug] ? await BANK_LOADERS[t.slug]() : null;
+  const count = t.count ?? bank?.length ?? 0;
   const siblings = t.siblings.map((s) => topicBySlug(s)!);
   const guides = t.guides.map((g) => guideBySlug(g)!);
 
@@ -61,11 +75,12 @@ export default async function TopicPage({ params }: Params) {
 
           <h1 className="text-[2.125rem] leading-[1.05] sm:text-[2.75rem]">{t.h1}</h1>
 
-          {/* the three facts that qualify this page, in mono because each is checkable */}
+          {/* the facts that qualify this page, in mono because each is checkable */}
           <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3 border-y border-rule py-4">
             {[
-              [`${t.count}`, "questions"],
-              [t.share.replace(" of the exam", ""), "of the exam"],
+              [`${count}`, "questions"],
+              ...(t.share ? [[t.share.replace(" of the exam", ""), "of the exam"]] : []),
+              [t.category, "test-plan category"],
               [SITE.updated, "last updated"],
             ].map(([v, k]) => (
               <div key={k} className="flex items-baseline gap-2">
@@ -86,57 +101,77 @@ export default async function TopicPage({ params }: Params) {
 
           <PrimaryCta className="mt-7" />
 
-          {/* ------------------------------------------ 5 free questions */}
+          {/* --------------------------------------------- the free questions */}
           <div className="mt-14">
-            <SectionHead
-              eyebrow={`${t.category}`}
-              title={`5 free ${t.name.toLowerCase()} questions`}
-              note="Playable here, no account. Rationales expand in place."
-            />
-            <div className="mt-8">
-              <QuestionSet
-                questions={questions}
-                label={`${t.name} · free set`}
-                gate={{
-                  eyebrow: "End of the free set",
-                  headline: "Keep going",
-                  body: `A free account opens 50 questions across every category, including more ${t.name.toLowerCase()}. No card.`,
-                  cta: { label: "Start free →", href: "/signup" },
-                  exits: [
-                    { label: "All 8 topics", href: "/nclex-practice-questions" },
-                    { label: "See pricing", href: "/pricing" },
-                  ],
-                }}
-              />
-            </div>
+            {hand ? (
+              <>
+                <SectionHead
+                  eyebrow={t.category}
+                  title={`5 free ${t.name.toLowerCase()} questions`}
+                  note="Playable here, no account. Rationales expand in place."
+                />
+                <div className="mt-8">
+                  <QuestionSet
+                    questions={hand}
+                    label={`${t.name} · free set`}
+                    gate={{
+                      eyebrow: "End of the free set",
+                      headline: "Keep going",
+                      body: `A free account opens 50 questions across every category, including more ${t.name.toLowerCase()}. No card.`,
+                      cta: { label: "Start free →", href: "/signup" },
+                      exits: [
+                        { label: "Practise any topic", href: "/practice" },
+                        { label: "See pricing", href: "/pricing" },
+                      ],
+                    }}
+                  />
+                </div>
+              </>
+            ) : bank ? (
+              <>
+                <SectionHead
+                  eyebrow={t.category}
+                  title={`The ${t.name.toLowerCase()} set, all ${bank.length} free`}
+                  note="Answer, check, and read why each of the four options wins or loses."
+                />
+                <div className="mt-8">
+                  <TopicDrill
+                    topic={{ slug: t.slug, name: t.name, icon: t.icon, category: t.category }}
+                    questions={bank}
+                  />
+                </div>
+              </>
+            ) : null}
           </div>
 
-          {/* ----------------------------------------- subtopic breakdown */}
-          <div className="mt-16">
-            <SectionHead
-              eyebrow="Breakdown"
-              title={`What is tested in ${t.name.toLowerCase()}`}
-              note="How the questions in this set are distributed, so you can see what you are buying before you buy it."
-            />
-            <table className="mt-7 w-full border-collapse text-left">
-              <thead>
-                <tr className="border-b border-ink">
-                  <th className="eyebrow py-2.5 font-normal">Subtopic</th>
-                  <th className="eyebrow py-2.5 text-right font-normal">Questions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {t.subtopics.map((s) => (
-                  <tr key={s.name} className="border-b border-rule">
-                    <td className="py-3 text-[0.9375rem] text-ink-2">{s.name}</td>
-                    <td className="py-3 text-right font-mono text-[0.875rem] text-ink">
-                      {s.count}
-                    </td>
+          {/* --------------------------------------------- subtopic breakdown */}
+          {t.subtopics && (
+            <div className="mt-16">
+              <SectionHead
+                eyebrow="Breakdown"
+                title={`What is tested in ${t.name.toLowerCase()}`}
+                note="How the questions in this set are distributed, so you can see what you are buying before you buy it."
+              />
+              <table className="mt-7 w-full border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-ink">
+                    <th className="eyebrow py-2.5 font-normal">Subtopic</th>
+                    <th className="eyebrow py-2.5 text-right font-normal">Questions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {t.subtopics.map((s) => (
+                    <tr key={s.name} className="border-b border-rule">
+                      <td className="py-3 text-[0.9375rem] text-ink-2">{s.name}</td>
+                      <td className="py-3 text-right font-mono text-[0.875rem] text-ink">
+                        {s.count}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           <InlineCta
             prompt={`Weak on ${t.name.toLowerCase()}? Two questions and we will tell you.`}
@@ -153,17 +188,19 @@ export default async function TopicPage({ params }: Params) {
                     <p className="font-display text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">
                       {s.name}
                     </p>
-                    <p className="mt-1.5 font-mono text-[11px] text-teal">{s.count} q →</p>
+                    <p className="mt-1.5 font-mono text-[11px] text-teal">
+                      {s.count ?? playableCount(s.slug)} q →
+                    </p>
                   </Link>
                 </li>
               ))}
             </ul>
             <p className="mt-4">
               <Link
-                href="/nclex-practice-questions"
+                href="/practice"
                 className="font-mono text-[0.8125rem] text-teal underline underline-offset-4 hover:text-teal-dark"
               >
-                ↑ All eight topics and 10 more free questions
+                ↑ Every topic, answerable on one page
               </Link>
             </p>
           </div>
@@ -188,7 +225,7 @@ export default async function TopicPage({ params }: Params) {
       </Section>
 
       <CtaBand
-        heading={`Drill all ${t.count} ${t.name.toLowerCase()} questions.`}
+        heading={`Drill all ${count} ${t.name.toLowerCase()} questions.`}
         sub="Start on the free tier: 50 questions across every category, full rationales, no card."
       />
       <div className="h-16 lg:hidden" aria-hidden />

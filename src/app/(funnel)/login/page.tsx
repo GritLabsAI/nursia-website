@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { SignupForm } from "@/components/SignupForm";
 import { FunnelHeader } from "@/components/FunnelHeader";
@@ -19,14 +18,9 @@ export default function LoginPage() {
           Your progress, review list, and free-question count are waiting where you left them.
         </p>
         <div className="mt-6">
+          {/* The form carries the "no account yet?" line itself, in both modes. */}
           <SignupForm mode="login" />
         </div>
-        <p className="mt-6 text-center text-[0.9375rem] text-ink-2">
-          No account yet?{" "}
-          <Link href="/signup" className="text-teal underline underline-offset-4">
-            Start free
-          </Link>
-        </p>
       </div>
     </div>
   );

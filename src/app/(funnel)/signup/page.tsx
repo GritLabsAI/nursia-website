@@ -7,12 +7,17 @@ import { SITE } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Start free — 50 NCLEX questions, no card",
   description:
-    "Make a free Nursia account with an email and a password. 50 NCLEX questions, full rationales, and your weak topics. No card, ever.",
+    "Make a free Nursia account with a mobile number or an email. 50 NCLEX questions, full rationales, and your weak topics. No card, ever.",
   alternates: { canonical: "/signup" },
   robots: { index: false, follow: true },
 };
 
-const GET = ["50 questions", "Full rationales", "Your weak topics", "No card, ever"];
+const GET = [
+  `${SITE.freeQuestions} practice questions`,
+  "Full answer rationales",
+  "Your weak topics identified",
+  "No card needed",
+];
 const WONT = ["No card required", "No auto-trial that charges you", "Unsubscribe in one click"];
 
 export default function SignupPage() {
@@ -23,25 +28,29 @@ export default function SignupPage() {
       {/*
         Mobile order is the whole point: heading, then the form, then the
         reassurance. The proof used to sit between the promise and the fields,
-        which put the password a full screen below the fold.
+        which put the first input a full screen below the fold.
       */}
       <div className="grid gap-10 pb-16 pt-7 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-20 lg:gap-y-10 lg:pt-14">
         <div className="lg:col-start-1 lg:row-start-1 lg:max-w-md">
-          <h1 className="text-[1.875rem] leading-[1.08] sm:text-[2.25rem] lg:text-[2.5rem]">
-            Make an account, <span className="mark">start practising</span>
+          <p className="eyebrow inline-flex rounded-full border border-rule bg-paper-2 px-3 py-1.5">
+            Free NCLEX practice
+          </p>
+
+          <h1 className="mt-4 text-[1.875rem] leading-[1.08] sm:text-[2.25rem] lg:text-[2.5rem]">
+            Sign up to start <span className="mark">practising for free</span>
           </h1>
           <p className="mt-4 font-body text-[1.0625rem] leading-[1.6] text-ink-2">
             {SITE.freeQuestions} real NCLEX questions with full rationales, free and permanent —
             <span className="hidden sm:inline">
               {" "}
-              not a trial that quietly turns into a charge. We ask for an email and a password and
-              nothing else.
+              not a trial that quietly turns into a charge. A mobile number or an email is all we
+              ask for.
             </span>
             <span className="sm:hidden"> no card, no trial that turns into a charge.</span>
           </p>
 
           {/* On a phone this is the only proof that runs above the fields. */}
-          <ul className="mt-5 flex flex-wrap gap-x-2 gap-y-2 lg:hidden">
+          <ul className="mt-5 flex flex-wrap gap-2 lg:hidden">
             {GET.map((g) => (
               <li
                 key={g}
@@ -58,12 +67,27 @@ export default function SignupPage() {
         </div>
 
         <div className="lg:col-start-1 lg:row-start-2 lg:max-w-md">
-          <div className="hidden border-t border-rule pt-5 lg:block">
-            <p className="eyebrow">What you get, free</p>
-            <ul className="mt-4 flex flex-col gap-2.5">
+          {/* The mockup put this on a dark panel beside the form. Same job here:
+              one block, higher contrast than anything else on the page. */}
+          <div className="flowsheet hidden rounded-sm bg-ink p-6 text-paper lg:block">
+            <p className="eyebrow !text-paper/60">What you get, free</p>
+            <ul className="mt-4 flex flex-col gap-3">
               {GET.map((g) => (
-                <li key={g} className="flex gap-3 text-[0.9375rem] text-ink-2">
-                  <span className="font-mono text-teal">✓</span>
+                <li key={g} className="flex items-start gap-3 text-[0.9375rem] text-paper">
+                  <span
+                    aria-hidden
+                    className="mt-[3px] flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border border-paper/30 bg-paper/10"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none">
+                      <path
+                        d="M5 13l4 4L19 7"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
                   {g}
                 </li>
               ))}
@@ -90,10 +114,10 @@ export default function SignupPage() {
               Not ready?
             </p>
             <Link
-              href="/nclex-practice-questions"
+              href="/practice"
               className="mt-2 inline-block font-mono text-[0.8125rem] leading-relaxed text-teal underline underline-offset-4 hover:text-teal-dark"
             >
-              → 10 questions with no account, on the practice hub
+              → 200 questions with no account, on the practice page
             </Link>
           </div>
         </div>
