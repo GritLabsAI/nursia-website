@@ -12,7 +12,7 @@ import { BANK_COUNTS } from "@/lib/bank/counts";
 export const SITE = {
   name: "Nursia",
   tagline: "NCLEX-RN practice questions, written and reviewed by nurses.",
-  email: "hello@nursia.com",
+  email: "hello@nursia.io",
   url: "https://nursia.com",
   updated: "August 2026",
   totalQuestions: 1200,
@@ -974,26 +974,39 @@ export const PRICING_FAQ: Faq[] = [
   },
 ];
 
+/**
+ * The homepage set. Deliberately not HUB_FAQ: that one answers questions about
+ * the exam, this one answers what someone asks before they sign up — money,
+ * authorship, formats, and whether it works on the phone in their hand.
+ */
 export const HOME_FAQ: Faq[] = [
   {
-    q: "Are these Next Generation NCLEX questions?",
-    a: "Yes — unfolding case studies, matrix, bowtie, and select-all-that-apply items alongside standard single-answer questions, matching the exam as it has been since April 2023.",
+    q: "Are the questions really free?",
+    a: "Two hundred of them are, on the practice page, with no account at all. A free account adds 50 more across every category and keeps your progress, and it never asks for a card.",
   },
   {
     q: "Who writes the questions?",
     a: "Practising registered nurses write every item, and two more RNs review each one against the NCSBN test plan before it goes live. Names and credentials are on the about page.",
   },
   {
-    q: "Can I cancel?",
-    a: "Any time, from account settings, in one click. Access runs to the end of the period you have paid for.",
+    q: "Are these Next Generation NCLEX questions?",
+    a: "Yes — unfolding case studies, matrix, bowtie, and select-all-that-apply items alongside standard single-answer questions, matching the exam as it has been since April 2023.",
+  },
+  {
+    q: "What is the readiness score?",
+    a: "One number for how ready you are, weighted the way the NCSBN test plan weights each category rather than by raw accuracy. It moves after every session and breaks down by category, so it tells you what to study next.",
+  },
+  {
+    q: "Does it work on a phone?",
+    a: "Yes. The whole thing runs in a browser on a phone, tablet, or laptop, and your progress follows you between them. There is no app to install.",
   },
   {
     q: "How long do I need to study?",
     a: "Four to six weeks at around 90 minutes a day covers most candidates coming straight out of school. Our 4-week plan lays out what to do each week.",
   },
   {
-    q: "Do you offer refunds?",
-    a: "14 days, no questions asked. Email us and we process it the same day.",
+    q: "Can I cancel, and do you refund?",
+    a: "Cancel any time from account settings in one click, and access runs to the end of the period you paid for. Refunds are 14 days, no questions asked, processed the same day.",
   },
 ];
 

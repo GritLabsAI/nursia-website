@@ -70,7 +70,7 @@ export default async function TopicPage({ params }: Params) {
       <StickyCta />
 
       <Section className="pt-10 pb-14">
-        <div className="mx-auto max-w-3xl">
+        <div className="max-w-3xl">
           <Breadcrumbs trail={trail} />
 
           <h1 className="text-[2.125rem] leading-[1.05] sm:text-[2.75rem]">{t.h1}</h1>
@@ -117,7 +117,7 @@ export default async function TopicPage({ params }: Params) {
                     gate={{
                       eyebrow: "End of the free set",
                       headline: "Keep going",
-                      body: `A free account opens 50 questions across every category, including more ${t.name.toLowerCase()}. No card.`,
+                      body: `A free account opens 50 questions across every category, including more ${t.name.toLowerCase()}.`,
                       cta: { label: "Start free →", href: "/signup" },
                       exits: [
                         { label: "Practise any topic", href: "/practice" },

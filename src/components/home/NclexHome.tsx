@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { HOME_FAQ } from "@/lib/content";
 import { CYCLE_STAGES } from "./cycleData";
 import { QTYPE_DATA } from "./qtypeData";
 
@@ -690,6 +691,34 @@ export function NclexHome() {
       </section>
 
       {/* -------------------------------------------------- cta strip */}
+      {/* ---------------------------------------------------------- faq */}
+      {/* Native <details>, so every answer is in the HTML whether or not it is
+          open — the same reason the question rationales are. */}
+      <section className="faq-fold" id="faq">
+        <div className="wrap">
+          <div className="faq-head">
+            <p className="section-eyebrow">Questions people ask first</p>
+            <h2 className="faq-heading">Before you sign up.</h2>
+          </div>
+          <div className="faq-list">
+            {HOME_FAQ.map((f) => (
+              <details key={f.q} className="faq-item">
+                <summary>
+                  <span>{f.q}</span>
+                  <span className="faq-mark" aria-hidden />
+                </summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+          <p className="faq-more">
+            More on the exam itself in the{" "}
+            <Link href="/guides">guides</Link>, or on{" "}
+            <Link href="/pricing">pricing</Link>.
+          </p>
+        </div>
+      </section>
+
       <section className="section-cta-strip">
         <div className="cta-strip">
           <div className="cta-proof">
@@ -715,7 +744,7 @@ export function NclexHome() {
             <Link href="/signup" className="btn-pill">
               Start free →
             </Link>
-            <span className="cta-strip-note">No card needed</span>
+            <span className="cta-strip-note">Cancel anytime</span>
           </div>
         </div>
 

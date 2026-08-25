@@ -1,8 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Wordmark } from "./Wordmark";
 
 const NAV = [
@@ -17,25 +13,11 @@ const NAV = [
  * Five links, "Log in" as plain text, "Start free" as the only solid button.
  * The wording of that button never changes anywhere on the site.
  *
- * The five links used to sit on a second scrollable rail on small screens,
- * which cost 210px of a 844px phone — a quarter of the viewport, pinned,
- * on every scroll. They live in a sheet now, so the phone bar carries the
- * wordmark and the one action and nothing else.
+ * On small screens the links sit on a scrollable rail under the bar rather
+ * than behind a menu button: one tap instead of two, and the sitemap stays
+ * on screen. The rail is kept tight — 36px — so the whole header is 92px.
  */
 export function SiteHeader() {
-  const [open, setOpen] = useState(false);
-  const pathname = usePathname();
-
-  // a tap on a link inside the sheet does not unmount the header, so close by route
-  useEffect(() => setOpen(false), [pathname]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
-
   return (
     <header className="sticky top-0 z-40 border-b border-rule bg-paper/92 backdrop-blur-sm">
       {/* From lg up: three columns, so the nav centres on the bar itself and does
@@ -63,7 +45,7 @@ export function SiteHeader() {
         <div className="col-start-3 flex items-center gap-2 justify-self-end sm:gap-4">
           <Link
             href="/login"
-            className="hidden text-sm font-medium text-ink-2 transition-colors hover:text-teal sm:block sm:text-[0.9375rem]"
+            className="text-sm font-medium text-ink-2 transition-colors hover:text-teal sm:text-[0.9375rem]"
           >
             Log in
           </Link>
@@ -73,60 +55,25 @@ export function SiteHeader() {
           >
             Start free
           </Link>
-
-          <button
-            type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-            aria-controls="site-menu"
-            aria-label={open ? "Close menu" : "Open menu"}
-            className="-mr-2 flex h-10 w-10 items-center justify-center rounded-sm text-ink transition-colors hover:bg-paper-2 lg:hidden"
-          >
-            <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" aria-hidden>
-              {open ? (
-                <path
-                  d="M5 5l10 10M15 5L5 15"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                />
-              ) : (
-                <path
-                  d="M3 6h14M3 10h14M3 14h14"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                />
-              )}
-            </svg>
-          </button>
         </div>
       </div>
 
-      {/* The sheet: full-width rows, thumb-sized, and it never renders on lg. */}
-      <div
-        id="site-menu"
-        hidden={!open}
-        className="border-t border-rule bg-paper lg:hidden"
+      {/* Small screens: the five links move to a scrollable rail rather than
+          a hamburger — one tap instead of two, and the sitemap stays visible. */}
+      <nav
+        aria-label="Sections"
+        className="flex gap-5 overflow-x-auto border-t border-rule px-5 py-2 sm:px-8 lg:hidden"
       >
-        <nav aria-label="Sections" className="mx-auto max-w-[1140px] px-5 py-2 sm:px-8">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex min-h-12 items-center border-b border-rule/70 text-[1rem] font-medium text-ink transition-colors last:border-b-0 hover:text-teal"
-            >
-              {item.label}
-            </Link>
-          ))}
+        {NAV.map((item) => (
           <Link
-            href="/login"
-            className="flex min-h-12 items-center border-t border-rule/70 font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-ink-2 transition-colors hover:text-teal"
+            key={item.href}
+            href={item.href}
+            className="shrink-0 text-sm font-medium text-ink-2 transition-colors hover:text-teal"
           >
-            Log in
+            {item.label}
           </Link>
-        </nav>
-      </div>
+        ))}
+      </nav>
     </header>
   );
 }
