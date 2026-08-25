@@ -22,7 +22,7 @@ export function LegalPage({
     <>
       <BreadcrumbSchema trail={trail} />
       <Section className="pt-10 pb-20">
-        <div className="mx-auto max-w-2xl">
+        <div className="max-w-2xl">
           <Breadcrumbs trail={trail} />
           <h1 className="text-[2.125rem] leading-[1.05] sm:text-[2.5rem]">{title}</h1>
           <p className="mt-3 font-mono text-[11px] text-muted">Last updated {SITE.updated}</p>

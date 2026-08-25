@@ -37,7 +37,7 @@ export default function PricingPage() {
       <FaqSchema items={PRICING_FAQ} />
 
       <Section className="pt-10 pb-14">
-        <div className="mx-auto max-w-3xl">
+        <div className="max-w-3xl">
           <Breadcrumbs trail={TRAIL} />
           <h1 className="text-[2.25rem] leading-[1.04] sm:text-[3rem]">
             One plan. <span className="mark">Cancel whenever.</span>
@@ -130,7 +130,7 @@ export default function PricingPage() {
       </Section>
 
       <CtaBand
-        heading="Start free — 10 questions, no card."
+        heading="Start free — 10 questions, nothing to enter."
         sub="Free tier first, price later. You will know whether the questions are worth paying for before we ask."
       />
     </>

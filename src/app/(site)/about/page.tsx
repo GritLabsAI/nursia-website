@@ -42,7 +42,7 @@ export default function AboutPage() {
       <BreadcrumbSchema trail={TRAIL} />
 
       <Section className="pt-10 pb-14">
-        <div className="mx-auto max-w-3xl">
+        <div className="max-w-3xl">
           <Breadcrumbs trail={TRAIL} />
           <h1 className="text-[2.25rem] leading-[1.04] sm:text-[3rem]">Why we built this</h1>
 

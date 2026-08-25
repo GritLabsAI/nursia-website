@@ -38,7 +38,7 @@ export default function ContactPage() {
           reviews, so it is the one thing we are strict about.
         </p>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:gap-16">
           <Suspense
             fallback={<div className="h-96 rounded-sm border border-rule bg-white" />}
           >

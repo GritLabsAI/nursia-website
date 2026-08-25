@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { FaqSchema } from "@/components/Blocks";
 import { NclexHome } from "@/components/home/NclexHome";
+import { HOME_FAQ } from "@/lib/content";
 import "./nclex-home.css";
 
 export const metadata: Metadata = {
@@ -10,5 +12,10 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <NclexHome />;
+  return (
+    <>
+      <FaqSchema items={HOME_FAQ} />
+      <NclexHome />
+    </>
+  );
 }

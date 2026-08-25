@@ -306,7 +306,7 @@ export default function HubPage() {
                 <p className="eyebrow">Free tier</p>
                 <p className="mt-3 font-mono text-[1.5rem] leading-none text-ink">50</p>
                 <p className="mt-2 text-[0.8125rem] leading-snug text-ink-2">
-                  more questions with a free account. No card.
+                  more questions with a free account.
                 </p>
                 <Link href="/signup" className="btn btn-primary mt-4 w-full !py-2.5 !text-sm">
                   Start free →

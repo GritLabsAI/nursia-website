@@ -2615,3 +2615,255 @@
     opacity: 1;
   }
 }
+
+/* ============================================================
+   PHONE PASS
+   The page read as chopped on a phone for three separate reasons,
+   all of them layout rather than content:
+
+   1. the hero was indented 42px while every other section sat at
+      18px, so the first screen never lined up with the rest;
+   2. the question-type deck held the height of its tallest slide,
+      which left a two-line question floating in a 300px well;
+   3. the cohort tiles in the closing band are rotated and offset,
+      and the band clipped the top of every one of them.
+
+   Everything below is the fix for those, plus one consistent
+   gutter and one consistent vertical rhythm.
+   ============================================================ */
+@media (max-width: 640px) {
+  /* --- one gutter, whole page ------------------------------- */
+  .nlx-home .wrap {
+    padding: 0 20px;
+  }
+  .nlx-home .hero-copy {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .nlx-home .hero-stage {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* --- vertical rhythm -------------------------------------- */
+  /* Sections ranged 40-48px top and bottom, which on a 667px screen
+     reads as an arbitrary gap rather than a beat. One value. */
+  .nlx-home section,
+  .nlx-home .section-why,
+  .nlx-home .section-anywhere,
+  .nlx-home .loop-fold {
+    padding-top: 44px;
+    padding-bottom: 44px;
+  }
+  .nlx-home .hero {
+    padding: 0;
+  }
+  .nlx-home .hero-copy {
+    padding-top: 34px;
+    padding-bottom: 26px;
+  }
+  .nlx-home .hero-stage {
+    padding-bottom: 34px;
+  }
+
+  /* --- the question-type deck ------------------------------- */
+  /* Sized to the slide on screen instead of to the tallest one in
+     the set. The three ghost cards behind it are height:100% of
+     this box, so they follow along. */
+  .nlx-home .qtype-stack {
+    width: 100%;
+    height: auto;
+    min-height: 340px;
+    margin-bottom: 24px;
+  }
+  .nlx-home .qtype-stack-front {
+    position: relative;
+  }
+  .nlx-home .qs-body {
+    justify-content: flex-start;
+    padding: 22px 18px;
+  }
+  .nlx-home .qtype-stack-wrap {
+    margin-top: 26px;
+  }
+
+  /* same treatment for the loop deck, same reason */
+  .nlx-home .cycle-stack {
+    width: 100%;
+    height: auto;
+    min-height: 250px;
+  }
+
+  /* --- closing band: the cohort ----------------------------- */
+  /* The tiles are rotated and translated up to 11px either way;
+     4px of top padding meant the band cropped every one of them. */
+  .nlx-home .cta-collage {
+    padding: 24px 20px 40px;
+    overflow: visible;
+  }
+  .nlx-home .cta-tile {
+    width: clamp(66px, 19vw, 92px);
+  }
+  .nlx-home .cta-strip {
+    padding: 36px 20px 30px;
+  }
+
+  /* --- touch targets ---------------------------------------- */
+  /* The deck dots were 8px of tappable area in a 44px world. */
+  .nlx-home .qtype-stack-dots button,
+  .nlx-home .cycle-dots button {
+    min-height: 32px;
+    min-width: 26px;
+  }
+  .nlx-home .btn-pill {
+    min-height: 48px;
+  }
+}
+
+/* ============================================================
+   FAQ
+   Native <details> so every answer ships in the HTML whether or
+   not it is open — the same reason the rationales do. The rule
+   above each row is the only decoration; the mark on the right
+   is a plus that becomes a minus.
+   ============================================================ */
+.nlx-home .faq-fold {
+  background: var(--color-paper);
+  border-top: 1px solid var(--color-rule);
+}
+.nlx-home .faq-head {
+  max-width: 620px;
+  margin: 0 auto 34px;
+  text-align: center;
+}
+.nlx-home .faq-heading {
+  margin-top: 12px;
+  font-size: clamp(28px, 4.6vw, 42px);
+  letter-spacing: -0.022em;
+  color: var(--color-ink);
+}
+.nlx-home .faq-list {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.nlx-home .faq-item {
+  border-top: 1px solid var(--color-rule);
+}
+.nlx-home .faq-item:last-child {
+  border-bottom: 1px solid var(--color-rule);
+}
+.nlx-home .faq-item > summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  list-style: none;
+  cursor: pointer;
+  padding: 20px 0;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: clamp(15.5px, 1.7vw, 17.5px);
+  letter-spacing: -0.012em;
+  color: var(--color-ink);
+  transition: color 0.15s ease;
+}
+.nlx-home .faq-item > summary::-webkit-details-marker {
+  display: none;
+}
+.nlx-home .faq-item > summary:hover {
+  color: var(--color-teal);
+}
+/* the plus: two rules, one of which folds away when the row opens */
+.nlx-home .faq-mark {
+  position: relative;
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  align-self: center;
+}
+.nlx-home .faq-mark::before,
+.nlx-home .faq-mark::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 1.5px;
+  background: var(--color-muted);
+  transition: transform 0.2s ease;
+}
+.nlx-home .faq-mark::after {
+  transform: rotate(90deg);
+}
+.nlx-home .faq-item[open] .faq-mark::after {
+  transform: rotate(0deg);
+}
+.nlx-home .faq-item[open] > summary {
+  color: var(--color-ink);
+}
+.nlx-home .faq-item > p {
+  max-width: 62ch;
+  padding: 0 0 22px;
+  font-family: var(--font-body);
+  font-size: clamp(14.5px, 1.6vw, 16px);
+  line-height: 1.7;
+  color: var(--color-ink-2);
+}
+.nlx-home .faq-more {
+  max-width: 720px;
+  margin: 26px auto 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+.nlx-home .faq-more a {
+  color: var(--color-teal);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (max-width: 640px) {
+  .nlx-home .faq-head {
+    text-align: left;
+    margin-bottom: 24px;
+  }
+  .nlx-home .faq-item > summary {
+    padding: 17px 0;
+    gap: 14px;
+  }
+}
+
+/* ============================================================
+   PHONE PASS, second round
+   ============================================================ */
+@media (max-width: 640px) {
+  /* The five loop stages were a horizontal scroll rail, so the fifth
+     one sat off-screen and the row asked to be swiped in a page that
+     scrolls vertically everywhere else. Wrap them instead: three, then
+     two, centred — five stages, all of them visible at once. */
+  .nlx-home .loop {
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-x: visible;
+    gap: 14px 6px;
+    padding-bottom: 0;
+  }
+  .nlx-home .loop-step {
+    flex: 0 1 calc(33.333% - 6px);
+    min-width: 0;
+    padding: 6px 2px;
+  }
+  .nlx-home .loop-label {
+    font-size: 12px;
+    line-height: 1.25;
+  }
+
+  /* The loop deck is a stack of absolutely-positioned screens. Giving the
+     stack `height: auto` in the last pass left the screen out of flow, so
+     the card was cut off at the bottom — put the front screen back in. */
+  .nlx-home .cycle-screen {
+    position: relative;
+  }
+  .nlx-home .cycle-stack {
+    min-height: 0;
+    margin-bottom: 20px;
+  }
+}
