@@ -232,9 +232,11 @@ export function QuestionSet({
               {gate.body}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+              {/* Signup CTA temporarily hidden — not working yet.
               <Link href={gate.cta.href} className="btn btn-primary">
                 {gate.cta.label}
               </Link>
+              */}
               <span className="font-mono text-[11px] text-muted">No card needed</span>
             </div>
             {gate.exits && (

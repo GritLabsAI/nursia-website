@@ -17,6 +17,9 @@ export function FunnelHeader({
   altLabel: string;
 }) {
   const router = useRouter();
+  // altHref/altLabel are unused while the login/signup cross-link below is hidden.
+  void altHref;
+  void altLabel;
 
   function back() {
     if (typeof window !== "undefined" && window.history.length > 1) router.back();
@@ -47,12 +50,14 @@ export function FunnelHeader({
           <Wordmark />
         </Link>
 
+        {/* Login/signup cross-link temporarily hidden — not working yet.
         <Link
           href={altHref}
           className="ml-auto min-h-11 shrink-0 content-center text-[0.9375rem] font-medium text-ink-2 transition-colors hover:text-teal"
         >
           {altLabel}
         </Link>
+        */}
       </div>
     </header>
   );

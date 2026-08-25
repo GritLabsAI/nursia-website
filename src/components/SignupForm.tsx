@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import Link from "next/link";
 import { signIn } from "@/lib/session";
 
 /**
@@ -339,6 +338,7 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
             )}
           </label>
 
+          {/* Forgot-password link temporarily hidden — login isn't working yet.
           {mode === "login" && (
             <a
               href="/login"
@@ -347,6 +347,7 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
               Forgot password?
             </a>
           )}
+          */}
 
           {error && (
             <p role="alert" className="font-mono text-[11px] text-wrong">
@@ -379,6 +380,7 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
         </>
       )}
 
+      {/* Login/signup cross-link temporarily hidden — not working yet.
       <p className="mt-5 text-center text-[0.875rem] text-ink-2">
         {mode === "signup" ? (
           <>
@@ -396,6 +398,7 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
           </>
         )}
       </p>
+      */}
 
       <p className="mt-4 text-center font-mono text-[11px] leading-relaxed text-muted">
         By continuing you agree to our{" "}
