@@ -41,9 +41,11 @@ export function TryClient() {
             are costing you marks. Email and password, no card.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-4">
+            {/* Signup CTA temporarily hidden — not working yet.
             <Link href="/signup" className="btn btn-primary">
               Start free →
             </Link>
+            */}
             <Link href="/nclex-practice-questions" className="btn btn-ghost">
               10 questions with no account
             </Link>

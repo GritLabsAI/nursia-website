@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { TopicIcon } from "@/components/TopicIcon";
 import type { BankQuestion } from "@/lib/bank/types";
 import type { IconKey } from "@/lib/icons";
@@ -331,9 +330,11 @@ function Results({
             {closeLabel}
           </button>
         ) : (
-          <Link href="/signup" className="btn btn-ghost">
-            Unlock 50 more, free →
-          </Link>
+          // Signup CTA temporarily hidden — not working yet.
+          // <Link href="/signup" className="btn btn-ghost">
+          //   Unlock 50 more, free →
+          // </Link>
+          null
         )}
       </div>
     </div>

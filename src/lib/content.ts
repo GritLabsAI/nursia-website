@@ -1037,5 +1037,6 @@ export const TOOLS = [
   { name: "Dosage calculator", note: "Check your setup, not just your answer", href: "/nclex" },
   { name: "Lab values sheet", note: "The 24 values the exam repeats", href: "/nclex" },
   { name: "Test plan breakdown", note: "All eight categories with weights", href: "/guides/whats-on-the-test-plan" },
-  { name: "Readiness quiz", note: "2 questions, instant estimate", href: "/signup" },
+  // Signup CTA temporarily hidden — not working yet.
+  // { name: "Readiness quiz", note: "2 questions, instant estimate", href: "/signup" },
 ];
