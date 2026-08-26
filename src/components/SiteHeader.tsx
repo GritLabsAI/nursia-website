@@ -81,34 +81,3 @@ export function SiteHeader() {
     </header>
   );
 }
-
-/** Signed-in shell: product navigation, plus the free-tier counter. */
-export function AppHeader({ questionsLeft }: { questionsLeft: number }) {
-  return (
-    <header className="border-b border-rule bg-paper">
-      <div className="mx-auto flex h-16 max-w-[1140px] items-center gap-7 px-5 sm:px-8">
-        <Link href="/" className="flex items-center" aria-label="Nursia — home">
-          <Wordmark />
-        </Link>
-        <nav aria-label="Main" className="flex items-center gap-6">
-          <span className="text-[0.9375rem] font-semibold text-ink">Practice</span>
-          <Link
-            href="/nclex"
-            className="text-[0.9375rem] font-medium text-ink-2 transition-colors hover:text-teal"
-          >
-            Progress
-          </Link>
-          <Link
-            href="/guides"
-            className="hidden text-[0.9375rem] font-medium text-ink-2 transition-colors hover:text-teal sm:block"
-          >
-            Guides
-          </Link>
-        </nav>
-        <span className="eyebrow ml-auto shrink-0 rounded-sm border border-rule bg-white px-2.5 py-1.5 !text-[10px] text-ink">
-          {questionsLeft} free left
-        </span>
-      </div>
-    </header>
-  );
-}

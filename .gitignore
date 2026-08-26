@@ -44,3 +44,8 @@ next-env.d.ts
 
 # logo build source font (re-downloadable, see scripts/README.md)
 scripts/.fonts/
+
+# firebase emulator logs
+*-debug.log
+firebase-debug.*.log
+.firebase/

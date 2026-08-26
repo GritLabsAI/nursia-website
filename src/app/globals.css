@@ -333,6 +333,34 @@
   .acc > summary:hover {
     color: var(--color-teal);
   }
+
+  /* --- exam chrome -------------------------------------------- */
+
+  /* The calculator the exam hands you: a keypad, not a UI button. */
+  .calc-key {
+    min-height: 2.25rem;
+    border: 1px solid var(--color-rule);
+    border-radius: 3px;
+    background: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    color: var(--color-ink);
+    transition:
+      border-color 0.12s ease,
+      background-color 0.12s ease;
+  }
+  .calc-key:hover {
+    border-color: var(--color-ink);
+    background: #fff;
+  }
+  .calc-key:active {
+    background: var(--color-paper-2);
+  }
+
+  /* The clock goes red for the last five minutes and only then. */
+  .exam-clock[data-low="true"] {
+    color: var(--color-wrong);
+  }
 }
 
 /* faint chart-paper grid, for dark bands only */

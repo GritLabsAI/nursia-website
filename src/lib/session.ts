@@ -1,63 +1,94 @@
 /**
- * Front-end session stub.
+ * The signed-in user.
  *
- * There is no auth backend in this build. The gate at /signup and the post-auth
- * pages behind it are wired through localStorage so the whole funnel is
- * walkable end to end. Replace signIn / signOut / read with real auth calls and
- * nothing else in the UI has to change.
+ * This was a localStorage stub; it is Firebase Auth now. The shape it exposes
+ * is deliberately unchanged — a subscribable store read through
+ * `useSyncExternalStore`, with `null` on the server and on the first client
+ * paint — so the pages that read it did not have to change.
  *
- * Exposed as a subscribable store so components can read it with
- * `useSyncExternalStore` rather than a mount effect.
+ * The one new state is `pending`: Firebase takes a moment to work out whether
+ * the browser already has a session, and a page that treats that moment as
+ * "signed out" flashes the gate at someone who is signed in.
  */
 
-const KEY = "nursia.session";
+import {
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut as firebaseSignOut,
+  type User,
+} from "firebase/auth";
+import { authMessage, firebaseReady, getFirebaseAuth } from "@/lib/firebase";
 
 export type Session = {
+  uid: string;
   email: string;
-  /** the free tier has to still mean something on this side of the gate */
-  questionsUsed: number;
-  startedAt: string;
+  /** from a Google account; empty for an email signup */
+  name: string;
 };
 
+/**
+ * Kept as the shape of a tier that is not switched on: nothing is metered
+ * while everything is free, so no page counts against this any more. It is
+ * here for the day there is a paid tier to draw a line for.
+ */
 export const FREE_ALLOWANCE = 50;
 
-/* Cached snapshot — useSyncExternalStore requires a stable reference between
-   changes, so we only re-parse when something writes. */
 let snapshot: Session | null = null;
-let raw: string | null = null;
+/** true until Firebase has told us one way or the other */
+let pending = firebaseReady;
+let started = false;
 const listeners = new Set<() => void>();
 
-function read(): Session | null {
-  const next = window.localStorage.getItem(KEY);
-  if (next !== raw) {
-    raw = next;
-    try {
-      snapshot = next ? (JSON.parse(next) as Session) : null;
-    } catch {
-      snapshot = null;
-    }
-  }
-  return snapshot;
-}
-
-function write(session: Session | null) {
-  if (session) window.localStorage.setItem(KEY, JSON.stringify(session));
-  else window.localStorage.removeItem(KEY);
-  read();
+function emit() {
   listeners.forEach((l) => l());
 }
 
+const toSession = (user: User): Session => ({
+  uid: user.uid,
+  email: user.email ?? "",
+  name: user.displayName ?? "",
+});
+
+/* One listener for the whole app, opened by the first subscriber. */
+function start() {
+  if (started) return;
+  started = true;
+
+  const auth = getFirebaseAuth();
+  if (!auth) {
+    pending = false;
+    return;
+  }
+
+  onAuthStateChanged(
+    auth,
+    (user) => {
+      snapshot = user ? toSession(user) : null;
+      pending = false;
+      emit();
+    },
+    () => {
+      /* An auth backend we cannot reach is the same as being signed out, and
+         the pages behind the gate say so rather than spinning. */
+      snapshot = null;
+      pending = false;
+      emit();
+    },
+  );
+}
+
 export function subscribe(listener: () => void) {
+  start();
   listeners.add(listener);
-  window.addEventListener("storage", listener);
-  return () => {
-    listeners.delete(listener);
-    window.removeEventListener("storage", listener);
-  };
+  return () => listeners.delete(listener);
 }
 
 export function getSnapshot(): Session | null {
-  return read();
+  return snapshot;
 }
 
 /** The server has no session, and neither does the first client paint. */
@@ -65,21 +96,54 @@ export function getServerSnapshot(): Session | null {
   return null;
 }
 
-export function signIn(email: string) {
-  const existing = getSnapshot();
-  write(
-    existing?.email === email
-      ? existing
-      : { email, questionsUsed: 8, startedAt: new Date().toISOString() },
-  );
+/** True while Firebase is still deciding — render a hold, not the gate. */
+export function isPending(): boolean {
+  return pending;
 }
 
-export function recordAnswered(count = 1) {
-  const s = getSnapshot();
-  if (!s) return;
-  write({ ...s, questionsUsed: Math.min(FREE_ALLOWANCE, s.questionsUsed + count) });
+export function getPendingServerSnapshot(): boolean {
+  return true;
 }
 
-export function signOut() {
-  write(null);
+/** Subscribe to `pending` alongside the session; same listener set. */
+export const subscribePending = subscribe;
+
+export class AuthUnavailable extends Error {
+  constructor() {
+    super("Accounts are not switched on yet.");
+    this.name = "AuthUnavailable";
+  }
 }
+
+function requireAuth() {
+  const auth = getFirebaseAuth();
+  if (!auth) throw new AuthUnavailable();
+  return auth;
+}
+
+export async function signUpWithEmail(email: string, password: string) {
+  await createUserWithEmailAndPassword(requireAuth(), email, password);
+}
+
+export async function signInWithEmail(email: string, password: string) {
+  await signInWithEmailAndPassword(requireAuth(), email, password);
+}
+
+export async function signInWithGoogle() {
+  const provider = new GoogleAuthProvider();
+  /* Always ask which account. Someone signed into a personal and a school
+     Google in the same browser should get to choose. */
+  provider.setCustomParameters({ prompt: "select_account" });
+  await signInWithPopup(requireAuth(), provider);
+}
+
+export async function resetPassword(email: string) {
+  await sendPasswordResetEmail(requireAuth(), email);
+}
+
+export async function signOut() {
+  const auth = getFirebaseAuth();
+  if (auth) await firebaseSignOut(auth);
+}
+
+export { authMessage };

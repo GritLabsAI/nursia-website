@@ -1,0 +1,53 @@
+rules_version = '2';
+
+/**
+ * Nursia — Firestore security rules.
+ *
+ * Everything a candidate writes lives under their own uid and nobody else can
+ * read it, including other signed-in candidates. There is no server here, so
+ * these rules are the whole of the access control: the web API key in the
+ * client is public by design and protects nothing.
+ *
+ * Deploy with:  firebase deploy --only firestore:rules
+ */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      /**
+       * One document per exam, keyed by its seed.
+       *
+       * Shape is checked rather than trusted: the client is the only writer,
+       * so a tampered payload would otherwise become the record. Answers stay
+       * capped at the exam length, and startedAt is immutable once written so
+       * an exam cannot be back-dated to buy time on the clock.
+       */
+      match /exams/{seed} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && request.resource.data.seed is number
+          && request.resource.data.startedAt is string
+          && request.resource.data.answers is list
+          && request.resource.data.answers.size() <= 200;
+
+        allow update: if isOwner(uid)
+          && request.resource.data.seed == resource.data.seed
+          && request.resource.data.startedAt == resource.data.startedAt
+          && request.resource.data.answers is list
+          && request.resource.data.answers.size() == resource.data.answers.size();
+      }
+    }
+
+    /* Anything not named above is closed. */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
