@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSession } from "@/lib/useSession";
 import {
   AuthUnavailable,
   authMessage,
@@ -52,6 +53,7 @@ function GoogleMark() {
 
 export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
   const router = useRouter();
+  const { session, pending } = useSession();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,6 +64,17 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
   const [busy, setBusy] = useState<"email" | "google" | "reset" | null>(null);
 
   const verb = mode === "signup" ? "Start free" : "Log in";
+
+  /* Arriving here *already* signed in means this page is a dead end asking
+     for a password they have already given, so send them on.
+     
+     Not when the session is one this form just created, though: that one is
+     on its way to the exam, and racing it to /try would send every new
+     account to the wrong place. */
+  const signingIn = useRef(false);
+  useEffect(() => {
+    if (!pending && session && !signingIn.current) router.replace("/try");
+  }, [pending, session, router]);
 
   /* Signing up lands you in the exam brief rather than on a dashboard: the
      fifty questions are the thing that was promised, and a menu in between is
@@ -74,9 +87,11 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
     setBusy(which);
     setError(null);
     setNote(null);
+    if (which !== "reset") signingIn.current = true;
     try {
       await action();
     } catch (err) {
+      signingIn.current = false;
       if (err instanceof AuthUnavailable) {
         setError("Accounts are not switched on yet. Practice questions work without one.");
       } else {

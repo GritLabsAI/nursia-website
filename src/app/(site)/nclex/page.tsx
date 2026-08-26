@@ -9,12 +9,14 @@ import {
   Section,
   SectionHead,
 } from "@/components/Blocks";
-import { GUIDES, TOOLS, TOPICS } from "@/lib/content";
+import { CLUSTERS, GUIDES, TOOLS, TOPICS } from "@/lib/content";
+
+const GUIDE_COUNT = GUIDES.length;
 
 export const metadata: Metadata = {
   title: { absolute: "Everything for the NCLEX — the full index | Nursia" },
   description:
-    "Every question set, guide, and tool on Nursia in one place: eight topic sets, nine guides, and the free reference sheets. Nothing on the site is more than two clicks from here.",
+    `Every question set, guide, and tool on Nursia in one place: ${TOPICS.length} topic sets, ${GUIDE_COUNT} guides, and the free reference sheets. Nothing on the site is more than two clicks from here.`,
   alternates: { canonical: "/nclex" },
 };
 
@@ -57,7 +59,7 @@ export default function NclexIndexPage() {
             <SectionHead
               eyebrow="1 · Question sets"
               title="By topic"
-              note="Eight sets, 1,200 questions. Five on each page are free with no account."
+              note={`${TOPICS.length} sets, 1,200 questions. Five on each page are free with no account.`}
             />
             <ul className="mt-8 grid gap-3 sm:grid-cols-2">
               {TOPICS.map((t) => (
@@ -89,7 +91,7 @@ export default function NclexIndexPage() {
             <SectionHead
               eyebrow="2 · Guides"
               title="Written explanations"
-              note="Grouped on the guides hub by where you are in your prep. Listed flat here."
+              note={`${GUIDE_COUNT} guides in ${CLUSTERS.length} clusters on the guides hub, grouped by where you are in your prep. Listed flat here.`}
             />
             <ul className="mt-8 grid gap-3 sm:grid-cols-2">
               {GUIDES.map((g) => (

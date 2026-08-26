@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { SignOutButton } from "./SignOutButton";
+import { AccountMenu } from "./AccountMenu";
 import { Wordmark } from "./Wordmark";
 
 /**
  * Signed-in shell: product navigation, plus how far into the exam they are.
  *
- * Its own file rather than sitting beside <SiteHeader>: it pulls in the sign
- * out button, which pulls in Firebase Auth, and <SiteHeader> is on every
- * public page. Sharing a module put the whole auth bundle in the payload of a
- * topic page that a search engine sent someone to.
+ * Its own file rather than sitting beside <SiteHeader>, which is on every
+ * public page and should not carry this one's weight.
+ *
+ * The account control is the same <AccountMenu> the public header uses, so
+ * the profile and the way out sit in the same corner of the screen wherever
+ * you are on the site.
  * This chip used to count a free tier down; there is no tier to count while
  * everything is free, and a counter with a paywall behind it was the whole
  * point of it.
@@ -39,7 +41,7 @@ export function AppHeader({ questionsAnswered }: { questionsAnswered: number }) 
           {questionsAnswered > 0 ? `${questionsAnswered} answered` : "Free access"}
         </span>
 
-        <SignOutButton />
+        <AccountMenu />
       </div>
     </header>
   );

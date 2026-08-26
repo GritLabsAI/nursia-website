@@ -6,13 +6,23 @@ import {
   Breadcrumbs,
   Byline,
   CtaBand,
+  FaqList,
+  FaqSchema,
   InlineCta,
   OnThisPage,
   Section,
 } from "@/components/Blocks";
 import { QuestionSet } from "@/components/QuestionSet";
 import { StickyCta } from "@/components/StickyCta";
-import { GUIDES, QUESTIONS, guideBySlug, playableCount, topicBySlug } from "@/lib/content";
+import {
+  GUIDES,
+  QUESTIONS,
+  SITE,
+  guideBySlug,
+  guideModified,
+  playableCount,
+  topicBySlug,
+} from "@/lib/content";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -24,10 +34,28 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const g = guideBySlug(slug);
   if (!g) return {};
+
+  /* Cut the description on a sentence, not mid-word at 155 — a truncated
+     snippet reads as scraped, and assistants quote descriptions verbatim. */
+  const description =
+    g.shortAnswer.length <= 158
+      ? g.shortAnswer
+      : `${g.shortAnswer.slice(0, 155).replace(/[\s,;:]+\S*$/, "")}…`;
+
   return {
     title: { absolute: `${g.title} | Nursia` },
-    description: g.shortAnswer.slice(0, 155),
+    description,
     alternates: { canonical: `/guides/${g.slug}` },
+    openGraph: {
+      type: "article",
+      title: g.h1,
+      description,
+      url: `/guides/${g.slug}`,
+      publishedTime: "2026-08-01T00:00:00.000Z",
+      modifiedTime: `${guideModified(g)}T00:00:00.000Z`,
+      authors: ["Dana Whitfield, RN, MSN"],
+    },
+    twitter: { card: "summary_large_image", title: g.h1, description },
   };
 }
 
@@ -50,14 +78,56 @@ export default async function GuidePage({ params }: Params) {
   const topicCount = topic.count ?? playableCount(topic.slug);
   const next = g.readNext.map((s) => guideBySlug(s)!).filter(Boolean);
 
+  const url = `${SITE.url}/guides/${g.slug}`;
+  const countWords = (text: string) => text.trim().split(/\s+/).length;
+  const words =
+    countWords(g.shortAnswer) +
+    g.sections.reduce((n, sec) => n + countWords(sec.body.join(" ")), 0) +
+    (g.faqs?.reduce((n, f) => n + countWords(`${f.q} ${f.a}`), 0) ?? 0);
+
+  /* One Article node, fully described. The extra properties are not padding:
+     `about`/`mentions` tie the page to entities an answer engine can resolve,
+     `author` carries the credential that makes health content quotable, and
+     `wordCount`/`timeRequired` stop it being read as a stub. */
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
+    "@id": `${url}#article`,
     headline: g.h1,
+    name: g.title,
     description: g.shortAnswer,
-    author: { "@type": "Person", name: "Dana Whitfield, RN, MSN" },
-    publisher: { "@type": "Organization", name: "Nursia" },
-    dateModified: "2026-08-01",
+    abstract: g.shortAnswer,
+    articleSection: g.sections.map((sec) => sec.h2),
+    inLanguage: "en-US",
+    isAccessibleForFree: true,
+    wordCount: words,
+    timeRequired: `PT${g.minutes}M`,
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    author: {
+      "@type": "Person",
+      name: "Dana Whitfield",
+      honorificSuffix: "RN, MSN",
+      jobTitle: "Lead item writer",
+      knowsAbout: ["NCLEX-RN", "Nursing education", topic.category],
+      worksFor: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    },
+    reviewedBy: {
+      "@type": "Person",
+      name: "Priya Raghavan",
+      honorificSuffix: "RN, MSN, CNE",
+    },
+    publisher: {
+      "@type": "Organization",
+      "@id": `${SITE.url}#organization`,
+      name: SITE.name,
+      url: SITE.url,
+    },
+    datePublished: "2026-08-01",
+    dateModified: guideModified(g),
+    about: { "@type": "Thing", name: "NCLEX-RN", sameAs: "https://www.nclex.com/" },
+    mentions: [{ "@type": "Thing", name: topic.category }],
+    isPartOf: { "@type": "CollectionPage", name: "NCLEX Guides", "@id": `${SITE.url}/guides` },
   };
 
   return (
@@ -67,6 +137,7 @@ export default async function GuidePage({ params }: Params) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
+      {g.faqs && <FaqSchema items={g.faqs} />}
       <StickyCta />
 
       <Section className="pt-10 pb-14">
@@ -134,6 +205,20 @@ export default async function GuidePage({ params }: Params) {
               </div>
             )}
 
+            {/* The long-tail phrasings the body cannot answer without turning
+                into a list. Visible copy first, schema second — never the
+                other way round. */}
+            {g.faqs && (
+              <div className="mt-14 border-t border-rule pt-8">
+                <h2 id="faq" className="scroll-mt-24 text-[1.5rem] sm:text-[1.75rem]">
+                  Common questions
+                </h2>
+                <div className="mt-5">
+                  <FaqList items={g.faqs} />
+                </div>
+              </div>
+            )}
+
             <div className="mt-14 border-t border-rule pt-5">
               <p className="eyebrow">Read next</p>
               <ul className="mt-4 grid gap-3 sm:grid-cols-3">
@@ -154,7 +239,10 @@ export default async function GuidePage({ params }: Params) {
           <aside className="hidden lg:block">
             <div className="sticky top-24">
               <OnThisPage
-                items={g.sections.map((s) => ({ label: s.h2, href: `#${anchor(s.h2)}` }))}
+                items={[
+                  ...g.sections.map((s) => ({ label: s.h2, href: `#${anchor(s.h2)}` })),
+                  ...(g.faqs ? [{ label: "Common questions", href: "#faq" }] : []),
+                ]}
               />
               <div className="mt-8 border-t border-rule pt-4">
                 <p className="eyebrow">Practise this</p>

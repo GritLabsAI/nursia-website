@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccountMenu } from "./AccountMenu";
 import { Wordmark } from "./Wordmark";
 
 const NAV = [
@@ -42,19 +43,11 @@ export function SiteHeader() {
           ))}
         </nav>
 
+        {/* Log in / Start free when signed out, a profile menu when signed in.
+            It loads its own auth only for browsers that might have a session,
+            so an anonymous reader still pays nothing for it. */}
         <div className="col-start-3 flex items-center gap-2 justify-self-end sm:gap-4">
-          <Link
-            href="/login"
-            className="text-sm font-medium text-ink-2 transition-colors hover:text-teal sm:text-[0.9375rem]"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="btn btn-primary !min-h-0 !px-3.5 !py-2 !text-[0.8125rem] sm:!px-[1.375rem] sm:!py-2.5 sm:!text-sm"
-          >
-            Start free
-          </Link>
+          <AccountMenu />
         </div>
       </div>
 

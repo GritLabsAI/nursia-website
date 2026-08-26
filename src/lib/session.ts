@@ -21,6 +21,7 @@ import {
   signOut as firebaseSignOut,
   type User,
 } from "firebase/auth";
+import { setAuthHint } from "@/lib/auth-hint";
 import { authMessage, firebaseReady, getFirebaseAuth } from "@/lib/firebase";
 
 export type Session = {
@@ -69,11 +70,17 @@ function start() {
     (user) => {
       snapshot = user ? toSession(user) : null;
       pending = false;
+      /* Written here rather than at the call sites so it covers every way the
+         state can change: signing in, signing out, a token expiring, and
+         another tab doing any of those. */
+      setAuthHint(Boolean(user));
       emit();
     },
     () => {
       /* An auth backend we cannot reach is the same as being signed out, and
-         the pages behind the gate say so rather than spinning. */
+         the pages behind the gate say so rather than spinning. The hint is
+         left alone: the session may well still be good once the network is,
+         and clearing it would turn a blip into a silent sign-out. */
       snapshot = null;
       pending = false;
       emit();
