@@ -308,11 +308,9 @@ export default function HubPage() {
                 <p className="mt-2 text-[0.8125rem] leading-snug text-ink-2">
                   more questions with a free account.
                 </p>
-                {/* Signup CTA temporarily hidden — not working yet.
                 <Link href="/signup" className="btn btn-primary mt-4 w-full !py-2.5 !text-sm">
                   Start free →
                 </Link>
-                */}
               </div>
             </div>
           </aside>

@@ -110,7 +110,10 @@ export function authMessage(error: unknown): string {
     case "auth/popup-blocked":
       return "Your browser blocked the Google window. Allow pop-ups for this site, or use email.";
     case "auth/unauthorized-domain":
-      return "This domain is not on the Firebase authorised list yet — we are fixing it.";
+      /* The domain is missing from Firebase's authorised list. Nothing the
+         person can do about it, so point them at the way in that does work
+         rather than promising a fix the page cannot deliver. */
+      return "Google sign-in is not available here yet. Use your email and a password instead.";
     case "auth/operation-not-allowed":
     case "auth/configuration-not-found":
       return "That sign-in method is not switched on yet. Try the other one.";

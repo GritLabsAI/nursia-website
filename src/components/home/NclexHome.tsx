@@ -231,11 +231,9 @@ export function NclexHome() {
               reviewed by practising nurses — and a readiness score that moves after every session.
             </p>
             <div className="hero-actions">
-              {/* Signup CTA temporarily hidden — not working yet.
               <Link href="/signup" className="btn-pill">
                 Start free →
               </Link>
-              */}
               <span className="hero-note">50 free questions · No card needed</span>
             </div>
             <dl className="hero-stats">
@@ -743,11 +741,9 @@ export function NclexHome() {
           </div>
           <h2 className="cta-strip-heading">50 free questions. No card.</h2>
           <div className="cta-strip-action">
-            {/* Signup CTA temporarily hidden — not working yet.
             <Link href="/signup" className="btn-pill">
               Start free →
             </Link>
-            */}
             <span className="cta-strip-note">Cancel anytime</span>
           </div>
         </div>

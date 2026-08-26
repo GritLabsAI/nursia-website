@@ -53,11 +53,9 @@ export function TryClient() {
             Email and password, no card, and nothing behind a paywall.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-4">
-            {/* Signup CTA temporarily hidden — not working yet.
             <Link href="/signup" className="btn btn-primary">
               Start free →
             </Link>
-            */}
             <Link href="/nclex-practice-questions" className="btn btn-ghost">
               Questions with no account
             </Link>

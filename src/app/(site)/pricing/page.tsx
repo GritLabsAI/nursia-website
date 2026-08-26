@@ -70,11 +70,9 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              {/* Signup CTA temporarily hidden — not working yet.
               <Link href="/signup" className="btn btn-ghost mt-8 w-full">
                 Start free
               </Link>
-              */}
             </div>
 
             <div className="rounded-sm border-2 border-ink bg-white p-7">
@@ -97,14 +95,12 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              {/* Signup CTA temporarily hidden — not working yet.
               <Link href="/signup" className="btn btn-primary mt-8 w-full">
                 Try 10 questions first →
               </Link>
               <p className="mt-3 text-center font-mono text-[11px] text-muted">
                 Even this button goes to the questions, not to checkout
               </p>
-              */}
             </div>
           </div>
 

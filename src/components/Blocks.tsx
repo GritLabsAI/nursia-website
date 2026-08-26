@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Faq } from "@/lib/content";
+import { SITE, type Faq } from "@/lib/content";
 
 /* ------------------------------------------------------------------ layout */
 
@@ -71,11 +71,9 @@ export function Breadcrumbs({ trail }: { trail: { label: string; href?: string }
 export function PrimaryCta({ className = "" }: { className?: string }) {
   return (
     <div className={`flex flex-wrap items-center gap-x-5 gap-y-3 ${className}`}>
-      {/* Signup CTA temporarily hidden — not working yet.
       <Link href="/signup" className="btn btn-primary">
         Start free →
       </Link>
-      */}
       <span className="font-mono text-[11px] text-muted">No card needed</span>
     </div>
   );
@@ -96,11 +94,9 @@ export function InlineCta({ prompt, action }: { prompt: string; action: string }
           {prompt}
         </p>
       </div>
-      {/* Signup CTA temporarily hidden — not working yet.
       <Link href="/signup" className="btn btn-ghost shrink-0 sm:ml-auto">
         {action}
       </Link>
-      */}
     </aside>
   );
 }
@@ -121,11 +117,9 @@ export function CtaBand({
           <p className="mt-4 font-body text-base leading-relaxed text-white/65">{sub}</p>
         </div>
         <div className="md:ml-auto md:shrink-0">
-          {/* Signup CTA temporarily hidden — not working yet.
           <Link href="/signup" className="btn btn-invert">
             Start free →
           </Link>
-          */}
           <p className="mt-3 font-mono text-[11px] text-white/45">
             Cancel anytime · 14-day refund
           </p>
@@ -182,7 +176,7 @@ export function BreadcrumbSchema({
       "@type": "ListItem",
       position: i + 1,
       name: c.label,
-      ...(c.href ? { item: `https://nursia.com${c.href}` } : {}),
+      ...(c.href ? { item: `${SITE.url}${c.href}` } : {}),
     })),
   };
   return (
