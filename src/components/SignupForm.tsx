@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { loggedIn, signedUp } from "@/lib/analytics";
 import { useSession } from "@/lib/useSession";
 import {
   AuthUnavailable,
@@ -113,15 +114,24 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
       return;
     }
     void run("email", async () => {
-      if (mode === "signup") await signUpWithEmail(email.trim(), password);
-      else await signInWithEmail(email.trim(), password);
+      if (mode === "signup") {
+        await signUpWithEmail(email.trim(), password);
+        signedUp("email");
+      } else {
+        await signInWithEmail(email.trim(), password);
+        loggedIn("email");
+      }
       router.push(destination);
     });
   }
 
   function google() {
     void run("google", async () => {
-      await signInWithGoogle();
+      const { isNew } = await signInWithGoogle();
+      /* Google is one button for both, so which event it was is only known
+         after the fact, from whether Firebase had seen this account before. */
+      if (isNew) signedUp("google");
+      else loggedIn("google");
       router.push(destination);
     });
   }

@@ -13,6 +13,7 @@
 
 import {
   GoogleAuthProvider,
+  getAdditionalUserInfo,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
@@ -136,12 +137,15 @@ export async function signInWithEmail(email: string, password: string) {
   await signInWithEmailAndPassword(requireAuth(), email, password);
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(): Promise<{ isNew: boolean }> {
   const provider = new GoogleAuthProvider();
   /* Always ask which account. Someone signed into a personal and a school
      Google in the same browser should get to choose. */
   provider.setCustomParameters({ prompt: "select_account" });
-  await signInWithPopup(requireAuth(), provider);
+  const credential = await signInWithPopup(requireAuth(), provider);
+  /* One button covers signing up and signing in; only Firebase knows which
+     this was. */
+  return { isNew: getAdditionalUserInfo(credential)?.isNewUser ?? false };
 }
 
 export async function resetPassword(email: string) {

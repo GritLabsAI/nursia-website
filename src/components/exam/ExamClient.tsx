@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { examCompleted, examStarted } from "@/lib/analytics";
+import { recordExamFinished, recordExamStarted } from "@/lib/stats";
 import { FunnelHeader } from "@/components/FunnelHeader";
 import { ExamResults } from "@/components/exam/ExamResults";
 import { ExamRunner } from "@/components/exam/ExamRunner";
@@ -65,8 +67,21 @@ export function ExamClient() {
   const scored = Boolean(exam?.score);
   useEffect(() => {
     if (!finishedAt || scored || !items || !exam) return;
-    const { correct, total, pct } = scoreExam(items, exam.answers);
+    const { correct, total, pct, passed } = scoreExam(items, exam.answers);
     recordScore({ correct, total, pct });
+
+    examCompleted({
+      correct,
+      total,
+      pct,
+      passed,
+      expired: exam.expired,
+      minutesTaken: Math.round(
+        (new Date(finishedAt).getTime() - new Date(exam.startedAt).getTime()) / 60000,
+      ),
+      unanswered: exam.answers.filter((a) => a === null).length,
+    });
+    void recordExamFinished(pct);
   }, [finishedAt, scored, items, exam]);
 
   /* Firebase has not said yet whether this browser is signed in. Showing the
@@ -80,6 +95,13 @@ export function ExamClient() {
         </div>
       </Shell>
     );
+  }
+
+  /** Every way a sitting begins goes through here, so it is counted once. */
+  function begin() {
+    startExam(newSeed(), EXAM_LENGTH);
+    examStarted({ length: EXAM_LENGTH });
+    recordExamStarted();
   }
 
   /* ------------------------------------------------------------ gate */
@@ -112,7 +134,7 @@ export function ExamClient() {
   if (!exam) {
     return (
       <Shell>
-        <Brief onStart={() => startExam(newSeed(), EXAM_LENGTH)} email={session.email} />
+        <Brief onStart={begin} email={session.email} />
       </Shell>
     );
   }
@@ -156,11 +178,7 @@ export function ExamClient() {
   if (exam.finishedAt) {
     return (
       <Shell>
-        <ExamResults
-          items={items}
-          state={exam}
-          onRetake={() => startExam(newSeed(), EXAM_LENGTH)}
-        />
+        <ExamResults items={items} state={exam} onRetake={begin} />
       </Shell>
     );
   }

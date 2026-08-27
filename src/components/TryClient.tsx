@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { AppHeader } from "@/components/AppHeader";
+import { StatsStrip } from "@/components/StatsStrip";
 import { TopicIcon } from "@/components/TopicIcon";
 import { EXAM_LENGTH, EXAM_MINUTES, PASS_MARK } from "@/lib/exam";
 import {
@@ -100,6 +101,8 @@ export function TryClient() {
           Everything here is free while we are in early access — the whole bank, the exam, and
           every rationale. No card, and nothing held back for a paid tier.
         </p>
+
+        <StatsStrip />
 
         {/* Said plainly rather than hidden: their work is safe, but it is
             safe in one browser only, and that is worth knowing before they

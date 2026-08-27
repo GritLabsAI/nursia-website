@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { TopicIcon } from "@/components/TopicIcon";
 import { Cross, LETTERS, Tick, WhyBlock } from "@/components/practice/Rationale";
+import { drillCompleted, questionAnswered } from "@/lib/analytics";
+import { recordAnswer } from "@/lib/stats";
 import type { BankQuestion } from "@/lib/bank/types";
 import type { IconKey } from "@/lib/icons";
 
@@ -297,6 +299,19 @@ export function TopicDrill({
     setRun((r) => r + 1);
   }
 
+  /* Reported when the last answer lands rather than when the results render,
+     so a set counts as finished even if they close it before reading them. */
+  function finish(all: number[]) {
+    const correct = all.reduce((n, p, k) => n + (p === questions[k].answer ? 1 : 0), 0);
+    drillCompleted({
+      topic: topic.slug,
+      correct,
+      total,
+      pct: total ? Math.round((correct / total) * 100) : 0,
+    });
+    setDone(true);
+  }
+
   return (
     <div className="qcard overflow-hidden">
       <div className="flex items-center gap-3.5 border-b border-rule bg-paper-2 px-5 py-3.5 sm:px-7">
@@ -349,8 +364,19 @@ export function TopicDrill({
               question={q}
               index={idx}
               total={total}
-              onAnswered={(p) => setPicks((prev) => [...prev, p])}
-              onNext={() => (idx === total - 1 ? setDone(true) : setI(idx + 1))}
+              onAnswered={(p) => {
+                const correct = p === q.answer;
+                questionAnswered({
+                  surface: "drill",
+                  questionId: q.id,
+                  topic: topic.slug,
+                  correct,
+                  index: idx,
+                });
+                recordAnswer(topic.slug, correct);
+                setPicks((prev) => [...prev, p]);
+              }}
+              onNext={() => (idx === total - 1 ? finish(picks) : setI(idx + 1))}
             />
           </div>
         ))

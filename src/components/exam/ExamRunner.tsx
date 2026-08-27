@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Calculator } from "@/components/exam/Calculator";
 import { LETTERS } from "@/components/practice/Rationale";
+import { questionAnswered } from "@/lib/analytics";
 import { clock, EXAM_MINUTES, type ExamItem } from "@/lib/exam";
+import { recordAnswer } from "@/lib/stats";
 import { answerAndAdvance, expireExam, secondsLeft, type ExamState } from "@/lib/exam-session";
 
 /**
@@ -28,11 +30,15 @@ function Item({
   const [picked, setPicked] = useState<number | null>(null);
   const [confirming, setConfirming] = useState(false);
   const stem = useRef<HTMLParagraphElement>(null);
+  /* Wall time on this question, for the pacing half of the report. Stamped in
+     the mount effect rather than during render, which must stay pure. */
+  const shownAt = useRef(0);
   const isLast = index === total - 1;
 
   /* Put the reader at the top of the stem — on a phone the scroll position
      carried over from the last question lands mid-options. */
   useEffect(() => {
+    shownAt.current = Date.now();
     stem.current?.scrollIntoView({ block: "start" });
   }, []);
 
@@ -44,6 +50,19 @@ function Item({
       setConfirming(true);
       return;
     }
+
+    const correct = picked === item.question.answer;
+    /* Recorded before the state change, because advancing unmounts this. */
+    questionAnswered({
+      surface: "exam",
+      questionId: item.question.id,
+      topic: item.category,
+      correct,
+      index,
+      secondsTaken: shownAt.current ? Math.round((Date.now() - shownAt.current) / 1000) : undefined,
+    });
+    recordAnswer(item.category, correct);
+
     answerAndAdvance(index, picked);
   }
 

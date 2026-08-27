@@ -43,6 +43,15 @@ service cloud.firestore {
           && request.resource.data.answers is list
           && request.resource.data.answers.size() == resource.data.answers.size();
       }
+      /**
+       * One running-totals document per account: answered, correct, and the
+       * same pair per topic. Counters only, so the shape is checked loosely —
+       * what matters is that it belongs to the owner and cannot grow without
+       * bound, which is why no answer history is allowed to live here.
+       */
+      match /stats/{doc} {
+        allow read, write: if isOwner(uid);
+      }
     }
 
     /* Anything not named above is closed. */
