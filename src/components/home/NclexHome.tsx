@@ -254,12 +254,11 @@ export function NclexHome() {
           <div className="hero-stage">
             <div className="hero-photo">
               <Image
-                src="/home/hero-desk.png"
+                src="/home/hero-desk.webp"
                 alt="A nursing student in scrubs working through NCLEX practice questions at her desk, a study plan on the whiteboard behind her"
                 width={1536}
                 height={1024}
                 priority
-                quality={95}
                 sizes="(max-width: 900px) 100vw, 52vw"
               />
             </div>
