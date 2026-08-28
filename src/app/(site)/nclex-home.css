@@ -1037,149 +1037,20 @@
 .nlx-home .anywhere-photo img { width: 100%; height: auto; border-radius: 20px; display: block; box-shadow: 0 24px 50px rgba(20,22,26,0.12);
 }
 /* device row */
-.nlx-home .anywhere-devices { display: flex; align-items: flex-end; justify-content: center; gap: 30px; margin-bottom: 44px;
+.nlx-home .anywhere-devices { display: flex; justify-content: center; margin-bottom: 44px;
 }
-.nlx-home .dv-ring { border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.nlx-home .dv-ring-lg { width: 108px; height: 108px;
-}
-.nlx-home .dv-ring-md { width: 84px; height: 84px;
-}
-.nlx-home .dv-ring-inner { width: 76%; height: 76%; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.nlx-home .dv-ring-pct { font-size: 19px; font-weight: 800; color: #14161a; line-height: 1.1;
-}
-.nlx-home .dv-ring-pct.sm { font-size: 15px;
-}
-.nlx-home .dv-ring-sub { font-size: 9.5px; font-weight: 700; color: #157f52;
-}
-/* phone */
-.nlx-home .dv-phone { width: 190px; background: #14161a; border-radius: 32px; padding: 8px; box-shadow: 0 24px 48px rgba(20,22,26,0.18);
-}
-.nlx-home .dv-phone-screen { background: #fff; border-radius: 25px; padding: 26px 16px 18px; position: relative; text-align: center;
-}
-.nlx-home .dv-phone-island { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 46px; height: 13px; background: #14161a; border-radius: 100px;
-}
-.nlx-home .dv-phone-title { font-size: 11px; font-weight: 800; color: #6e6b63; margin-bottom: 12px;
-}
-.nlx-home .dv-ring-lg { margin: 0 auto 12px;
-}
-.nlx-home .dv-note { font-size: 10px; color: #6e6b63; line-height: 1.4; margin-bottom: 14px;
-}
-.nlx-home .dv-weak-label { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: #6e6b63; text-align: left; margin-bottom: 6px;
-}
-.nlx-home .dv-weak-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 10.5px; font-weight: 700; color: #14161a; text-align: left;
-}
-.nlx-home .dv-tag-red { font-size: 8.5px; font-weight: 800; color: #b23a2e; background: #fdf5f3; padding: 3px 7px; border-radius: 100px; white-space: nowrap;
-}
-/* laptop */
-.nlx-home .dv-laptop { width: 460px;
-}
-.nlx-home .dv-laptop-top { background: #14161a; border-radius: 16px 16px 0 0; padding: 12px 12px 0;
-}
-.nlx-home .dv-laptop-cam { display: block; width: 5px; height: 5px; border-radius: 50%; background: #3a3d44; margin: 0 auto 10px;
-}
-.nlx-home .dv-laptop-screen { background: #fff; border-radius: 8px 8px 0 0; padding: 18px 20px 20px;
-}
-.nlx-home .dv-laptop-hinge { height: 4px; background: #0a0b0d; margin: 0 4px;
-}
-.nlx-home .dv-laptop-deck {
-    height: 16px;
-    background: linear-gradient(180deg, #3a3d44, #14161a);
-    margin: 0 -12px;
-    clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
-    border-radius: 0 0 4px 4px;
-    position: relative;
-    box-shadow: 0 4px 10px rgba(20,22,26,0.18);
-}
-.nlx-home .dv-laptop-deck::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.10);
-}
-.nlx-home .dv-laptop-deck::after { content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 90px; height: 5px; background: #0a0a10; border-radius: 0 0 5px 5px;
-}
-.nlx-home .dv-dash-head { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #14161a; margin-bottom: 14px;
-}
-.nlx-home .dv-dash-home { font-size: 13px;
-}
-.nlx-home .dv-dash-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 12px; margin-bottom: 12px;
-}
-.nlx-home .dv-dash-grid.two { grid-template-columns: 1fr 1fr;
-}
-.nlx-home .dv-dash-card { background: #f4f2eb; border: 1px solid #e3dfd4; border-radius: 10px; padding: 12px 14px;
-}
-.nlx-home .dv-dash-label { font-size: 10px; font-weight: 800; color: #6e6b63; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 8px;
-}
-.nlx-home .dv-dash-grid .dv-ring-md { margin: 0 auto 6px;
-}
-.nlx-home .dv-dash-grid .dv-dash-card:first-child { text-align: center;
-}
-.nlx-home .dv-ring-delta { font-size: 9.5px; font-weight: 800; color: #157f52; text-align: center;
-}
-.nlx-home .area-row.sm .area-name { font-size: 10.5px;
+/* One image, scaling with the column. height:auto keeps the aspect ratio when
+   the width attribute and the rendered width disagree. */
+.nlx-home .anywhere-devices img { width: 100%; height: auto; max-width: 1200px;
+}.nlx-home .area-row.sm .area-name { font-size: 10.5px;
 }
 .nlx-home .area-row.sm .area-pct { font-size: 10.5px; min-width: 30px;
 }
 .nlx-home .area-row.sm { margin-bottom: 7px; gap: 4px;
 }
 .nlx-home .area-row.sm .area-track { height: 5px; margin-top: 2px;
+}.nlx-home .qs-opt-row.correct { border-color: #157f52; background: #f3faf5;
 }
-.nlx-home .dv-plan-time { font-size: 16px; font-weight: 800; color: #14161a; margin-bottom: 10px;
-}
-.nlx-home .dv-plan-time span { display: block; font-size: 9.5px; font-weight: 600; color: #6e6b63; margin-top: 2px;
-}
-.nlx-home .dv-plan-btn { display: inline-block; background: #0b6b62; color: #fff; font-size: 10.5px; font-weight: 800; padding: 8px 14px; border-radius: 8px;
-}
-.nlx-home .dv-continue-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 700; color: #14161a;
-}
-.nlx-home .dv-continue-row small { font-weight: 600; color: #6e6b63; font-size: 9.5px;
-}
-.nlx-home .dv-continue-frac { font-size: 11px; font-weight: 800; color: #0b6b62;
-}
-/* tablet */
-.nlx-home .dv-tablet { width: 400px;
-}
-.nlx-home .dv-tablet-frame { background: #14161a; border-radius: 20px; padding: 12px; box-shadow: 0 24px 48px rgba(20,22,26,0.16);
-}
-.nlx-home .dv-tablet-screen { background: #fff; border-radius: 10px; padding: 14px 16px;
-}
-.nlx-home .dv-q-head { display: flex; align-items: center; gap: 12px; font-size: 9.5px; font-weight: 700; color: #6e6b63; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e3dfd4;
-}
-.nlx-home .dv-q-timer { margin-right: auto;
-}
-.nlx-home .dv-q-body { display: grid; grid-template-columns: 1.15fr 1fr; gap: 12px;
-}
-.nlx-home .dv-q-main .qs-stem { font-size: 11px; margin-bottom: 8px;
-}
-.nlx-home .dv-q-main .qs-opts { gap: 6px;
-}
-.nlx-home .dv-q-main .qs-opt-row { padding: 7px 9px; gap: 8px;
-}
-.nlx-home .dv-q-main .qs-opt-text { font-size: 10px; line-height: 1.3;
-}
-.nlx-home .dv-letter { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid #cdc7b6; font-size: 8.5px; font-weight: 800; color: #6e6b63; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.nlx-home .qs-opt-row.correct { border-color: #157f52; background: #f3faf5;
-}
-.nlx-home .qs-opt-row.correct .dv-letter { border-color: #157f52; background: #157f52; color: #fff;
-}
-.nlx-home .dv-explain-head { font-size: 11px; font-weight: 800; color: #14161a; margin-bottom: 6px;
-}
-.nlx-home .dv-explain-tabs { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;
-}
-.nlx-home .dv-explain-tabs span { font-size: 8px; font-weight: 700; padding: 4px 8px; border-radius: 100px; background: #f4f2eb; color: #6e6b63;
-}
-.nlx-home .dv-explain-tabs span.on { background: #f4f2eb; color: #084f49;
-}
-.nlx-home .dv-explain-text { font-size: 9.5px; line-height: 1.45; color: #3a3d44; background: #f4f2eb; border-radius: 8px; padding: 9px 10px; margin-bottom: 8px;
-}
-.nlx-home .dv-tip { display: flex; gap: 6px; font-size: 9px; line-height: 1.4; color: #5b4a12; background: #fdf7d2; border: 1px solid #e6d98a; border-radius: 8px; padding: 8px 9px;
-}
-.nlx-home .dv-tip b { font-size: 9px;
-}
-.nlx-home .dv-q-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #e3dfd4;
-}
-.nlx-home .dv-q-footer .qs-btn { padding: 6px 14px; font-size: 10px;
-}
-
 /* ============================================================
    ADAPTATION LAYER
    The mock arrived in its own voice: system-font headings,
@@ -1215,70 +1086,10 @@
   font-weight: 600;
   color: var(--color-muted);
   letter-spacing: -0.015em;
-}
-
-/* prose — question rationales and section notes are meant to be
-   read slowly, so they get the text serif like the rest of the site */
-.nlx-home .anywhere-sub,
-.nlx-home .section-head p,
-.nlx-home .readiness-sub,
-.nlx-home .why-card-reason,
-.nlx-home .af-desc,
-.nlx-home .cy-explain,
-.nlx-home .dv-explain-text,
-.nlx-home .dv-note {
-  font-family: var(--font-body);
-  line-height: 1.62;
-}
-
-/* data — anything a candidate could check gets the mono face */
-.nlx-home .readiness-number,
-.nlx-home .area-pct,
-.nlx-home .area-delta,
-.nlx-home .readiness-delta,
-.nlx-home .dv-ring-pct,
-.nlx-home .dv-ring-delta,
-.nlx-home .dv-plan-time,
-.nlx-home .dv-continue-frac,
-.nlx-home .dv-letter,
-.nlx-home .dv-q-head,
-.nlx-home .qs-topbar-counter,
-.nlx-home .qs-drag-badge,
-.nlx-home .qs-linechart-labels span,
-.nlx-home .qs-unit,
-.nlx-home .cy-counter,
-.nlx-home .cy-readiness-score,
-.nlx-home .cy-readiness-delta,
-.nlx-home .cy-retest-ring,
-.nlx-home .cy-growth-delta,
-.nlx-home .cy-growth-stat .val,
-.nlx-home .cy-opt .letter {
-  font-family: var(--font-mono);
-  font-weight: 500;
-}
-.nlx-home .readiness-number {
+}.nlx-home .readiness-number {
   font-weight: 600;
   letter-spacing: -0.04em;
-}
-
-/* labels — the site's eyebrow: mono, tracked out, never bold */
-.nlx-home .section-eyebrow,
-.nlx-home .anywhere-badge,
-.nlx-home .readiness-label,
-.nlx-home .dv-dash-label,
-.nlx-home .dv-weak-label,
-.nlx-home .qs-bt-col-head,
-.nlx-home .qs-col-head,
-.nlx-home .qs-grid-head .qs-grid-cell,
-.nlx-home .cy-growth-stat .lbl,
-.nlx-home .dv-phone-title {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-.nlx-home .section-eyebrow {
+}.nlx-home .section-eyebrow {
   font-size: 11px;
   margin-bottom: 14px;
   color: var(--color-muted);
@@ -1344,27 +1155,7 @@
   box-shadow:
     0 1px 0 rgba(20, 22, 26, 0.04),
     0 10px 24px -18px rgba(20, 22, 26, 0.35);
-}
-.nlx-home .why-card,
-.nlx-home .qs-opt-row,
-.nlx-home .qs-drag-row,
-.nlx-home .qs-dropdown-panel,
-.nlx-home .qs-grid-table,
-.nlx-home .qs-bt-box,
-.nlx-home .qs-bt-center,
-.nlx-home .qs-bt-chip,
-.nlx-home .qs-pill,
-.nlx-home .qs-numeric-box,
-.nlx-home .cy-opt,
-.nlx-home .cy-explain,
-.nlx-home .cy-status,
-.nlx-home .cy-growth-stats,
-.nlx-home .dv-dash-card,
-.nlx-home .dv-tip,
-.nlx-home .dv-explain-text {
-  border-radius: 3px;
-}
-.nlx-home .qtype-stack-front,
+}.nlx-home .qtype-stack-front,
 .nlx-home .qtype-deck,
 .nlx-home .cycle-screen,
 .nlx-home .cycle-deck,
@@ -1372,26 +1163,6 @@
 .nlx-home .af-icon {
   border-radius: 4px;
 }
-/* tags stop being lozenges */
-.nlx-home .why-tag,
-.nlx-home .area-delta,
-.nlx-home .readiness-delta,
-.nlx-home .cy-readiness-delta,
-.nlx-home .cy-growth-delta,
-.nlx-home .cy-counter,
-.nlx-home .dv-tag-red,
-.nlx-home .qs-topbar-counter,
-.nlx-home .dv-explain-tabs span {
-  border-radius: 2px;
-}
-.nlx-home .why-tag,
-.nlx-home .dv-tag-red,
-.nlx-home .cy-counter {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-}
-
 /* the why panel is a question card, so it inherits the qcard look */
 .nlx-home .why-panel {
   background: #fff;
@@ -1442,25 +1213,7 @@
 }
 .nlx-home .btn-pill:hover {
   background: #efe04a;
-}
-
-/* buttons drawn inside the product mock-ups: same geometry as the
-   real thing, scaled down, so the screenshots look like this site */
-.nlx-home .qs-btn,
-.nlx-home .cy-btn,
-.nlx-home .dv-plan-btn {
-  border-radius: 3px;
-  font-family: var(--font-ui);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-.nlx-home .qs-btn-solid,
-.nlx-home .cy-btn-solid,
-.nlx-home .dv-plan-btn {
-  background: var(--color-teal);
-  color: #fff;
-}
-.nlx-home .qs-btn-outline,
+}.nlx-home .qs-btn-outline,
 .nlx-home .cy-btn-outline {
   background: #fff;
   border: 1px solid var(--color-rule);
@@ -1570,72 +1323,7 @@
 .nlx-home .anywhere-devices {
   max-width: 1200px;
   padding: 0 24px;
-  gap: 22px;
 }
-
-/* phone — thickest bezel relative to size, smallest of the three */
-.nlx-home .dv-phone {
-  width: 168px;
-  border-radius: 26px;
-  padding: 7px;
-}
-.nlx-home .dv-phone-screen {
-  border-radius: 20px;
-  padding: 24px 13px 16px;
-}
-.nlx-home .dv-phone-island {
-  width: 40px;
-  height: 11px;
-}
-
-/* laptop — widest by a clear margin, and the base sells it */
-.nlx-home .dv-laptop {
-  width: 600px;
-}
-.nlx-home .dv-laptop-top {
-  border-radius: 12px 12px 0 0;
-  padding: 11px 11px 0;
-}
-.nlx-home .dv-laptop-screen {
-  border-radius: 4px 4px 0 0;
-  padding: 16px 18px 18px;
-}
-.nlx-home .dv-laptop-hinge {
-  height: 5px;
-  margin: 0 3px;
-}
-.nlx-home .dv-laptop-deck {
-  height: 22px;
-  margin: 0 -22px;
-  clip-path: polygon(3.5% 0, 96.5% 0, 100% 100%, 0 100%);
-  border-radius: 0 0 6px 6px;
-}
-.nlx-home .dv-laptop-deck::after {
-  width: 108px;
-  height: 6px;
-}
-
-/* tablet — two thirds of the laptop, and the thinnest bezel of
-   the three, which is what actually distinguishes a slab on sight */
-.nlx-home .dv-tablet {
-  width: 330px;
-}
-.nlx-home .dv-tablet-frame {
-  border-radius: 16px;
-  padding: 9px;
-}
-.nlx-home .dv-tablet-screen {
-  border-radius: 7px;
-  padding: 12px 13px;
-}
-.nlx-home .dv-q-head {
-  font-size: 9px;
-  gap: 8px;
-}
-.nlx-home .dv-q-body {
-  gap: 10px;
-}
-
 /* ============================================================
    CLOSING BAND
    Section padding and strip padding were stacking to ~290px of
@@ -2234,9 +1922,6 @@
   .nlx-home .cycle-wrap {
     zoom: 1.25;
   }
-  .nlx-home .anywhere-devices {
-    gap: 20px;
-  }
 }
 
 /* ---------------------------------------------- <= 1200px */
@@ -2247,24 +1932,9 @@
   .nlx-home .qtype-section-head {
     white-space: normal;
   }
-  /* three devices no longer fit side by side: laptop on top,
-     phone + tablet beneath it */
-  .nlx-home .anywhere-devices {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 28px;
-  }
   .nlx-home .anywhere-devices {
     padding: 0 24px;
-  }
-  .nlx-home .dv-laptop {
-    order: -1;
-    width: min(600px, 100%);
-  }
-  .nlx-home .dv-tablet {
-    width: min(360px, 100%);
-  }
-  .nlx-home .qtype-stack {
+  }  .nlx-home .qtype-stack {
     width: 100%;
     max-width: 700px;
   }
@@ -2469,17 +2139,7 @@
   }
   .nlx-home .qs-stem {
     font-size: 13.5px;
-  }
-
-  /* tablet mock: explanation panel drops under the question */
-  .nlx-home .dv-q-body {
-    grid-template-columns: 1fr;
-  }
-  .nlx-home .dv-q-head {
-    flex-wrap: wrap;
-    gap: 6px 10px;
-  }
-}
+  }}
 
 /* ---------------------------------------------- <= 560px  */
 @media (max-width: 560px) {
