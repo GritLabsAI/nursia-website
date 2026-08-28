@@ -131,6 +131,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {process.env.NEXT_PUBLIC_GA_ID && (
               <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
             )}
+            {/* Google Ads conversion tag.
+                GA4 above loads gtag.js; this adds a SECOND config to the same
+                tag so Ads gets its own click-through attribution rather than
+                waiting on a GA4 import. Deliberately after GoogleAnalytics —
+                gtag must exist before it is configured. */}
+            {process.env.NEXT_PUBLIC_GA_ID && process.env.NEXT_PUBLIC_GOOGLE_ADS_ID && (
+              <Script id="google-ads-tag" strategy="afterInteractive">
+                {`window.dataLayer=window.dataLayer||[];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('config','${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}');`}
+              </Script>
+            )}
             {process.env.NEXT_PUBLIC_CLARITY_ID && (
               <Script id="clarity" strategy="afterInteractive">
                 {`(function(c,l,a,r,i,t,y){

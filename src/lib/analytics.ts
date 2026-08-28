@@ -61,6 +61,9 @@ export function questionAnswered(p: {
     question_index: p.index,
     seconds_taken: p.secondsTaken,
   });
+  /* SECONDARY in Google Ads — recorded, but excluded from bidding. Optimising
+     for this would buy people who answer one free question and leave. */
+  adsConversion(process.env.NEXT_PUBLIC_ADS_QUESTION_LABEL);
 }
 
 export function examStarted(p: { length: number }) {
@@ -97,9 +100,37 @@ export function drillCompleted(p: { topic: string; correct: number; total: numbe
   });
 }
 
+/* ------------------------------------------------------------------ ads */
+
+/**
+ * Google Ads conversions.
+ *
+ * These ride the SAME gtag.js that GA4 loads — the root layout adds a second
+ * `gtag('config', 'AW-…')` alongside the GA4 one. So there is no extra script
+ * and no GA4 import step; Google Ads gets its own click-through attribution,
+ * which is what the bidding strategy actually reads.
+ *
+ * The labels are per-conversion-action and come from the account. They are
+ * public (they ship to every browser that loads the page), so they live in
+ * env for configurability, not for secrecy.
+ *
+ * Silent no-op when unset, exactly like `track` above: a missing env var must
+ * never break a signup.
+ */
+function adsConversion(sendTo: string | undefined) {
+  if (!sendTo || typeof window === "undefined") return;
+  try {
+    window.gtag?.("event", "conversion", { send_to: sendTo });
+  } catch {
+    /* analytics must never take a page down with it */
+  }
+}
+
 /** GA4 recognises sign_up and login by name and reports on them specially. */
 export function signedUp(method: "email" | "google") {
   track("sign_up", { method });
+  /* The campaign's PRIMARY conversion — this is what Google Ads bids toward. */
+  adsConversion(process.env.NEXT_PUBLIC_ADS_SIGNUP_LABEL);
 }
 
 export function loggedIn(method: "email" | "google") {
