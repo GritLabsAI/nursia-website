@@ -208,7 +208,6 @@ const PLACES = [
   },
 ];
 
-const RING = "conic-gradient(#0b6b62 0% 78%, #e3dfd4 78% 100%)";
 
 export function NclexHome() {
   const cycle = useDeck(CYCLE_STAGES.length, 2400, 220);
@@ -231,11 +230,9 @@ export function NclexHome() {
               reviewed by practising nurses — and a readiness score that moves after every session.
             </p>
             <div className="hero-actions">
-              {/* Signup CTA temporarily hidden — not working yet.
               <Link href="/signup" className="btn-pill">
                 Start free →
               </Link>
-              */}
               <span className="hero-note">50 free questions · No card needed</span>
             </div>
             <dl className="hero-stats">
@@ -256,12 +253,11 @@ export function NclexHome() {
           <div className="hero-stage">
             <div className="hero-photo">
               <Image
-                src="/home/hero-desk.png"
+                src="/home/hero-desk.webp"
                 alt="A nursing student in scrubs working through NCLEX practice questions at her desk, a study plan on the whiteboard behind her"
                 width={1536}
                 height={1024}
                 priority
-                quality={95}
                 sizes="(max-width: 900px) 100vw, 52vw"
               />
             </div>
@@ -554,141 +550,19 @@ export function NclexHome() {
         </div>
 
         {/* the three device mock-ups */}
+        {/* The three device mockups used to be ~135 lines of DOM behind 97 CSS
+            rules. They read well on a desktop and badly on a phone, where each
+            one stretched to the full column width — a "laptop" taller than it
+            was wide, and 1,400px of scrolling for one decorative point. As a
+            single image they keep their proportions at every size. */}
         <div className="wrap anywhere-devices">
-          <div className="dv-phone">
-            <div className="dv-phone-screen">
-              <div className="dv-phone-island" />
-              <div className="dv-phone-title">Readiness Score</div>
-              <div className="dv-ring dv-ring-lg" style={{ background: RING }}>
-                <div className="dv-ring-inner">
-                  <span className="dv-ring-pct">78%</span>
-                  <span className="dv-ring-sub">Ready</span>
-                </div>
-              </div>
-              <div className="dv-note">Great progress! Keep consistent to reach your goal.</div>
-              <div className="dv-weak-label">Weak areas</div>
-              <div className="dv-weak-row">
-                <span>Physiological Adaptation</span>
-                <span className="dv-tag-red">Needs focus</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="dv-laptop">
-            <div className="dv-laptop-top">
-              <span className="dv-laptop-cam" />
-              <div className="dv-laptop-screen">
-                <div className="dv-dash-head">
-                  <span className="dv-dash-home">⌂</span> Dashboard
-                </div>
-                <div className="dv-dash-grid">
-                  <div className="dv-dash-card">
-                    <div className="dv-dash-label">Your Readiness Score</div>
-                    <div className="dv-ring dv-ring-md" style={{ background: RING }}>
-                      <div className="dv-ring-inner">
-                        <span className="dv-ring-pct sm">78%</span>
-                        <span className="dv-ring-sub">Ready</span>
-                      </div>
-                    </div>
-                    <div className="dv-ring-delta">↑ 12% this week</div>
-                  </div>
-                  <div className="dv-dash-card">
-                    <div className="dv-dash-label">Focus Areas</div>
-                    {AREAS.map((a) => (
-                      <div key={a.name} className="area-row sm">
-                        <span className="area-name">{a.name}</span>
-                        <span className="area-pct">{a.pct}%</span>
-                        <div className="area-track">
-                          <div className="area-fill" style={{ width: `${a.pct}%` }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="dv-dash-grid two">
-                  <div className="dv-dash-card">
-                    <div className="dv-dash-label">Today’s Plan</div>
-                    <div className="dv-plan-time">
-                      35 min <span>Estimated time</span>
-                    </div>
-                    <div className="dv-plan-btn">Start practice</div>
-                  </div>
-                  <div className="dv-dash-card">
-                    <div className="dv-dash-label">Continue Learning</div>
-                    <div className="dv-continue-row">
-                      <span>
-                        Prioritization
-                        <br />
-                        <small>10 questions</small>
-                      </span>
-                      <span className="dv-continue-frac">6/10</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="dv-laptop-hinge" />
-            <div className="dv-laptop-deck" />
-          </div>
-
-          <div className="dv-tablet">
-            <div className="dv-tablet-frame">
-              <div className="dv-tablet-screen">
-                <div className="dv-q-head">
-                  <span>Question 25 of 85</span>
-                  <span className="dv-q-timer">⌛ 01:32:15</span>
-                  <span className="dv-q-mark">☐ Mark for Review</span>
-                </div>
-                <div className="dv-q-body">
-                  <div className="dv-q-main">
-                    <div className="qs-stem">
-                      A nurse is caring for a client who is postoperative following abdominal
-                      surgery. Which intervention should the nurse perform first?
-                    </div>
-                    <div className="qs-opts">
-                      {[
-                        ["A", "Assess the surgical incision", false],
-                        ["B", "Encourage the client to cough and deep breathe", true],
-                        ["C", "Check the client’s pain level", false],
-                        ["D", "Assist the client to ambulate", false],
-                      ].map(([letter, text, correct]) => (
-                        <div
-                          key={letter as string}
-                          className={`qs-opt-row${correct ? " correct" : ""}`}
-                        >
-                          <span className="dv-letter">{letter as string}</span>
-                          <span className="qs-opt-text">{text as string}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="dv-q-side">
-                    <div className="dv-explain-head">Explanation</div>
-                    <div className="dv-explain-tabs">
-                      <span className="on">Why B is correct</span>
-                      <span>Why others are incorrect</span>
-                    </div>
-                    <div className="dv-explain-text">
-                      Encouraging the client to cough and deep breathe is the priority to prevent
-                      postoperative complications such as atelectasis and pneumonia.
-                    </div>
-                    <div className="dv-tip">
-                      <span className="dv-tip-ico">💡</span>
-                      <div>
-                        <b>NCLEX® Tip</b>
-                        <br />
-                        Always address airway, breathing, and circulation first.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="dv-q-footer">
-                  <span className="qs-btn qs-btn-outline">‹ Previous</span>
-                  <span className="qs-btn qs-btn-solid">Next</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Image
+            src="/home/devices.webp"
+            alt="Nursia on a phone, a laptop and a tablet: a readiness score of 78%, a dashboard of focus areas by category, and a question showing why one answer is right and the others are not."
+            width={2400}
+            height={950}
+            sizes="(max-width: 900px) 92vw, 1200px"
+          />
         </div>
       </section>
 
@@ -743,11 +617,9 @@ export function NclexHome() {
           </div>
           <h2 className="cta-strip-heading">50 free questions. No card.</h2>
           <div className="cta-strip-action">
-            {/* Signup CTA temporarily hidden — not working yet.
             <Link href="/signup" className="btn-pill">
               Start free →
             </Link>
-            */}
             <span className="cta-strip-note">Cancel anytime</span>
           </div>
         </div>

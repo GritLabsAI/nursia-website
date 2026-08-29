@@ -97,11 +97,9 @@ export function SiteFooter() {
             </p>
             <p className="text-[0.875rem] text-white/55">No card. Cancel anytime.</p>
           </div>
-          {/* Signup CTA temporarily hidden — not working yet.
           <Link href="/signup" className="btn btn-invert sm:ml-auto">
             Start free →
           </Link>
-          */}
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-t border-white/12 pt-6 sm:flex-row sm:items-start">

@@ -2,30 +2,43 @@
 
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
-import { AppHeader } from "@/components/SiteHeader";
-import { QuestionSet } from "@/components/QuestionSet";
-import { QUESTIONS, SITE, TOPICS } from "@/lib/content";
+import { AppHeader } from "@/components/AppHeader";
+import { StatsStrip } from "@/components/StatsStrip";
+import { TopicIcon } from "@/components/TopicIcon";
+import { EXAM_LENGTH, EXAM_MINUTES, PASS_MARK } from "@/lib/exam";
 import {
-  FREE_ALLOWANCE,
-  getServerSnapshot,
-  getSnapshot,
-  subscribe,
-} from "@/lib/session";
+  getServerSnapshot as examServerSnapshot,
+  getSnapshot as examSnapshot,
+  getSyncServerState,
+  getSyncState,
+  subscribe as examSubscribe,
+} from "@/lib/exam-session";
+import { topicsIn } from "@/lib/content";
+import { BANK_COUNTS } from "@/lib/bank/counts";
+import { useSession } from "@/lib/useSession";
 
-const FIRST_SESSION = [
-  QUESTIONS["pharm-104"],
-  QUESTIONS["sata-101"],
-  QUESTIONS["risk-066"],
-];
-
+/**
+ * The hub behind the gate.
+ *
+ * Two things live here and nothing else: the exam, and the topic sets. There
+ * is no paywall on either while we are in early access, so this page no longer
+ * counts anything down or holds anything back — the old free-tier band was
+ * describing a gate that is not there.
+ */
 export function TryClient() {
-  /* Read straight from the session store — no mount effect, and the server
-     render (no session) matches the first client paint. */
-  const session = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const { session, pending } = useSession();
+  const exam = useSyncExternalStore(examSubscribe, examSnapshot, examServerSnapshot);
+  const sync = useSyncExternalStore(examSubscribe, getSyncState, getSyncServerState);
 
-  const used = session?.questionsUsed ?? 0;
-  const left = Math.max(0, FREE_ALLOWANCE - used);
-  const spent = left === 0;
+  /* Held while Firebase works out whether this browser is signed in — see
+     useSession. The gate below must not flash at an account holder. */
+  if (pending) {
+    return (
+      <div className="mx-auto max-w-[1140px] px-5 py-24 sm:px-8">
+        <p className="eyebrow text-center">One moment</p>
+      </div>
+    );
+  }
 
   /* Signed out — the gate is named rather than sprung as a surprise. */
   if (!session) {
@@ -37,17 +50,15 @@ export function TryClient() {
             Practice needs a free account
           </h1>
           <p className="mt-4 font-body text-[1.0625rem] leading-relaxed text-ink-2">
-            So we can save your progress, count your free questions down, and tell you which topics
-            are costing you marks. Email and password, no card.
+            So we can hold your exam report and tell you which categories are costing you marks.
+            Email and password, no card, and nothing behind a paywall.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-4">
-            {/* Signup CTA temporarily hidden — not working yet.
             <Link href="/signup" className="btn btn-primary">
               Start free →
             </Link>
-            */}
             <Link href="/nclex-practice-questions" className="btn btn-ghost">
-              10 questions with no account
+              Questions with no account
             </Link>
           </div>
         </div>
@@ -55,92 +66,129 @@ export function TryClient() {
     );
   }
 
+  const answered = exam?.answers.filter((a) => a !== null).length ?? 0;
+  const finished = Boolean(exam?.finishedAt);
+  const inProgress = Boolean(exam) && !finished;
+
+  const score = exam?.score ?? null;
+
+  const topics = [...topicsIn("category"), ...topicsIn("subject")]
+    .map((t) => ({ ...t, bank: BANK_COUNTS[t.slug] ?? 0 }))
+    .filter((t) => t.bank > 0);
+
   return (
     <>
-      <AppHeader questionsLeft={left} />
+      <AppHeader questionsAnswered={answered} />
 
       <div className="mx-auto max-w-[1140px] px-5 py-10 sm:px-8 sm:py-14">
         <p className="eyebrow">{session.email}</p>
-        <h1 className="mt-3 text-[2rem] leading-tight sm:text-[2.5rem]">
-          Welcome — <span className="mark">pick where to start</span>
+        <h1 className="mt-3 max-w-2xl text-[2rem] leading-tight sm:text-[2.5rem]">
+          {finished ? (
+            <>
+              Your report is <span className="mark">ready</span>
+            </>
+          ) : inProgress ? (
+            <>
+              You have an exam <span className="mark">in progress</span>
+            </>
+          ) : (
+            <>
+              Start with the <span className="mark">{EXAM_LENGTH}-question exam</span>
+            </>
+          )}
         </h1>
         <p className="mt-4 max-w-xl font-body text-[1.0625rem] leading-relaxed text-ink-2">
-          You have {left} of your {FREE_ALLOWANCE} free questions left. Progress saves from here,
-          so a rationale you read today shows up in your review list tomorrow.
+          Everything here is free while we are in early access — the whole bank, the exam, and
+          every rationale. No card, and nothing held back for a paid tier.
         </p>
 
-        <div className="mt-9 grid gap-4 md:grid-cols-2">
-          <div className="rounded-sm border-2 border-ink bg-white p-6">
-            <p className="eyebrow !text-ink">Recommended first</p>
-            <h2 className="mt-3 text-[1.375rem]">Diagnostic · 8 questions</h2>
-            <p className="mt-3 font-body text-[0.9375rem] leading-relaxed text-ink-2">
-              One question from each category. It takes about six minutes and it ends with a ranked
-              list of what to drill — which is the only thing worth knowing in week one.
-            </p>
-            <button type="button" className="btn btn-primary mt-6 w-full">
-              Start diagnostic
-            </button>
-          </div>
+        <StatsStrip />
 
-          <div className="rounded-sm border border-rule bg-white p-6">
-            <p className="eyebrow">If you already know</p>
-            <h2 className="mt-3 text-[1.375rem]">Pick a topic</h2>
-            <p className="mt-3 font-body text-[0.9375rem] leading-relaxed text-ink-2">
-              Go straight to your weak area. Eight sets, weighted the way the test plan weights
-              them.
-            </p>
-            <details className="mt-5">
-              <summary className="btn btn-ghost w-full cursor-pointer list-none">
-                Browse 8 topics
-              </summary>
-              <ul className="mt-3 grid gap-2">
-                {TOPICS.map((t) => (
-                  <li key={t.slug}>
-                    <Link
-                      href={`/nclex-practice-questions/${t.slug}`}
-                      className="flex items-center gap-3 rounded-sm border border-rule px-3 py-2.5 text-[0.875rem] text-ink-2 transition-colors hover:border-ink"
-                    >
-                      {t.name}
-                      <span className="ml-auto font-mono text-[11px] text-teal">{t.count}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </div>
-        </div>
-
-        {/* the session itself */}
-        <div className="mt-14 max-w-2xl">
-          <QuestionSet questions={FIRST_SESSION} label="Free tier · saved to your review list" />
-        </div>
-
-        {/* At question 50 this is a paywall, not a gate: they see the readiness
-            estimate they earned before they see a price. */}
-        <div
-          className={`mt-12 max-w-2xl rounded-sm border p-6 ${
-            spent ? "border-ink bg-paper-2" : "border-dashed border-rule bg-white"
-          }`}
-        >
-          <p className="eyebrow">{spent ? "Free tier used" : `At question ${FREE_ALLOWANCE}`}</p>
-          <h2 className="mt-3 text-[1.375rem]">
-            {spent
-              ? `You have used your ${FREE_ALLOWANCE} free questions.`
-              : "What happens when the free tier runs out"}
-          </h2>
-          <p className="mt-3 font-body text-[0.9375rem] leading-relaxed text-ink-2">
-            {SITE.totalQuestions - FREE_ALLOWANCE} questions left in full access. We show you the
-            readiness estimate you earned first, then the price — in that order, because the
-            estimate is the thing you worked for.
+        {/* Said plainly rather than hidden: their work is safe, but it is
+            safe in one browser only, and that is worth knowing before they
+            spend a hundred minutes on it. */}
+        {sync === "failing" && (
+          <p className="mt-6 rounded-sm border border-wrong/40 bg-wrong/[0.04] px-4 py-3 font-mono text-[11px] leading-relaxed text-ink-2">
+            Saving to your account is not working right now, so this exam lives only in this
+            browser. It will not follow you to another device, and clearing your browser data
+            would lose it.
           </p>
-          <div className="mt-5 flex flex-wrap items-center gap-4">
-            <Link href="/pricing" className="btn btn-ghost">
-              See pricing
-            </Link>
-            <span className="font-mono text-[11px] text-muted">
-              ${SITE.price}/mo · cancel in one click · 14-day refund
-            </span>
+        )}
+
+        {/* ------------------------------------------------- the exam */}
+        <div className="mt-9 rounded-sm border-2 border-ink bg-white p-6 sm:p-7">
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <p className="eyebrow !text-ink">
+              {finished ? "Exam complete" : inProgress ? "Resume" : "Recommended first"}
+            </p>
+            {finished && score && (
+              <span
+                className={`rounded-sm px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.08em] text-white ${
+                  score.pct >= PASS_MARK ? "bg-correct" : "bg-wrong"
+                }`}
+              >
+                {score.pct}% · {score.pct >= PASS_MARK ? "above the line" : "below the line"}
+              </span>
+            )}
           </div>
+
+          <h2 className="mt-3 text-[1.5rem] sm:text-[1.75rem]">
+            {EXAM_LENGTH} questions, {EXAM_MINUTES} minutes, one report
+          </h2>
+          <p className="mt-3 max-w-2xl font-body text-[0.9375rem] leading-relaxed text-ink-2">
+            {finished
+              ? "Your score, the category breakdown, and a written rationale on all fifty — including a line on each option you did not pick."
+              : inProgress
+                ? `You are ${answered} of ${EXAM_LENGTH} in, and the clock has been running since you started. Pick it up where you left it.`
+                : "Drawn across every client-need category and weighted the way the test plan weights them. No rationale until the end and no going back, because that is what the real thing does."}
+          </p>
+
+          {inProgress && (
+            <div className="mt-5 h-[3px] rounded-full bg-rule" aria-hidden>
+              <div
+                className="h-full rounded-full bg-teal"
+                style={{ width: `${(answered / EXAM_LENGTH) * 100}%` }}
+              />
+            </div>
+          )}
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/exam" className="btn btn-primary">
+              {finished ? "Open the report →" : inProgress ? "Resume the exam →" : "Begin →"}
+            </Link>
+            {finished && (
+              <Link href="/practice" className="btn btn-ghost">
+                Drill a weak category
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* ----------------------------------------------- the topics */}
+        <div className="mt-14">
+          <div className="flex flex-wrap items-baseline gap-x-4">
+            <h2 className="text-[1.375rem]">Or drill a topic</h2>
+            <p className="font-mono text-[11px] text-muted">
+              Rationale after every question, no clock
+            </p>
+          </div>
+
+          <ul className="mt-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            {topics.map((t) => (
+              <li key={t.slug}>
+                <Link
+                  href={`/nclex-practice-questions/${t.slug}`}
+                  className="flex items-center gap-3 rounded-sm border border-rule bg-white px-4 py-3.5 transition-colors hover:border-ink"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-rule bg-paper text-teal">
+                    <TopicIcon name={t.icon} className="h-4 w-4" />
+                  </span>
+                  <span className="min-w-0 flex-1 text-[0.9375rem] text-ink-2">{t.name}</span>
+                  <span className="font-mono text-[11px] text-teal">{t.bank}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </>

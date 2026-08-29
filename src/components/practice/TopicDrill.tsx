@@ -1,87 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { TopicIcon } from "@/components/TopicIcon";
+import { Cross, LETTERS, Tick, WhyBlock } from "@/components/practice/Rationale";
+import { drillCompleted, questionAnswered } from "@/lib/analytics";
+import { recordAnswer } from "@/lib/stats";
 import type { BankQuestion } from "@/lib/bank/types";
 import type { IconKey } from "@/lib/icons";
-
-const LETTERS = ["A", "B", "C", "D", "E", "F"];
-
-const Tick = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden>
-    <path
-      d="M5 13l4 4L19 7"
-      stroke="currentColor"
-      strokeWidth={2.6}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const Cross = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="none" aria-hidden>
-    <path
-      d="M6 6l12 12M18 6L6 18"
-      stroke="currentColor"
-      strokeWidth={2.6}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-/**
- * The A–D breakdown. This is the part of the mockup worth keeping above
- * everything else: not just which option was right, but a line on each of the
- * three that were not. `picked` is null in the review list, where the row for
- * your answer is still flagged.
- */
-function WhyBlock({ question, picked }: { question: BankQuestion; picked: number | null }) {
-  if (!question.why.length) return null;
-
-  return (
-    <div>
-      <p className="eyebrow">Why each option is right or wrong</p>
-      <ul className="mt-3 flex flex-col gap-2">
-        {question.options.map((opt, i) => {
-          const isCorrect = i === question.answer;
-          const youPicked = picked === i && !isCorrect;
-          return (
-            <li
-              key={i}
-              className={`flex gap-3 rounded-sm border p-3 ${
-                isCorrect ? "border-correct/35 bg-correct/[0.04]" : "border-rule bg-white"
-              } ${youPicked ? "border-wrong/45 bg-wrong/[0.04]" : ""}`}
-            >
-              <span
-                className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full text-white ${
-                  isCorrect ? "bg-correct" : "bg-muted/60"
-                }`}
-              >
-                {isCorrect ? <Tick className="h-2.5 w-2.5" /> : <Cross className="h-2.5 w-2.5" />}
-              </span>
-              <div className="min-w-0">
-                <p className="text-[0.875rem] font-semibold leading-snug text-ink">
-                  <span className="font-mono text-muted">{LETTERS[i]}. </span>
-                  {opt}
-                  {youPicked && (
-                    <span className="ml-2 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.08em] text-wrong">
-                      your answer
-                    </span>
-                  )}
-                </p>
-                <p className="mt-1 font-body text-[0.875rem] leading-[1.6] text-ink-2">
-                  {question.why[i]}
-                </p>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-}
 
 function QuestionCard({
   question,
@@ -330,11 +256,9 @@ function Results({
             {closeLabel}
           </button>
         ) : (
-          // Signup CTA temporarily hidden — not working yet.
-          // <Link href="/signup" className="btn btn-ghost">
-          //   Unlock 50 more, free →
-          // </Link>
-          null
+          <Link href="/signup" className="btn btn-ghost">
+            Unlock 50 more, free →
+          </Link>
         )}
       </div>
     </div>
@@ -373,6 +297,19 @@ export function TopicDrill({
     setPicks([]);
     setDone(false);
     setRun((r) => r + 1);
+  }
+
+  /* Reported when the last answer lands rather than when the results render,
+     so a set counts as finished even if they close it before reading them. */
+  function finish(all: number[]) {
+    const correct = all.reduce((n, p, k) => n + (p === questions[k].answer ? 1 : 0), 0);
+    drillCompleted({
+      topic: topic.slug,
+      correct,
+      total,
+      pct: total ? Math.round((correct / total) * 100) : 0,
+    });
+    setDone(true);
   }
 
   return (
@@ -427,8 +364,19 @@ export function TopicDrill({
               question={q}
               index={idx}
               total={total}
-              onAnswered={(p) => setPicks((prev) => [...prev, p])}
-              onNext={() => (idx === total - 1 ? setDone(true) : setI(idx + 1))}
+              onAnswered={(p) => {
+                const correct = p === q.answer;
+                questionAnswered({
+                  surface: "drill",
+                  questionId: q.id,
+                  topic: topic.slug,
+                  correct,
+                  index: idx,
+                });
+                recordAnswer(topic.slug, correct);
+                setPicks((prev) => [...prev, p]);
+              }}
+              onNext={() => (idx === total - 1 ? finish(picks) : setI(idx + 1))}
             />
           </div>
         ))

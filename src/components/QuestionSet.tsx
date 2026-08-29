@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { questionAnswered } from "@/lib/analytics";
+import { normalizeTopic, recordAnswer } from "@/lib/stats";
 import { useState } from "react";
 import type { Question } from "@/lib/content";
 
@@ -213,7 +215,20 @@ export function QuestionSet({
               index={i}
               total={total}
               isLast={i === total - 1}
-              onScored={(ok) => setScore((s) => s + (ok ? 1 : 0))}
+              onScored={(ok) => {
+                /* These are the sample sets on the public pages, so most of
+                   the people answering have no account. The GA4 event still
+                   lands; recordAnswer no-ops without a session. */
+                questionAnswered({
+                  surface: "sample",
+                  questionId: q.id,
+                  topic: normalizeTopic(q.category),
+                  correct: ok,
+                  index: i,
+                });
+                recordAnswer(q.category, ok);
+                setScore((s) => s + (ok ? 1 : 0));
+              }}
               onNext={() => (i === total - 1 ? setDone(true) : setCurrent(i + 1))}
             />
           </div>
@@ -232,11 +247,9 @@ export function QuestionSet({
               {gate.body}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
-              {/* Signup CTA temporarily hidden — not working yet.
               <Link href={gate.cta.href} className="btn btn-primary">
                 {gate.cta.label}
               </Link>
-              */}
               <span className="font-mono text-[11px] text-muted">No card needed</span>
             </div>
             {gate.exits && (

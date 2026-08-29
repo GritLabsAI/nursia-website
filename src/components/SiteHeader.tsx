@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccountMenu } from "./AccountMenu";
 import { Wordmark } from "./Wordmark";
 
 const NAV = [
@@ -42,23 +43,11 @@ export function SiteHeader() {
           ))}
         </nav>
 
+        {/* Log in / Start free when signed out, a profile menu when signed in.
+            It loads its own auth only for browsers that might have a session,
+            so an anonymous reader still pays nothing for it. */}
         <div className="col-start-3 flex items-center gap-2 justify-self-end sm:gap-4">
-          {/* Login temporarily hidden — not working yet.
-          <Link
-            href="/login"
-            className="text-sm font-medium text-ink-2 transition-colors hover:text-teal sm:text-[0.9375rem]"
-          >
-            Log in
-          </Link>
-          */}
-          {/* Start free temporarily hidden — points to the same not-working auth flow as login.
-          <Link
-            href="/signup"
-            className="btn btn-primary !min-h-0 !px-3.5 !py-2 !text-[0.8125rem] sm:!px-[1.375rem] sm:!py-2.5 sm:!text-sm"
-          >
-            Start free
-          </Link>
-          */}
+          <AccountMenu />
         </div>
       </div>
 
@@ -78,37 +67,6 @@ export function SiteHeader() {
           </Link>
         ))}
       </nav>
-    </header>
-  );
-}
-
-/** Signed-in shell: product navigation, plus the free-tier counter. */
-export function AppHeader({ questionsLeft }: { questionsLeft: number }) {
-  return (
-    <header className="border-b border-rule bg-paper">
-      <div className="mx-auto flex h-16 max-w-[1140px] items-center gap-7 px-5 sm:px-8">
-        <Link href="/" className="flex items-center" aria-label="Nursia — home">
-          <Wordmark />
-        </Link>
-        <nav aria-label="Main" className="flex items-center gap-6">
-          <span className="text-[0.9375rem] font-semibold text-ink">Practice</span>
-          <Link
-            href="/nclex"
-            className="text-[0.9375rem] font-medium text-ink-2 transition-colors hover:text-teal"
-          >
-            Progress
-          </Link>
-          <Link
-            href="/guides"
-            className="hidden text-[0.9375rem] font-medium text-ink-2 transition-colors hover:text-teal sm:block"
-          >
-            Guides
-          </Link>
-        </nav>
-        <span className="eyebrow ml-auto shrink-0 rounded-sm border border-rule bg-white px-2.5 py-1.5 !text-[10px] text-ink">
-          {questionsLeft} free left
-        </span>
-      </div>
     </header>
   );
 }

@@ -42,7 +42,68 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large" },
+  },
+  twitter: { card: "summary_large_image" },
+  applicationName: SITE.name,
+  authors: [{ name: SITE.name, url: SITE.url }],
+  publisher: SITE.name,
+  category: "education",
+};
+
+/**
+ * The site's entity graph, declared once at the root so every page inherits a
+ * resolvable publisher. Answer engines reconcile a claim ("Nursia says X")
+ * against an organization node; without one, the site is an anonymous string.
+ */
+const graph = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE.url}#organization`,
+      name: SITE.name,
+      url: SITE.url,
+      description: SITE.tagline,
+      email: SITE.email,
+      logo: { "@type": "ImageObject", url: `${SITE.url}/icon.svg` },
+      knowsAbout: [
+        "NCLEX-RN",
+        "Next Generation NCLEX",
+        "Nursing licensure examination",
+        "Nursing education",
+        "Clinical judgement measurement model",
+      ],
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: SITE.email,
+        availableLanguage: "English",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE.url}#website`,
+      url: SITE.url,
+      name: SITE.name,
+      description: SITE.tagline,
+      inLanguage: "en-US",
+      publisher: { "@id": `${SITE.url}#organization` },
+    },
+    {
+      "@type": "EducationalOccupationalProgram",
+      "@id": `${SITE.url}#program`,
+      name: "NCLEX-RN preparation",
+      description: `${SITE.totalQuestions} NCLEX-RN practice questions with full rationales, written and reviewed by registered nurses.`,
+      provider: { "@id": `${SITE.url}#organization` },
+      educationalCredentialAwarded: "None — exam preparation only",
+      occupationalCategory: "29-1141.00 Registered Nurses",
+      url: `${SITE.url}/nclex-practice-questions`,
+    },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -51,6 +112,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${bricolage.variable} ${sourceSerif.variable} ${plexMono.variable}`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
+        />
+      </head>
       <body className="min-h-dvh">
         <a
           href="#main"
@@ -72,6 +139,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             )}
             {process.env.NEXT_PUBLIC_GA_ID && (
               <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+            )}
+            {/* Google Ads conversion tag.
+                GA4 above loads gtag.js; this adds a SECOND config to the same
+                tag so Ads gets its own click-through attribution rather than
+                waiting on a GA4 import. Deliberately after GoogleAnalytics —
+                gtag must exist before it is configured. */}
+            {process.env.NEXT_PUBLIC_GA_ID && process.env.NEXT_PUBLIC_GOOGLE_ADS_ID && (
+              <Script id="google-ads-tag" strategy="afterInteractive">
+                {`window.dataLayer=window.dataLayer||[];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('config','${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}');`}
+              </Script>
             )}
           </>
         )}

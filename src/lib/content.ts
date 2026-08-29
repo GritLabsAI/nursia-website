@@ -8,12 +8,13 @@
 
 import type { IconKey } from "@/lib/icons";
 import { BANK_COUNTS } from "@/lib/bank/counts";
+import { EXTRA_GUIDES } from "@/lib/guides-content";
 
 export const SITE = {
   name: "Nursia",
   tagline: "NCLEX-RN practice questions, written and reviewed by nurses.",
   email: "hello@nursia.io",
-  url: "https://nursia.com",
+  url: "https://nursia.io",
   updated: "August 2026",
   totalQuestions: 1200,
   freeQuestions: 50,
@@ -575,22 +576,29 @@ export const playableCount = (slug: string) => BANK_COUNTS[slug] ?? 0;
 
 export type GuideSection = { h2: string; body: string[] };
 
+export type Cluster = "before" | "during" | "content" | "after";
+
 export type Guide = {
   slug: string;
   title: string;
   h1: string;
-  cluster: "before" | "during" | "after";
+  cluster: Cluster;
   minutes: number;
   updated: string;
+  /** ISO form of `updated`, for dateModified in schema and <lastmod> in the
+      sitemap. Optional so the original nine keep their published date. */
+  updatedISO?: string;
   /** the first 60 words, written to answer the query outright */
   shortAnswer: string;
   sections: GuideSection[];
+  /** Rendered as visible copy *and* as FAQPage schema. Never schema-only. */
+  faqs?: Faq[];
   /** the one topic page this guide has to earn its keep by linking to */
   topic: string;
   readNext: string[];
 };
 
-export const GUIDES: Guide[] = [
+const CORE_GUIDES: Guide[] = [
   {
     slug: "how-hard-is-the-nclex",
     title: "How hard is the NCLEX?",
@@ -628,6 +636,20 @@ export const GUIDES: Guide[] = [
           "Four to six weeks of consistent daily questions is the range most candidates need if they are coming straight out of school. Longer than eight weeks and retention starts working against you; shorter than three and there is not enough time to find and fix your weak categories.",
           "Volume matters less than the review. Seventy-five questions a day that you review carefully beats two hundred that you do not.",
         ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Is the NCLEX harder than nursing school exams?",
+        a: "It is harder in a different way. Nursing school rewards recall; the NCLEX rewards ranking. Most items give you four actions a competent nurse would eventually take and ask which comes first, so knowing all four is the starting point rather than the answer.",
+      },
+      {
+        q: "How long should I study for the NCLEX?",
+        a: "Four to six weeks of consistent daily questions suits most candidates coming straight out of school. Past eight weeks retention starts working against you; under three there is not enough time to find and fix weak categories.",
+      },
+      {
+        q: "Does the NCLEX feel hard even if you pass?",
+        a: "Yes. The adaptive engine holds you near 50% accuracy on purpose, so it should feel difficult the whole way through. Candidates who report the exam felt comfortable are more often the ones who receive bad news.",
       },
     ],
     topic: "med-surg",
@@ -670,6 +692,20 @@ export const GUIDES: Guide[] = [
         ],
       },
     ],
+    faqs: [
+      {
+        q: "When did the Next Generation NCLEX start?",
+        a: "April 2023. Since then every NCLEX-RN includes unfolding case studies and the new item types alongside standard questions.",
+      },
+      {
+        q: "What are the Next Gen NCLEX item types?",
+        a: "Matrix grids, bowtie items, highlight-in-text, drop-down cloze, extended multiple response, and unfolding case studies of six linked questions. All of them still test prioritization — the interface changed, the reasoning did not.",
+      },
+      {
+        q: "Did Next Gen change the passing standard?",
+        a: "No. The test plan, the eight client-need categories, and the passing standard are unchanged. What changed is that clinical judgement is now measured across six linked steps rather than one isolated question.",
+      },
+    ],
     topic: "risk-reduction",
     readNext: ["how-hard-is-the-nclex", "how-to-answer-sata", "whats-on-the-test-plan"],
   },
@@ -702,6 +738,20 @@ export const GUIDES: Guide[] = [
         body: [
           "Threaded through all eight categories are nursing process, caring, communication and documentation, teaching and learning, and culture and spirituality. These are not separately weighted, but they explain why so many items that look like med-surg are actually communication items in a med-surg costume.",
         ],
+      },
+    ],
+    faqs: [
+      {
+        q: "What are the eight NCLEX client-need categories?",
+        a: "Management of care, safety and infection control, health promotion and maintenance, psychosocial integrity, basic care and comfort, pharmacological and parenteral therapies, reduction of risk potential, and physiological adaptation.",
+      },
+      {
+        q: "Which NCLEX category has the most questions?",
+        a: "Management of care, at 17–23% of scored items, followed by pharmacological and parenteral therapies at 13–19% and physiological adaptation at 11–17%.",
+      },
+      {
+        q: "Can I skip a low-weighted category?",
+        a: "No. Every category appears on every exam. The weights are useful for sequencing your study and for triaging which weak area is urgent, never for deciding what to leave out.",
       },
     ],
     topic: "safe-care",
@@ -744,6 +794,20 @@ export const GUIDES: Guide[] = [
         ],
       },
     ],
+    faqs: [
+      {
+        q: "Is 4 weeks enough to study for the NCLEX?",
+        a: "For most candidates coming straight out of a nursing program, yes. Four to six weeks of daily reviewed questions is the range that works; the constraint is consistency, not calendar length.",
+      },
+      {
+        q: "How many hours a day should I study for the NCLEX?",
+        a: "Around 90 minutes to two hours: roughly 75 questions plus twice as long reviewing them as answering them. Longer sessions produce diminishing returns and worse review quality.",
+      },
+      {
+        q: "Should I study by topic or do mixed questions?",
+        a: "Topic sets early, while you are building a category. From about week three, most of your volume should be mixed-category, because reading a stem cold is half the skill the exam scores.",
+      },
+    ],
     topic: "pharmacology",
     readNext: ["how-to-answer-sata", "test-day-checklist", "how-hard-is-the-nclex"],
   },
@@ -774,6 +838,20 @@ export const GUIDES: Guide[] = [
         body: [
           "Classic SATA is all-or-nothing: five options, four right, zero credit. Some Next Gen formats do give partial credit with a penalty for incorrect selections. In both cases the strategy is the same — select what you can defend, stop there.",
         ],
+      },
+    ],
+    faqs: [
+      {
+        q: "How many options are correct on a select-all-that-apply question?",
+        a: "Anywhere from one to all of them. There is no fixed number, and expecting two or three is a common source of misses.",
+      },
+      {
+        q: "Is there partial credit on SATA questions?",
+        a: "Classic select-all-that-apply items are all-or-nothing. Most Next Generation item types, including matrix and extended multiple response, do use partial credit with a point deducted per incorrect selection.",
+      },
+      {
+        q: "What is the best strategy for SATA questions?",
+        a: "Treat each option as its own true-or-false question about the stem, decided independently. Comparing options against each other is what turns one uncertainty into a wrong answer.",
       },
     ],
     topic: "sata",
@@ -809,6 +887,20 @@ export const GUIDES: Guide[] = [
         ],
       },
     ],
+    faqs: [
+      {
+        q: "How many dosage calculation questions are on the NCLEX?",
+        a: "Usually a handful rather than a block — most candidates see somewhere between two and ten. They are worth preparing for because they are the items you can get right with certainty.",
+      },
+      {
+        q: "Do you get a calculator on the NCLEX?",
+        a: "Yes. An on-screen calculator is available throughout the exam, so the risk is setup and units, not arithmetic.",
+      },
+      {
+        q: "What is the best method for NCLEX dosage math?",
+        a: "Dimensional analysis, used consistently. Writing the units and cancelling them catches the misplaced decimal that every distractor in a dosage item is built from.",
+      },
+    ],
     topic: "pharmacology",
     readNext: ["four-week-study-plan", "how-to-answer-sata", "test-day-checklist"],
   },
@@ -841,6 +933,20 @@ export const GUIDES: Guide[] = [
         ],
       },
     ],
+    faqs: [
+      {
+        q: "What do I need to bring to the NCLEX?",
+        a: "One unexpired government-issued photo ID whose first and last name match your Authorization to Test exactly. Nothing else is permitted in the testing room.",
+      },
+      {
+        q: "What happens if my ID name doesn't match my ATT?",
+        a: "You will be turned away and forfeit the exam fee. There is no discretion at the test centre, so any mismatch must be fixed through your board of nursing well before the date.",
+      },
+      {
+        q: "Can I take breaks during the NCLEX?",
+        a: "Yes, there are optional breaks, but the five-hour clock keeps running through them. A ten-minute break costs ten minutes of exam time.",
+      },
+    ],
     topic: "safe-care",
     readNext: ["how-hard-is-the-nclex", "reading-your-result", "four-week-study-plan"],
   },
@@ -865,6 +971,20 @@ export const GUIDES: Guide[] = [
         body: [
           "You will receive a Candidate Performance Report showing whether you were below, near, or above the passing standard in each category. It is the single most useful study document you will ever get, and it is worth building your entire retake plan from it.",
         ],
+      },
+    ],
+    faqs: [
+      {
+        q: "What is the Candidate Performance Report?",
+        a: "The document sent to candidates who do not pass. It places you Below, Near, or Above the passing standard in each of the eight client-need categories, and it is the most actionable study plan you will ever be handed.",
+      },
+      {
+        q: "Does the NCLEX tell you your score?",
+        a: "No. The result is pass or fail. There is no percentage, no scaled score, and no ranking against other candidates.",
+      },
+      {
+        q: "How long until I can retake the NCLEX?",
+        a: "Most commonly 45 days, set by the NCSBN and your board of nursing. You re-register with Pearson VUE, pay the fee again, and wait for a new Authorization to Test.",
       },
     ],
     topic: "safe-care",
@@ -899,12 +1019,34 @@ export const GUIDES: Guide[] = [
         ],
       },
     ],
+    faqs: [
+      {
+        q: "What is the NCLEX pass rate for repeat candidates?",
+        a: "Around 45% for US-educated repeat candidates, roughly half the first-time rate. The gap is driven mostly by method — repeating content review instead of switching to reviewed practice questions.",
+      },
+      {
+        q: "How should I study differently after failing the NCLEX?",
+        a: "Start from the Candidate Performance Report, not from page one of a review book. Spend your time on the Below categories, in questions with rationales, and name the reason for every miss: content, misread, or ranking.",
+      },
+      {
+        q: "How many times can you take the NCLEX?",
+        a: "The NCSBN permits eight attempts a year with a 45-day wait between them, but individual state boards can impose stricter limits including a lifetime cap. Check your board's rule before booking.",
+      },
+    ],
     topic: "psychosocial",
     readNext: ["reading-your-result", "four-week-study-plan", "how-hard-is-the-nclex"],
   },
 ];
 
+/** The published set: the original nine plus everything in guides-content.ts. */
+export const GUIDES: Guide[] = [...CORE_GUIDES, ...EXTRA_GUIDES];
+
 export const guideBySlug = (slug: string) => GUIDES.find((g) => g.slug === slug);
+
+/** Fallback for the original nine, which predate `updatedISO`. */
+export const guideModified = (g: Guide) => g.updatedISO ?? "2026-08-01";
+
+export const guidesIn = (cluster: Cluster) => GUIDES.filter((g) => g.cluster === cluster);
 
 export const CLUSTERS = [
   {
@@ -916,6 +1058,11 @@ export const CLUSTERS = [
     id: "during" as const,
     label: "While you study",
     note: "Method, plan, and the two formats that decide scores.",
+  },
+  {
+    id: "content" as const,
+    label: "Know the content cold",
+    note: "The areas that decide most scores, each sitting on a question set.",
   },
   {
     id: "after" as const,
@@ -1037,6 +1184,5 @@ export const TOOLS = [
   { name: "Dosage calculator", note: "Check your setup, not just your answer", href: "/nclex" },
   { name: "Lab values sheet", note: "The 24 values the exam repeats", href: "/nclex" },
   { name: "Test plan breakdown", note: "All eight categories with weights", href: "/guides/whats-on-the-test-plan" },
-  // Signup CTA temporarily hidden — not working yet.
-  // { name: "Readiness quiz", note: "2 questions, instant estimate", href: "/signup" },
+  { name: "Readiness quiz", note: "2 questions, instant estimate", href: "/signup" },
 ];

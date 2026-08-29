@@ -9,12 +9,14 @@ import {
   Section,
   SectionHead,
 } from "@/components/Blocks";
-import { CLUSTERS, GUIDES, topicBySlug } from "@/lib/content";
+import { CLUSTERS, GUIDES, SITE, topicBySlug } from "@/lib/content";
+
+const COUNT = GUIDES.length;
+const DEEP_DIVES = GUIDES.filter((g) => g.cluster === "content").length;
 
 export const metadata: Metadata = {
-  title: { absolute: "NCLEX Guides — study plans, formats, test day | Nursia" },
-  description:
-    "Nine NCLEX-RN guides grouped by where you are in your prep: before you start, while you study, and test day and after. Written and reviewed by nurses.",
+  title: { absolute: "NCLEX Guides — study plans, scoring, content, test day | Nursia" },
+  description: `${COUNT} NCLEX-RN guides grouped by where you are in your prep: before you start, while you study, the content that decides scores, and test day and after. Written and reviewed by nurses.`,
   alternates: { canonical: "/guides" },
 };
 
@@ -60,6 +62,33 @@ export default function GuidesPage() {
   return (
     <>
       <BreadcrumbSchema trail={TRAIL} />
+      {/* The hub declares its own inventory. An answer engine that reads this
+          gets every guide, its position, and its freshness in one fetch. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "@id": `${SITE.url}/guides`,
+            name: "NCLEX Guides",
+            description: `${COUNT} NCLEX-RN guides written and reviewed by registered nurses.`,
+            inLanguage: "en-US",
+            isPartOf: { "@id": `${SITE.url}#website` },
+            about: { "@type": "Thing", name: "NCLEX-RN" },
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: COUNT,
+              itemListElement: GUIDES.map((g, i) => ({
+                "@type": "ListItem",
+                position: i + 1,
+                name: g.title,
+                url: `${SITE.url}/guides/${g.slug}`,
+              })),
+            },
+          }),
+        }}
+      />
 
       <Section className="pt-10 pb-14">
         <div className="max-w-3xl">
@@ -67,11 +96,13 @@ export default function GuidesPage() {
           <h1 className="text-[2.25rem] leading-[1.04] sm:text-[3rem]">Guides for the NCLEX</h1>
 
           <p className="mt-6 font-body text-[1.0625rem] leading-[1.68] text-ink-2 sm:text-[1.1875rem]">
-            Nine guides, grouped by where you are rather than by when we published them. If you
+            {COUNT} guides, grouped by where you are rather than by when we published them. If you
             are still deciding how seriously to take the exam, start with how hard the NCLEX
-            actually is. If you have a date booked, go straight to the 4-week plan. And if you are
-            here after a result you did not want, the last cluster is written for you and it does
-            not open with sympathy — it opens with the Candidate Performance Report.
+            actually is. If you have a date booked, go straight to the 4-week plan. If the gap is
+            content rather than method, the third cluster is {DEEP_DIVES} deep dives on the areas that
+            decide most scores. And if you are here after a result you did not want, the last
+            cluster is written for you and it does not open with sympathy — it opens with the
+            Candidate Performance Report.
           </p>
 
           <PrimaryCta className="mt-7" />
