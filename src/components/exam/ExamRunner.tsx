@@ -5,7 +5,7 @@ import { Calculator } from "@/components/exam/Calculator";
 import { LETTERS } from "@/components/practice/Rationale";
 import { questionAnswered } from "@/lib/analytics";
 import { clock, EXAM_MINUTES, type ExamItem } from "@/lib/exam";
-import { recordAnswer } from "@/lib/stats";
+import { recordAttempt } from "@/lib/attempts";
 import { answerAndAdvance, expireExam, secondsLeft, type ExamState } from "@/lib/exam-session";
 
 /**
@@ -22,10 +22,13 @@ function Item({
   item,
   index,
   total,
+  seed,
 }: {
   item: ExamItem;
   index: number;
   total: number;
+  /** the sitting this answer belongs to */
+  seed: number;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -52,6 +55,9 @@ function Item({
     }
 
     const correct = picked === item.question.answer;
+    const secondsTaken = shownAt.current
+      ? Math.round((Date.now() - shownAt.current) / 1000)
+      : undefined;
     /* Recorded before the state change, because advancing unmounts this. */
     questionAnswered({
       surface: "exam",
@@ -59,9 +65,19 @@ function Item({
       topic: item.category,
       correct,
       index,
-      secondsTaken: shownAt.current ? Math.round((Date.now() - shownAt.current) / 1000) : undefined,
+      secondsTaken,
     });
-    recordAnswer(item.category, correct);
+    recordAttempt({
+      questionId: item.question.id,
+      surface: "exam",
+      topic: item.category,
+      correct,
+      picked: [picked],
+      answer: [item.question.answer],
+      index,
+      secondsTaken,
+      examSeed: seed,
+    });
 
     answerAndAdvance(index, picked);
   }
@@ -205,7 +221,7 @@ export function ExamRunner({ items, state }: { items: ExamItem[]; state: ExamSta
       {/* Keyed on the index so every question arrives with a clean slate —
           nothing to reset, and no way for the previous selection to survive
           into the next item. */}
-      <Item key={index} item={item} index={index} total={items.length} />
+      <Item key={index} item={item} index={index} total={items.length} seed={state.seed} />
 
       <p className="mt-5 text-center font-mono text-[11px] text-muted">
         {items.length - answered} to go · rationales for all {items.length} come at the end

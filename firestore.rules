@@ -43,6 +43,56 @@ service cloud.firestore {
           && request.resource.data.answers is list
           && request.resource.data.answers.size() == resource.data.answers.size();
       }
+
+      /**
+       * One document per answered question — the raw behaviour log behind the
+       * review list and the study plan.
+       *
+       * Create-only, and never updatable: an attempt is something that
+       * happened. Allowing a rewrite would mean a wrong answer could be
+       * quietly turned into a right one, and every number built on top of
+       * these would stop meaning anything. Delete stays open so an account can
+       * be cleared out.
+       *
+       * The shape is checked because the client is the only writer. The
+       * `picked` and `answer` caps are there so a single document cannot be
+       * grown into a place to store arbitrary data.
+       */
+      match /attempts/{attemptId} {
+        allow read, delete: if isOwner(uid);
+        allow update: if false;
+
+        allow create: if isOwner(uid)
+          && request.resource.data.questionId is string
+          && request.resource.data.questionId.size() <= 64
+          && request.resource.data.correct is bool
+          && request.resource.data.answeredAt is string
+          && request.resource.data.surface in ['exam', 'drill', 'sample']
+          && request.resource.data.picked is list
+          && request.resource.data.picked.size() <= 10
+          && request.resource.data.answer is list
+          && request.resource.data.answer.size() <= 10;
+      }
+
+      /**
+       * users/{uid}/questions/{questionId} — what this account knows about one
+       * item: how often it has been met, how often it was right, and how it
+       * went last time. Counters and a last-seen snapshot, so the shape is
+       * checked loosely; what matters is that it belongs to the owner.
+       */
+      match /questions/{questionId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      /**
+       * One small document per day. This is what a streak and a "questions
+       * this week" line are read from, and keeping them out of the summary
+       * document is what stops that document growing forever.
+       */
+      match /daily/{day} {
+        allow read, write: if isOwner(uid);
+      }
+
       /**
        * One running-totals document per account: answered, correct, and the
        * same pair per topic. Counters only, so the shape is checked loosely —
@@ -52,6 +102,30 @@ service cloud.firestore {
       match /stats/{doc} {
         allow read, write: if isOwner(uid);
       }
+    }
+
+    /**
+     * The question bank, mirrored out of src/lib/bank by
+     * scripts/seed-questions.mjs.
+     *
+     * Read requires an account. The site itself does not read from here — the
+     * public pages render the bank from the bundle, which is what keeps the
+     * questions in the server HTML where a crawler can see them — so gating
+     * this costs nothing and keeps the whole bank, answer keys included, off
+     * an endpoint anyone can page through with the public API key.
+     *
+     * Nothing writes from a browser. The seed script uses the Admin SDK, which
+     * bypasses these rules entirely.
+     */
+    match /questions/{questionId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    /** Bank version and per-topic counts, written by the same script. */
+    match /meta/{doc} {
+      allow read: if request.auth != null;
+      allow write: if false;
     }
 
     /* Anything not named above is closed. */

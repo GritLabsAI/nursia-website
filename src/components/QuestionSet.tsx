@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { questionAnswered } from "@/lib/analytics";
-import { normalizeTopic, recordAnswer } from "@/lib/stats";
+import { recordAttempt } from "@/lib/attempts";
+import { FREE_PREVIEW, PREVIEW_GATE, useMaybeSignedIn, type GateConfig } from "@/lib/gate";
+import { normalizeTopic } from "@/lib/stats";
 import { useState } from "react";
 import type { Question } from "@/lib/content";
+
+export type { GateConfig };
 
 const KEYS = ["A", "B", "C", "D", "E", "F"];
 
@@ -22,7 +26,7 @@ function QuestionBody({
   question: Question;
   index: number;
   total: number;
-  onScored: (correct: boolean) => void;
+  onScored: (correct: boolean, picked: number[]) => void;
   onNext: () => void;
   isLast: boolean;
 }) {
@@ -41,7 +45,7 @@ function QuestionBody({
   function check() {
     if (!picked.length || checked) return;
     setChecked(true);
-    onScored(same(picked, question.answer));
+    onScored(same(picked, question.answer), picked);
   }
 
   function stateOf(i: number): string | undefined {
@@ -148,22 +152,16 @@ function QuestionBody({
   );
 }
 
-export type GateConfig = {
-  /** shown above the headline, e.g. "After 3 questions" */
-  eyebrow: string;
-  headline: string;
-  body: string;
-  cta: { label: string; href: string };
-  /** small links out, so the gate is never a dead end */
-  exits?: { label: string; href: string }[];
-};
-
 /**
  * The signature object on this site: a real question, answerable in place, with
  * the rationale unfolding underneath. Every public page carries one.
  *
  * All questions render into the DOM up front — only visibility changes — so the
  * question set is in the static HTML and crawlable without JavaScript.
+ *
+ * Without an account the set stops after `FREE_PREVIEW` and shows the gate.
+ * The remaining questions are still in the markup, which is what the SEO pages
+ * are for; what stops is the drill, and the scoring behind it.
  */
 export function QuestionSet({
   questions,
@@ -179,8 +177,15 @@ export function QuestionSet({
   const [done, setDone] = useState(false);
   /** bumped on restart so every QuestionBody remounts with fresh state */
   const [run, setRun] = useState(0);
+  /** true once the preview ran out on an anonymous visitor */
+  const [locked, setLocked] = useState(false);
 
+  const signedIn = useMaybeSignedIn();
   const total = questions.length;
+  /* The gate the caller wrote is about finishing the set; PREVIEW_GATE is
+     about running out of it. They say different things, so they are not
+     interchangeable — but a page that supplied neither still gets one. */
+  const shown = locked ? PREVIEW_GATE : (gate ?? PREVIEW_GATE);
 
   return (
     <div>
@@ -215,10 +220,11 @@ export function QuestionSet({
               index={i}
               total={total}
               isLast={i === total - 1}
-              onScored={(ok) => {
+              onScored={(ok, picked) => {
                 /* These are the sample sets on the public pages, so most of
-                   the people answering have no account. The GA4 event still
-                   lands; recordAnswer no-ops without a session. */
+                   the people answering have no account. The GA4 event lands
+                   either way, and the attempt queues on the device — if they
+                   sign up later it goes to the account with the rest. */
                 questionAnswered({
                   surface: "sample",
                   questionId: q.id,
@@ -226,35 +232,58 @@ export function QuestionSet({
                   correct: ok,
                   index: i,
                 });
-                recordAnswer(q.category, ok);
+                recordAttempt({
+                  questionId: q.id,
+                  surface: "sample",
+                  topic: q.category,
+                  correct: ok,
+                  picked,
+                  answer: q.answer,
+                  index: i,
+                });
                 setScore((s) => s + (ok ? 1 : 0));
               }}
-              onNext={() => (i === total - 1 ? setDone(true) : setCurrent(i + 1))}
+              onNext={() => {
+                /* Out of preview: stop here rather than at the end of the set. */
+                if (!signedIn && i + 1 >= FREE_PREVIEW && i < total - 1) {
+                  setLocked(true);
+                  setDone(true);
+                  return;
+                }
+                if (i === total - 1) setDone(true);
+                else setCurrent(i + 1);
+              }}
             />
           </div>
         ))}
 
-        {done && gate && (
+        {done && (
           <div className="reveal px-5 py-7 sm:px-6">
-            <p className="eyebrow">{gate.eyebrow}</p>
+            <p className="eyebrow">{shown.eyebrow}</p>
             <h3 className="mt-2 text-2xl sm:text-[1.75rem]">
-              You got{" "}
-              <span className="mark">
-                {score} of {total}
-              </span>
+              {locked ? (
+                shown.headline
+              ) : (
+                <>
+                  You got{" "}
+                  <span className="mark">
+                    {score} of {total}
+                  </span>
+                </>
+              )}
             </h3>
             <p className="mt-3 max-w-lg font-body text-[0.9375rem] leading-relaxed text-ink-2 sm:text-base">
-              {gate.body}
+              {shown.body}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
-              <Link href={gate.cta.href} className="btn btn-primary">
-                {gate.cta.label}
+              <Link href={shown.cta.href} className="btn btn-primary">
+                {shown.cta.label}
               </Link>
               <span className="font-mono text-[11px] text-muted">No card needed</span>
             </div>
-            {gate.exits && (
+            {shown.exits && (
               <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-rule pt-4">
-                {gate.exits.map((e) => (
+                {shown.exits.map((e) => (
                   <li key={e.href}>
                     <Link
                       href={e.href}
@@ -266,18 +295,22 @@ export function QuestionSet({
                 ))}
               </ul>
             )}
-            <button
-              type="button"
-              className="mt-6 font-mono text-[11px] text-muted underline underline-offset-4 hover:text-ink"
-              onClick={() => {
-                setDone(false);
-                setCurrent(0);
-                setScore(0);
-                setRun((r) => r + 1);
-              }}
-            >
-              Start the set again
-            </button>
+            {/* Only offered when they finished it. Restarting a locked set
+                would just hand back the same two questions. */}
+            {!locked && (
+              <button
+                type="button"
+                className="mt-6 font-mono text-[11px] text-muted underline underline-offset-4 hover:text-ink"
+                onClick={() => {
+                  setDone(false);
+                  setCurrent(0);
+                  setScore(0);
+                  setRun((r) => r + 1);
+                }}
+              >
+                Start the set again
+              </button>
+            )}
           </div>
         )}
       </div>

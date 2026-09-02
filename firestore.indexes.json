@@ -1,0 +1,15 @@
+{
+  "//": "Deploy with: npx firebase deploy --only firestore:indexes",
+  "indexes": [
+    {
+      "//": "The review list: users/{uid}/questions where lastCorrect == false, newest first. Every other query in the app is single-field and served by an automatic index.",
+      "collectionGroup": "questions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "lastCorrect", "order": "ASCENDING" },
+        { "fieldPath": "lastAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

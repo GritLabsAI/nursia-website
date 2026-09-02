@@ -1,26 +1,28 @@
 /**
  * What a candidate has actually done, accumulated on their account.
  *
- * The exam document holds one sitting. This holds the running total across
- * every sitting and every topic drill, which is the thing that answers "am I
- * getting better, and at what" — and the thing a study plan would be built
- * from later.
+ * The exam document holds one sitting and `attempts.ts` holds the individual
+ * answers. This holds the running total across every sitting and every drill,
+ * which is the thing that answers "am I getting better, and at what" in one
+ * read — and the thing a study plan is built from.
  *
  * Counters only, updated with Firestore's atomic increment. That matters for
  * two reasons: two tabs answering questions cannot clobber each other's
  * totals, and a write costs one round trip regardless of how big the document
- * has grown. No answer history is kept here — the per-sitting documents
- * already have that, and a growing array in a hot document is how this kind of
- * thing turns into a bill.
+ * has grown. No answer history is kept here — `attempts.ts` has that, and a
+ * growing array in a hot document is how this kind of thing turns into a bill.
  *
- * A failure never surfaces to the person answering. Losing a counter is not
- * worth interrupting a question for, and the next answer writes again.
+ * The per-answer increments are written by the attempt flush rather than here,
+ * so twenty answers cost one write to this document instead of twenty. What is
+ * left here are the exam-level counters and the reads.
+ *
+ * Firebase is imported inside the functions, never at the top. `normalizeTopic`
+ * is imported by every question surface on the site, including the public pages
+ * a search engine sent someone to, and a static import here would put the whole
+ * Firestore bundle on all of them.
  */
 
-import { doc, getDoc, increment, setDoc } from "firebase/firestore";
 import { BLUEPRINT } from "@/lib/exam";
-import { getDb } from "@/lib/firebase";
-import { getSnapshot as getSession } from "@/lib/session";
 
 export type Stats = {
   answered: number;
@@ -68,7 +70,12 @@ export function normalizeTopic(topic: string | undefined): string | undefined {
 }
 
 /** users/{uid}/stats/summary — one document, so reading it is one round trip. */
-function statsDoc() {
+async function statsDoc() {
+  const [{ getDb }, { getSnapshot: getSession }, { doc }] = await Promise.all([
+    import("@/lib/firebase"),
+    import("@/lib/session"),
+    import("firebase/firestore"),
+  ]);
   const db = getDb();
   const session = getSession();
   if (!db || !session) return null;
@@ -76,44 +83,28 @@ function statsDoc() {
 }
 
 async function bump(fields: Record<string, unknown>) {
-  const ref = statsDoc();
-  if (!ref) return;
   try {
+    const ref = await statsDoc();
+    if (!ref) return;
+    const { setDoc } = await import("firebase/firestore");
     await setDoc(ref, { ...fields, updatedAt: new Date().toISOString() }, { merge: true });
   } catch {
-    /* signed out, offline, or rules — the answer itself is already recorded
-       on the sitting, and the next write tries again */
+    /* signed out, offline, or rules — losing a counter is not worth
+       interrupting a question for, and the next write tries again */
   }
 }
 
-/**
- * One answered question. `topic` is the blueprint category in the exam and the
- * topic slug in a drill; both are useful, and keeping them in one map means a
- * weak area shows up wherever it was found.
- */
-export function recordAnswer(topic: string | undefined, correct: boolean) {
-  const key = normalizeTopic(topic);
-  const fields: Record<string, unknown> = {
-    answered: increment(1),
-    correct: increment(correct ? 1 : 0),
-  };
-  if (key) {
-    fields.byTopic = {
-      [key]: { answered: increment(1), correct: increment(correct ? 1 : 0) },
-    };
-  }
-  void bump(fields);
-}
-
-export function recordExamStarted() {
-  void bump({ examsStarted: increment(1) });
+export async function recordExamStarted() {
+  const { increment } = await import("firebase/firestore");
+  await bump({ examsStarted: increment(1) });
 }
 
 /** `bestPct` is not a counter, so it is read before it is written. */
 export async function recordExamFinished(pct: number) {
-  const ref = statsDoc();
-  if (!ref) return;
   try {
+    const ref = await statsDoc();
+    if (!ref) return;
+    const { getDoc, increment, setDoc } = await import("firebase/firestore");
     const current = await getDoc(ref);
     const best = (current.data()?.bestPct as number | undefined) ?? 0;
     await setDoc(
@@ -131,9 +122,10 @@ export async function recordExamFinished(pct: number) {
 }
 
 export async function readStats(): Promise<Stats | null> {
-  const ref = statsDoc();
-  if (!ref) return null;
   try {
+    const ref = await statsDoc();
+    if (!ref) return null;
+    const { getDoc } = await import("firebase/firestore");
     const snap = await getDoc(ref);
     if (!snap.exists()) return null;
     return { ...EMPTY_STATS, ...(snap.data() as Partial<Stats>) };
