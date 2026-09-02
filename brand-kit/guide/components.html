@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Components — Flowsheet</title>
+<link rel="icon" href="../logos/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="guide.css">
+</head>
+<body>
+<div class="shell">
+<main class="main">
+<div class="page">
+
+  <header class="pagehead">
+    <p class="eyebrow">Applying it · 04</p>
+    <h1>Components</h1>
+    <p class="lede">
+      Everything below is live HTML using the same rules as the product. The
+      set is deliberately short: one card, three buttons, four states, and a
+      handful of pieces of furniture.
+    </p>
+  </header>
+
+  <!-- ============ QUESTION CARD ============ -->
+  <section class="block">
+    <p class="eyebrow">The signature object</p>
+    <h2>Question card</h2>
+    <div class="prose">
+      <p>
+        White <code>#FFFFFF</code>, 1px <code>#E3DFD4</code> border, 4px
+        radius, one very soft shadow. A mono eyebrow naming the topic, the stem,
+        then four answer rows — each its own bordered box with a small mono key
+        at the left. Nothing else goes inside it.
+      </p>
+    </div>
+
+    <div class="demo on-paper">
+      <p class="caption">Unanswered</p>
+      <div class="qcard">
+        <p class="eyebrow">Pharmacological therapies · Item #4127</p>
+        <p class="stem">
+          A client is prescribed furosemide. Which laboratory value should the
+          nurse review before administering the first dose?
+        </p>
+        <div class="qopt"><span class="qkey">A</span><span>Serum potassium</span></div>
+        <div class="qopt"><span class="qkey">B</span><span>Serum calcium</span></div>
+        <div class="qopt"><span class="qkey">C</span><span>Platelet count</span></div>
+        <div class="qopt" style="margin-bottom:0"><span class="qkey">D</span><span>Prothrombin time</span></div>
+      </div>
+    </div>
+
+    <div class="demo on-paper">
+      <p class="caption">Answered — wrong pick, correct shown, rationale revealed</p>
+      <div class="qcard">
+        <p class="eyebrow">Pharmacological therapies · Item #4127</p>
+        <p class="stem">
+          A client is prescribed furosemide. Which laboratory value should the
+          nurse review before administering the first dose?
+        </p>
+        <div class="qopt" data-state="correct"><span class="qkey">A</span><span>Serum potassium</span></div>
+        <div class="qopt" data-state="wrong"><span class="qkey">B</span><span>Serum calcium</span></div>
+        <div class="qopt"><span class="qkey">C</span><span>Platelet count</span></div>
+        <div class="qopt"><span class="qkey">D</span><span>Prothrombin time</span></div>
+        <div style="border-top:1px solid var(--rule);margin-top:16px;padding-top:16px">
+          <p class="eyebrow" style="margin-bottom:8px">Rationale</p>
+          <p style="font-family:var(--font-body);font-size:15.5px;line-height:1.65;color:var(--ink-2);margin:0">
+            Furosemide is a loop diuretic and wastes potassium, so hypokalaemia
+            is the risk that changes what you do next. Calcium is affected but
+            is not the value that would hold the dose; coagulation studies are
+            unrelated.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="margin-top:44px">Answer row states</h2>
+    <div class="grid g2">
+      <div>
+        <p class="eyebrow" style="margin-bottom:10px">Default</p>
+        <div class="qopt"><span class="qkey">A</span><span>Serum potassium</span></div>
+        <p class="eyebrow" style="margin:22px 0 10px">Picked, not yet submitted</p>
+        <div class="qopt" data-state="picked"><span class="qkey">A</span><span>Serum potassium</span></div>
+      </div>
+      <div>
+        <p class="eyebrow" style="margin-bottom:10px">Correct</p>
+        <div class="qopt" data-state="correct"><span class="qkey">A</span><span>Serum potassium</span></div>
+        <p class="eyebrow" style="margin:22px 0 10px">Wrong</p>
+        <div class="qopt" data-state="wrong"><span class="qkey">B</span><span>Serum calcium</span></div>
+      </div>
+    </div>
+    <div class="note">
+      A state is carried by the border, the fill <em>and</em> the key colour —
+      three signals, so the meaning survives without colour vision. The row is a
+      button and keeps its 44px minimum height at every breakpoint.
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <!-- ============ BUTTONS ============ -->
+  <section class="block">
+    <p class="eyebrow">Actions</p>
+    <h2>Buttons</h2>
+    <div class="prose">
+      <p>
+        Three, and no more. 3px radius, 44px minimum height, display face at
+        600, tracking −0.01em. A surface gets one primary button; everything
+        else is a link.
+      </p>
+    </div>
+    <div class="demo on-paper">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <span class="btn btn-primary">Start free</span>
+        <span class="btn btn-ghost">See a sample question</span>
+        <a href="#" style="font-weight:600;font-size:15px;text-decoration:underline">Or read how scoring works</a>
+      </div>
+    </div>
+    <div class="demo on-ink">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <span class="btn btn-invert">Start free</span>
+        <span class="btn" style="background:transparent;color:var(--paper);border-color:#4a4d55">Sign in</span>
+      </div>
+      <p class="prose" style="font-size:14px;margin:18px 0 0;color:#b9bcc2">
+        On the ink ground the primary button turns highlighter yellow. Teal
+        against ink is unreadable and is never used there.
+      </p>
+    </div>
+    <table>
+      <thead><tr><th style="width:150px">Variant</th><th style="width:200px">Fill / border</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td class="name">btn-primary</td><td class="k">teal · white text<br>hover teal-dark</td><td>The one action on a light surface. Usually "Start free".</td></tr>
+        <tr><td class="name">btn-invert</td><td class="k">highlight · ink text<br>hover #EFE04A</td><td>The one action on the ink ground.</td></tr>
+        <tr><td class="name">btn-ghost</td><td class="k">transparent · 1px ink<br>hover fills ink</td><td>The secondary action. Never two of these side by side.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="hr">
+
+  <!-- ============ FURNITURE ============ -->
+  <section class="block">
+    <p class="eyebrow">Furniture</p>
+    <h2>Eyebrow</h2>
+    <div class="demo on-paper">
+      <p class="eyebrow">Safe and effective care environment</p>
+      <h3 style="font-size:26px;font-weight:700;margin-top:10px">Management of care</h3>
+    </div>
+    <div class="prose" style="margin-top:16px">
+      <p>
+        Mono, 11px, uppercase, 0.14em tracking, muted. It labels a section or a
+        card and always sits directly above the thing it labels. It is never a
+        sentence and never the only text in a block.
+      </p>
+    </div>
+
+    <h2 style="margin-top:44px">The highlighter stroke</h2>
+    <div class="demo on-paper">
+      <p style="font-family:var(--font-body);font-size:21px;line-height:1.6;color:var(--ink);max-width:34rem;margin:0">
+        Fifty NCLEX questions with a full rationale on every one, and
+        <span class="mark">no credit card</span>.
+      </p>
+    </div>
+    <div class="prose" style="margin-top:16px">
+      <p>
+        A background gradient sitting at 88% of the line height, 0.42em tall,
+        cloned across line breaks. <strong>One per surface, behind one
+        phrase.</strong> It marks the single thing you would want someone to
+        remember if they read nothing else. On the hero it draws itself in over
+        620ms, once.
+      </p>
+    </div>
+
+    <h2 style="margin-top:44px">Index cell</h2>
+    <div class="grid g3">
+      <a class="cell" href="#">
+        <p class="eyebrow">01</p>
+        <h3 style="font-size:17px;margin:8px 0 6px">Management of care</h3>
+        <p class="mono" style="font-size:12px;color:var(--muted);margin:0">312 questions</p>
+      </a>
+      <a class="cell" href="#">
+        <p class="eyebrow">02</p>
+        <h3 style="font-size:17px;margin:8px 0 6px">Pharmacological therapies</h3>
+        <p class="mono" style="font-size:12px;color:var(--muted);margin:0">284 questions</p>
+      </a>
+      <a class="cell" href="#">
+        <p class="eyebrow">03</p>
+        <h3 style="font-size:17px;margin:8px 0 6px">Physiological adaptation</h3>
+        <p class="mono" style="font-size:12px;color:var(--muted);margin:0">198 questions</p>
+      </a>
+    </div>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      White, 1px rule, 3px radius, no shadow — a card only becomes a
+      <em>question</em> card when it holds a stem. The border goes ink on hover;
+      nothing lifts or scales.
+    </p>
+
+    <h2 style="margin-top:44px">Accordion</h2>
+    <div style="max-width:42rem;margin-top:24px">
+      <details class="acc" open>
+        <summary>Do I need a credit card for the free questions?</summary>
+        <p style="font-family:var(--font-body);font-size:16px;line-height:1.7;color:var(--ink-2);margin:0 0 18px">
+          No. Fifty questions, with the rationale on each one, no card at any
+          point.
+        </p>
+      </details>
+      <details class="acc">
+        <summary>Are the questions written by nurses?</summary>
+      </details>
+      <details class="acc">
+        <summary>Which item types are covered?</summary>
+      </details>
+    </div>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      Native <code>&lt;details&gt;</code>, so it is crawlable and works with
+      JavaScript off. A hairline under each row, a mono <span class="mono">+</span>
+      that becomes <span class="mono">−</span>. No chevrons, no boxes.
+    </p>
+
+    <h2 style="margin-top:44px">Exam chrome</h2>
+    <div class="grid g2">
+      <div class="demo on-paper" style="margin-top:0">
+        <p class="caption">Calculator — a keypad, not a UI</p>
+        <div style="display:grid;grid-template-columns:repeat(4,52px);gap:6px">
+          <button class="calc-key">7</button><button class="calc-key">8</button><button class="calc-key">9</button><button class="calc-key">÷</button>
+          <button class="calc-key">4</button><button class="calc-key">5</button><button class="calc-key">6</button><button class="calc-key">×</button>
+          <button class="calc-key">1</button><button class="calc-key">2</button><button class="calc-key">3</button><button class="calc-key">−</button>
+          <button class="calc-key">0</button><button class="calc-key">.</button><button class="calc-key">C</button><button class="calc-key">+</button>
+        </div>
+        <p class="prose" style="font-size:14px;margin:18px 0 0">
+          It mirrors the calculator the real exam hands you. Paper fill, mono
+          digits, 3px radius, no colour.
+        </p>
+      </div>
+      <div class="demo on-paper" style="margin-top:0">
+        <p class="caption">Exam clock</p>
+        <p class="mono" style="font-size:34px;font-weight:600;margin:0">01:12:40</p>
+        <p class="mono" style="font-size:34px;font-weight:600;margin:14px 0 0;color:var(--wrong)">00:04:18</p>
+        <p class="prose" style="font-size:14px;margin:18px 0 0">
+          The clock goes red for the last five minutes and only then. It never
+          flashes, pulses or counts you down anywhere else on the site.
+        </p>
+      </div>
+    </div>
+
+    <h2 style="margin-top:44px">Stat strip</h2>
+    <div class="demo on-ink flowsheet">
+      <div class="grid g3" style="margin-top:0">
+        <div>
+          <p class="mono" style="font-size:40px;font-weight:600;margin:0;color:var(--highlight)">1,240</p>
+          <p class="eyebrow" style="margin-top:8px;color:#9a978f">Questions in the bank</p>
+        </div>
+        <div>
+          <p class="mono" style="font-size:40px;font-weight:600;margin:0;color:#fff">100%</p>
+          <p class="eyebrow" style="margin-top:8px;color:#9a978f">With a written rationale</p>
+        </div>
+        <div>
+          <p class="mono" style="font-size:40px;font-weight:600;margin:0;color:#fff">8</p>
+          <p class="eyebrow" style="margin-top:8px;color:#9a978f">NCLEX item types covered</p>
+        </div>
+      </div>
+    </div>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      The one place the faint chart-paper grid is used, and only on the ink
+      ground. Numbers are mono; at most one of them is highlighter yellow.
+      <strong>Never a pass rate, never a user count.</strong>
+    </p>
+  </section>
+
+  <footer class="pagefoot"></footer>
+</div>
+</main>
+</div>
+<script src="guide.js"></script>
+</body>
+</html>

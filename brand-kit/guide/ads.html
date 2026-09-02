@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ad creative — Flowsheet</title>
+<link rel="icon" href="../logos/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="guide.css">
+<style>
+  .ad {
+    aspect-ratio: 4 / 5;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .ad .foot { margin-top: auto; padding-top: 18px; }
+  .ad img.wm { width: 74px; }
+</style>
+</head>
+<body>
+<div class="shell">
+<main class="main">
+<div class="page">
+
+  <header class="pagehead">
+    <p class="eyebrow">Applying it · 07</p>
+    <h1>Ad creative</h1>
+    <p class="lede">
+      The same system at 1080×1350. One idea, one headline, one supporting
+      line, one CTA. The offer in every ad is the free tier — fifty questions,
+      no card, full rationales — and nothing else.
+    </p>
+  </header>
+
+  <section class="block">
+    <p class="eyebrow">Rules</p>
+    <h2>What holds across every ad</h2>
+    <table>
+      <thead><tr><th style="width:170px">Element</th><th>Rule</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Format</td><td>1080×1350 (4:5) by default. 1080×1080 and 1080×1920 are cut from the same layout, never redesigned.</td></tr>
+        <tr><td class="name">Ground</td><td>Paper <code>#FBFAF6</code>, or the ink ground for one concept in a set. Never white.</td></tr>
+        <tr><td class="name">Fill</td><td>Underfilled. If the layout feels comfortable, remove something.</td></tr>
+        <tr><td class="name">Alignment</td><td>Left, always. One optional centred concept per campaign, maximum.</td></tr>
+        <tr><td class="name">Highlighter</td><td>One stroke, behind one phrase, in one ad out of a set — not in every one.</td></tr>
+        <tr><td class="name">Logo</td><td>Small, bottom-left. Ink cut on paper, reverse on ink, white on photography. It is never the hero.</td></tr>
+        <tr><td class="name">CTA</td><td>A teal rectangle, 3px radius, white display text at 600, about 44px tall. On ink it is highlighter yellow with ink text.</td></tr>
+        <tr><td class="name">Separators</td><td>Hairlines. Never a box inside a box.</td></tr>
+        <tr><td class="name">Offer</td><td>The free tier only. Never a price, an upgrade, or a paid feature.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="hr">
+
+  <section class="block">
+    <p class="eyebrow">The set</p>
+    <h2>Six concepts, drawn to scale</h2>
+    <p class="prose" style="margin-top:14px">
+      These are the six that work. They are rendered here in HTML at 4:5 so the
+      proportions are real — hand the equivalent brief in
+      <code>AD-CONTEXT.md</code> to an image model, or rebuild them in a design
+      tool.
+    </p>
+
+    <div class="grid g3" style="margin-top:26px">
+
+      <!-- 01 -->
+      <div class="ad">
+        <p class="eyebrow">01 · The number</p>
+        <p class="mono" style="font-size:104px;font-weight:600;letter-spacing:-0.05em;line-height:.9;margin:14px 0 0">50</p>
+        <p style="font-family:var(--font-body);font-size:19px;line-height:1.5;color:var(--ink-2);margin:18px 0 0">
+          free NCLEX questions.<br>No card.
+        </p>
+        <div class="foot">
+          <span class="btn btn-primary" style="font-size:14px;padding:11px 18px;min-height:40px">Start free</span>
+          <img class="wm" src="../logos/nursia-wordmark.svg" alt="" style="margin-top:18px">
+        </div>
+      </div>
+
+      <!-- 02 -->
+      <div class="ad">
+        <p class="eyebrow">02 · The card</p>
+        <h3 style="font-size:27px;font-weight:800;letter-spacing:-0.022em;margin:12px 0 16px">Which one first?</h3>
+        <div class="qcard" style="padding:13px;box-shadow:none">
+          <p class="eyebrow" style="font-size:9px">Prioritization</p>
+          <p class="stem" style="font-size:12.5px;margin:6px 0 10px">A nurse receives handoff on four clients. Which should be assessed first?</p>
+          <div class="qopt" style="font-size:11px;padding:7px 9px;margin-bottom:5px"><span class="qkey" style="width:17px;height:17px;font-size:8.5px">A</span><span>Incisional pain 6 of 10</span></div>
+          <div class="qopt" style="font-size:11px;padding:7px 9px;margin-bottom:5px"><span class="qkey" style="width:17px;height:17px;font-size:8.5px">B</span><span>New dyspnoea, SpO₂ 88%</span></div>
+          <div class="qopt" style="font-size:11px;padding:7px 9px;margin-bottom:5px"><span class="qkey" style="width:17px;height:17px;font-size:8.5px">C</span><span>Awaiting discharge teaching</span></div>
+          <div class="qopt" style="font-size:11px;padding:7px 9px;margin-bottom:0"><span class="qkey" style="width:17px;height:17px;font-size:8.5px">D</span><span>PRN antiemetic requested</span></div>
+        </div>
+        <div class="foot">
+          <p style="font-family:var(--font-body);font-size:14px;color:var(--ink-2);margin:0 0 12px">50 free questions. No card.</p>
+          <img class="wm" src="../logos/nursia-wordmark.svg" alt="">
+        </div>
+      </div>
+
+      <!-- 03 -->
+      <div class="ad">
+        <p class="eyebrow">03 · The split</p>
+        <h3 style="font-size:23px;font-weight:800;letter-spacing:-0.022em;line-height:1.1;margin:12px 0 20px">One of these teaches you something.</h3>
+        <div style="display:grid;grid-template-columns:64px 1fr;gap:14px;flex:1">
+          <div style="border-right:1px solid var(--rule)">
+            <p class="eyebrow" style="font-size:9px">Answer</p>
+            <p class="mono" style="font-size:30px;font-weight:600;margin:6px 0 0;color:var(--correct)">C</p>
+          </div>
+          <div>
+            <p style="font-family:var(--font-body);font-size:12.5px;line-height:1.55;color:var(--ink-2);margin:0 0 9px">A — expected post-op, not first.</p>
+            <p style="font-family:var(--font-body);font-size:12.5px;line-height:1.55;color:var(--ink-2);margin:0 0 9px">B — important, can wait.</p>
+            <p style="font-family:var(--font-body);font-size:12.5px;line-height:1.55;color:var(--ink-2);margin:0">D — a PRN is available.</p>
+          </div>
+        </div>
+        <div class="foot">
+          <img class="wm" src="../logos/nursia-wordmark.svg" alt="">
+        </div>
+      </div>
+
+      <!-- 04 -->
+      <div class="ad" style="background:var(--ink);border-color:#2a2d33">
+        <p class="eyebrow" style="color:#8b887f">04 · The dark one</p>
+        <p style="font-family:var(--font-body);font-size:25px;line-height:1.45;color:#fff;margin:auto 0 0">
+          Fifty NCLEX questions, the reasoning written out on every one, and
+          <span style="background-image:linear-gradient(var(--highlight),var(--highlight));background-repeat:no-repeat;background-position:0 88%;background-size:100% .42em;color:var(--ink)">no credit card</span>.
+        </p>
+        <div class="foot">
+          <span class="btn btn-invert" style="font-size:14px;padding:11px 18px;min-height:40px">Start free</span>
+          <img class="wm" src="../logos/nursia-wordmark-reverse.svg" alt="" style="margin-top:18px">
+        </div>
+      </div>
+
+      <!-- 05 -->
+      <div class="ad">
+        <p class="eyebrow">05 · The item types</p>
+        <h3 style="font-size:23px;font-weight:800;letter-spacing:-0.022em;line-height:1.1;margin:12px 0 20px">The item types that catch people out.</h3>
+        <div style="flex:1">
+          <p class="mono" style="font-size:13px;letter-spacing:.08em;color:var(--ink);border-top:1px solid var(--rule);padding:11px 0;margin:0">SELECT ALL THAT APPLY</p>
+          <p class="mono" style="font-size:13px;letter-spacing:.08em;color:var(--ink);border-top:1px solid var(--rule);padding:11px 0;margin:0">MATRIX</p>
+          <p class="mono" style="font-size:13px;letter-spacing:.08em;color:var(--ink);border-top:1px solid var(--rule);padding:11px 0;margin:0">BOWTIE</p>
+          <p class="mono" style="font-size:13px;letter-spacing:.08em;color:var(--ink);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:11px 0;margin:0">CASE STUDY</p>
+        </div>
+        <div class="foot">
+          <p style="font-family:var(--font-body);font-size:14px;color:var(--ink-2);margin:0 0 12px">All eight, free to try.</p>
+          <img class="wm" src="../logos/nursia-wordmark.svg" alt="">
+        </div>
+      </div>
+
+      <!-- 06 -->
+      <div class="ad" style="padding:0">
+        <img src="../photos/cta-night.png" alt="" style="width:100%;flex:1;object-fit:cover">
+        <div style="background:var(--paper);padding:22px">
+          <p class="eyebrow">06 · The photo third</p>
+          <h3 style="font-size:22px;font-weight:800;letter-spacing:-0.022em;line-height:1.1;margin:10px 0 12px">Fifteen minutes is enough for four questions.</h3>
+          <span class="btn btn-primary" style="font-size:13px;padding:9px 15px;min-height:36px">Start free</span>
+          <img class="wm" src="../logos/nursia-wordmark.svg" alt="" style="margin-top:16px;width:64px">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <section class="block">
+    <p class="eyebrow">Compliance</p>
+    <h2>What gets an ad rejected</h2>
+    <div class="prose">
+      <ul>
+        <li><strong>Copy that asserts something about the viewer.</strong> "Failed the NCLEX?" is a Meta rejection. Reframe as a fact about a population.</li>
+        <li><strong>A pass rate or score claim</strong>, in the image or the caption.</li>
+        <li><strong>A fabricated testimonial or user count.</strong></li>
+        <li><strong>Anything implying NCSBN endorsement</strong>, including using the NCLEX logo or an official-looking seal.</li>
+        <li><strong>Before/after framing</strong> of a person's performance or circumstance.</li>
+      </ul>
+    </div>
+    <div class="note">
+      <strong>Generating these.</strong> <code>AD-CONTEXT.md</code> and
+      <code>for-chatgpt/START-HERE.md</code> hold the same system written as a
+      prompt. Upload the three PNGs in <code>for-chatgpt/</code> alongside it so
+      the model has the real wordmark rather than inventing one — image models
+      cannot be trusted to re-draw letterforms, and a warped wordmark is the
+      single most common failure.
+    </div>
+  </section>
+
+  <footer class="pagefoot"></footer>
+</div>
+</main>
+</div>
+<script src="guide.js"></script>
+</body>
+</html>

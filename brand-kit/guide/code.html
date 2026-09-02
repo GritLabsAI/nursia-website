@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tokens &amp; code — Flowsheet</title>
+<link rel="icon" href="../logos/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="guide.css">
+</head>
+<body>
+<div class="shell">
+<main class="main">
+<div class="page">
+
+  <header class="pagehead">
+    <p class="eyebrow">For engineers · 08</p>
+    <h1>Tokens &amp; code</h1>
+    <p class="lede">
+      The site runs on Tailwind v4 with the palette declared in an
+      <code>@theme</code> block. That block is the source of truth; everything
+      in <code>tokens/</code> is generated to match it.
+    </p>
+  </header>
+
+  <section class="block">
+    <p class="eyebrow">Source of truth</p>
+    <h2>Where the system actually lives</h2>
+    <table>
+      <thead><tr><th style="width:290px">File</th><th>Holds</th></tr></thead>
+      <tbody>
+        <tr><td class="name">src/app/globals.css</td><td>The <code>@theme</code> palette and font stacks, the base layer, and every component class — <code>.eyebrow</code>, <code>.prose-ns</code>, <code>.mark</code>, <code>.btn</code>, <code>.qcard</code>, <code>.qopt</code>, <code>.cell</code>, <code>.acc</code>, <code>.calc-key</code>.</td></tr>
+        <tr><td class="name">scripts/build-logo.mjs</td><td>Generates every logo cut from one definition, letterforms outlined. Also feeds the app icons, favicon and OG image.</td></tr>
+        <tr><td class="name">brand-kit/tokens/</td><td>The same values as <code>tokens.css</code>, <code>tokens.json</code> and <code>tokens.scss</code>, for anything outside the Next.js app — email, slides, a native app, a design tool.</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      Change a colour in <code>globals.css</code> and update
+      <code>brand-kit/tokens/</code> in the same commit. There is no build step
+      that syncs them, so they drift the moment you forget.
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>The theme block</h2>
+<pre><span class="c">/* src/app/globals.css */</span>
+@import "tailwindcss";
+
+@theme {
+  <span class="t">--color-paper</span>: #fbfaf6;
+  <span class="t">--color-paper-2</span>: #f4f2eb;
+  <span class="t">--color-ink</span>: #14161a;
+  <span class="t">--color-ink-2</span>: #3a3d44;
+  <span class="t">--color-muted</span>: #6e6b63;
+  <span class="t">--color-rule</span>: #e3dfd4;
+  <span class="t">--color-teal</span>: #0b6b62;
+  <span class="t">--color-teal-dark</span>: #084f49;
+  <span class="t">--color-highlight</span>: #f5e85c;
+  <span class="t">--color-correct</span>: #157f52;
+  <span class="t">--color-wrong</span>: #b23a2e;
+
+  <span class="t">--font-display</span>: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  <span class="t">--font-ui</span>:      var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  <span class="t">--font-body</span>:    var(--font-source-serif), Georgia, "Times New Roman", serif;
+  <span class="t">--font-mono</span>:    var(--font-plex-mono), ui-monospace, Menlo, monospace;
+}</pre>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      Declaring them in <code>@theme</code> means every colour is also a utility:
+      <code>bg-paper</code>, <code>text-ink-2</code>, <code>border-rule</code>,
+      <code>bg-teal</code>. Do not write a raw hex in a component — if the value
+      is not in the theme, it is not in the system.
+    </p>
+  </section>
+
+  <section class="block">
+    <h2>Fonts, wired through next/font</h2>
+<pre><span class="c">// src/app/layout.tsx</span>
+import { Bricolage_Grotesque, Source_Serif_4, IBM_Plex_Mono } from "next/font/google";
+
+const bricolage   = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
+const sourceSerif = Source_Serif_4({ subsets: ["latin"], variable: "--font-source-serif" });
+const plexMono    = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400","500","600","700"], variable: "--font-plex-mono" });</pre>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      The <code>fonts/</code> folder in this kit holds the same three faces as
+      files, for slides, email, print and anything that cannot reach a CDN. All
+      three are SIL Open Font Licence — free to embed, ship and subset, with the
+      licences included.
+    </p>
+  </section>
+
+  <hr class="hr">
+
+  <section class="block">
+    <p class="eyebrow">Recipes</p>
+    <h2>The eyebrow</h2>
+<pre>&lt;p class="eyebrow"&gt;Management of care&lt;/p&gt;
+
+<span class="c">/* what that class is */</span>
+font-family: var(--font-mono);
+font-size: 11px;
+font-weight: 500;
+letter-spacing: 0.14em;
+text-transform: uppercase;
+color: var(--color-muted);</pre>
+
+    <h2 style="margin-top:44px">The highlighter stroke</h2>
+<pre>&lt;h1&gt;Fifty questions, &lt;span class="mark"&gt;free&lt;/span&gt;.&lt;/h1&gt;
+
+.mark {
+  background-image: linear-gradient(var(--color-highlight), var(--color-highlight));
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 100% 0.42em;
+  box-decoration-break: clone;   <span class="c">/* survives a line wrap */</span>
+}</pre>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      Add <code>.mark-draw</code> to animate it in once over 620ms. Use that on
+      the hero and nowhere else.
+    </p>
+
+    <h2 style="margin-top:44px">An answer row</h2>
+<pre>&lt;button class="qopt" data-state="correct"&gt;
+  &lt;span class="qkey"&gt;A&lt;/span&gt;
+  &lt;span&gt;Serum potassium&lt;/span&gt;
+&lt;/button&gt;</pre>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      State goes on <code>data-state</code>, never on a class, so the styling
+      stays declarative and there is exactly one place each state is defined.
+      Valid values: unset, <code>picked</code>, <code>correct</code>,
+      <code>wrong</code>.
+    </p>
+  </section>
+
+  <hr class="hr">
+
+  <section class="block">
+    <p class="eyebrow">Outside the app</p>
+    <h2>Using the tokens elsewhere</h2>
+<pre><span class="c">/* plain CSS */</span>
+@import url("tokens/tokens.css");
+
+.cta {
+  background: var(--ns-teal);
+  color: #fff;
+  border-radius: var(--ns-radius-control);
+  min-height: var(--ns-tap-min);
+  font-family: var(--ns-font-ui);
+}</pre>
+<pre><span class="c">// Sass</span>
+@use "tokens/tokens" as ns;
+
+.cta {
+  background: ns.$ns-teal;
+  border-radius: ns.$ns-radius-control;
+  @include ns.ns-eyebrow;
+}</pre>
+<pre><span class="c">// JS / design tooling</span>
+import tokens from "./tokens/tokens.json" with { type: "json" };
+
+tokens.color.action.teal.value;   <span class="c">// "#0B6B62"</span>
+tokens.type.eyebrow;              <span class="c">// the full eyebrow recipe</span>
+tokens.rules;                     <span class="c">// the nine hard rules, as strings</span></pre>
+  </section>
+
+  <section class="block">
+    <h2>Checklist before shipping a surface</h2>
+    <div class="prose">
+      <ul>
+        <li>Ground is paper, not white. White appears only inside a card.</li>
+        <li>Exactly one primary action. Exactly one highlighter stroke, or none.</li>
+        <li>Every border is 1px <code>rule</code>. Nothing casts a shadow except a card.</li>
+        <li>Headline in the display face, sentences in the serif, labels in mono. No exceptions.</li>
+        <li>Every tappable thing clears 44px.</li>
+        <li>Focus ring present, teal, 2px, not overridden.</li>
+        <li>Colour is never the only signal for a state.</li>
+        <li>No pass rate, no invented count, no fabricated quote, no NCSBN implication.</li>
+        <li>Read it out loud. If it sounds like a growth team wrote it, rewrite it.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="pagefoot"></footer>
+</div>
+</main>
+</div>
+<script src="guide.js"></script>
+</body>
+</html>

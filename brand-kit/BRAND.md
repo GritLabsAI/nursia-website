@@ -5,6 +5,10 @@ Design system name: **Flowsheet** — clinical paper ground, ink type, scrub-tea
 actions, and one highlighter stroke reserved for the single most important thing
 on a surface.
 
+> **This is the two-minute version.** The full design language is eight HTML
+> pages at [`guide/index.html`](guide/index.html), and the same thing in plain
+> text at [`DESIGN-LANGUAGE.md`](DESIGN-LANGUAGE.md).
+
 ---
 
 ## Colours
@@ -93,8 +97,11 @@ rejection; "Most repeat testers lose points on prioritization" is fine.
 ## Files
 
 ```
+guide/    the design language as eight HTML pages — start at guide/index.html
+tokens/   tokens.css, tokens.json, tokens.scss
 logos/    every logo cut, SVG + PNG, plus the full usage README
 fonts/    Bricolage Grotesque, Source Serif 4, IBM Plex Mono (+ OFL licences)
 photos/   the photography already shot for the site — the look to match
-AD-CONTEXT.md   paste this into ChatGPT before asking for static ads
+DESIGN-LANGUAGE.md  the full written spec
+AD-CONTEXT.md       paste this into ChatGPT before asking for static ads
 ```
