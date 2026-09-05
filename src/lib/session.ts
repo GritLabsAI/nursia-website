@@ -154,32 +154,6 @@ export async function signInWithGoogle(): Promise<{ isNew: boolean }> {
 /* ------------------------------------------------------------------ phone */
 
 /**
- * Put a typed number into the shape Firebase requires.
- *
- * Firebase only accepts E.164 — a plus, a country code, then digits — and
- * rejects anything else outright. People type numbers with spaces, dashes and
- * brackets, and a form that refuses them for it is a form that loses signups.
- *
- * A bare ten-digit number is assumed to be American, because that is who sits
- * the NCLEX-RN. Anyone outside the US has to type their country code, which is
- * what the placeholder asks for, and any number that already starts with a plus
- * is left exactly as it was.
- */
-export function toE164(input: string): string {
-  const trimmed = input.trim();
-  if (trimmed.startsWith("+")) return "+" + trimmed.slice(1).replace(/\D/g, "");
-  const digits = trimmed.replace(/\D/g, "");
-  if (digits.length === 10) return `+1${digits}`;
-  /* 11 digits starting with a 1 is a US number typed with its country code but
-     no plus, which is the other way people write it. */
-  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
-  return `+${digits}`;
-}
-
-/** Roughly E.164: a plus and 8–15 digits. Firebase does the real validation. */
-export const looksLikePhone = (value: string) => /^\+\d{8,15}$/.test(toE164(value));
-
-/**
  * The reCAPTCHA that has to pass before Google will send an SMS.
  *
  * Invisible, so nobody sees anything unless Google decides this browser looks
@@ -202,20 +176,22 @@ function resetVerifier() {
 }
 
 /**
- * Send the code. `containerId` is an empty div the widget can live in.
+ * Send the code. `e164` is already in Firebase's shape — see lib/phone, which
+ * owns the country codes and the length rules. `containerId` is an empty div
+ * the widget can live in.
  *
  * The returned object is what carries the confirmation back — hold it, and
  * hand it to `confirmPhoneCode` with whatever they type.
  */
 export async function startPhoneSignIn(
-  phone: string,
+  e164: string,
   containerId: string,
 ): Promise<ConfirmationResult> {
   const auth = requireAuth();
   resetVerifier();
   verifier = new RecaptchaVerifier(auth, containerId, { size: "invisible" });
   try {
-    return await signInWithPhoneNumber(auth, toE164(phone), verifier);
+    return await signInWithPhoneNumber(auth, e164, verifier);
   } catch (error) {
     /* A failed send leaves a spent verifier behind; the next attempt needs a
        fresh one or it fails for a reason that has nothing to do with the code. */

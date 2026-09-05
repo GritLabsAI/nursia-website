@@ -11,14 +11,20 @@ import {
   authMessage,
   cancelPhoneSignIn,
   confirmPhoneCode,
-  looksLikePhone,
   resetPassword,
   signInWithEmail,
   signInWithGoogle,
   signUpWithEmail,
   startPhoneSignIn,
-  toE164,
 } from "@/lib/session";
+import {
+  COUNTRIES,
+  DEFAULT_COUNTRY,
+  findCountry,
+  formatE164,
+  nationalError,
+  toE164,
+} from "@/lib/phone";
 
 /**
  * The gate. An email and a password, Google, or a mobile number. Nothing else
@@ -96,12 +102,16 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
      code. Holding the confirmation rather than a token is Firebase's design —
      it is the thing that knows which send this code belongs to. */
   const [usePhone, setUsePhone] = useState(false);
+  const [country, setCountry] = useState(DEFAULT_COUNTRY.code);
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [sent, setSent] = useState<ConfirmationResult | null>(null);
   const [wait, setWait] = useState(0);
 
   const verb = mode === "signup" ? "Start free" : "Log in";
+  /** the picked country, and the number as Firebase will receive it */
+  const dialling = findCountry(country);
+  const e164 = toE164(dialling, phone);
 
   /* The resend countdown, and the widget teardown when this form goes away. */
   useEffect(() => {
@@ -199,18 +209,22 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
 
   /** Ask for the code. Also used by the resend, which is the same call again. */
   function sendCode() {
-    if (!looksLikePhone(phone)) {
-      setError("That does not look like a mobile number. Include the country code, like +1.");
+    /* Checked here rather than by Firebase: a bad number caught locally costs
+       nothing, and one caught by Firebase costs a message out of the day's
+       quota and half a minute waiting for a text that is not coming. */
+    const wrong = nationalError(dialling, phone);
+    if (wrong) {
+      setError(wrong);
       return;
     }
     void run("sms", async () => {
-      const confirmation = await startPhoneSignIn(phone, RECAPTCHA_ID);
+      const confirmation = await startPhoneSignIn(e164, RECAPTCHA_ID);
       setSent(confirmation);
       setCode("");
       /* Long enough that nobody sends four messages waiting for the first,
          short enough to be usable when a carrier really has swallowed one. */
       setWait(45);
-      setNote(`Code sent to ${toE164(phone)}.`);
+      setNote(`Code sent to ${formatE164(e164)}.`);
     });
   }
 
@@ -274,7 +288,7 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
                   className={`${FIELD} text-center font-mono text-[1.25rem] tracking-[0.35em] placeholder:text-muted/60`}
                 />
                 <span className="font-mono text-[11px] text-muted">
-                  Sent to {toE164(phone)} ·{" "}
+                  Sent to {formatE164(e164)} ·{" "}
                   <button
                     type="button"
                     onClick={editNumber}
@@ -321,30 +335,74 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
             /* Step one. Deliberately not a form of its own — the enter key is
                wired to the same handler as the button. */
             <div className="flex flex-col gap-4">
-              <label className="flex flex-col gap-1.5">
-                <span className="eyebrow">Mobile number</span>
-                <input
-                  required
-                  autoFocus
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  enterKeyHint="go"
-                  placeholder="+1 555 123 4567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      sendCode();
-                    }
-                  }}
-                  className={`${FIELD} placeholder:text-muted/70`}
-                />
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="phone-national" className="eyebrow">
+                  Mobile number
+                </label>
+
+                {/* The country is picked, not typed. One border around both, so
+                    the pair reads as the single field it is. */}
+                <div className="flex rounded-sm border border-rule bg-paper transition-colors focus-within:border-teal focus-within:bg-white">
+                  <div className="relative shrink-0">
+                    <select
+                      aria-label="Country code"
+                      value={country}
+                      onChange={(e) => {
+                        setCountry(e.target.value);
+                        setError(null);
+                      }}
+                      className="h-full min-h-[52px] cursor-pointer appearance-none bg-transparent py-0 pl-3.5 pr-7 font-mono text-[0.9375rem] text-ink outline-none"
+                    >
+                      {COUNTRIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.code} {c.dial}
+                        </option>
+                      ))}
+                    </select>
+                    <svg
+                      viewBox="0 0 12 12"
+                      aria-hidden
+                      className="pointer-events-none absolute right-2 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-muted"
+                    >
+                      <path
+                        d="M2 4.5 6 8.5 10 4.5"
+                        stroke="currentColor"
+                        strokeWidth={1.6}
+                        fill="none"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </div>
+
+                  <span className="my-2.5 w-px bg-rule" aria-hidden />
+
+                  <input
+                    id="phone-national"
+                    required
+                    autoFocus
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel-national"
+                    enterKeyHint="go"
+                    placeholder={dialling.example}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        sendCode();
+                      }
+                    }}
+                    className="min-h-[52px] w-full bg-transparent px-3.5 text-[1rem] text-ink outline-none placeholder:text-muted/70"
+                  />
+                </div>
+
                 <span className="font-mono text-[11px] text-muted">
-                  We text you a code. Standard message rates apply.
+                  {phone
+                    ? `We will text ${formatE164(e164)}`
+                    : "We text you a code. Standard message rates apply."}
                 </span>
-              </label>
+              </div>
 
               {error && (
                 <p role="alert" className="font-mono text-[11px] leading-relaxed text-wrong">

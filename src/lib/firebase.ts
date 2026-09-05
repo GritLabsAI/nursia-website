@@ -91,6 +91,12 @@ export function getDb(): Firestore | null {
 export function authMessage(error: unknown): string {
   const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
 
+  /* The friendly message is for the candidate; this is for whoever has to fix
+     it. Several of these codes mean a console setting rather than anything the
+     person typed, and translating them into calm prose without leaving the real
+     one somewhere is how a configuration bug turns into a week of guessing. */
+  if (code) console.warn(`[nursia] auth error: ${code}`, error);
+
   switch (code) {
     case "auth/email-already-in-use":
       return "That email already has an account. Log in instead.";
@@ -120,7 +126,13 @@ export function authMessage(error: unknown): string {
     case "auth/quota-exceeded":
       return "We have sent too many codes today. Use your email instead, or try tomorrow.";
     case "auth/captcha-check-failed":
-      return "The robot check did not pass. Reload the page and try again.";
+    case "auth/invalid-app-credential":
+      /* Nearly always this domain missing from the authorised list, or an API
+         key with referrer restrictions that do not include it. Nothing the
+         candidate can do, so point at the door that does open. */
+      return "The robot check did not pass here. Use your email instead, or try again later.";
+    case "auth/billing-not-enabled":
+      return "Text messages are not switched on for this site yet. Use your email instead.";
     case "auth/network-request-failed":
       return "We could not reach the server. Check your connection and try again.";
     case "auth/popup-closed-by-user":
