@@ -97,6 +97,23 @@ export function authMessage(error: unknown): string {
      one somewhere is how a configuration bug turns into a week of guessing. */
   if (code) console.warn(`[nursia] auth error: ${code}`, error);
 
+  /**
+   * `auth/operation-not-allowed` covers two completely different problems and
+   * the code alone cannot tell them apart: the provider being switched off, and
+   * the SMS region allowlist not including the country somebody just picked.
+   * Only the message says which, so it is read.
+   *
+   * Worth the special case because the second one is a normal thing for a real
+   * candidate to hit — the allowlist exists to stop SMS-pumping fraud, so it is
+   * always narrower than the world — and "that sign-in method is switched off"
+   * sends them to support over a country we simply do not text yet.
+   */
+  const detail =
+    typeof error === "object" && error && "message" in error ? String(error.message) : "";
+  if (code === "auth/operation-not-allowed" && /region/i.test(detail)) {
+    return "We cannot text that country yet. Use your email or Google instead.";
+  }
+
   switch (code) {
     case "auth/email-already-in-use":
       return "That email already has an account. Log in instead.";
@@ -132,7 +149,9 @@ export function authMessage(error: unknown): string {
          candidate can do, so point at the door that does open. */
       return "The robot check did not pass here. Use your email instead, or try again later.";
     case "auth/billing-not-enabled":
-      return "Text messages are not switched on for this site yet. Use your email instead.";
+      /* The project is on the free plan, which will not send SMS to most
+         countries at all. A console and billing problem, not theirs. */
+      return "Text messages are not available here yet. Use your email or Google instead.";
     case "auth/network-request-failed":
       return "We could not reach the server. Check your connection and try again.";
     case "auth/popup-closed-by-user":
