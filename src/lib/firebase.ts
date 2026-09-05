@@ -98,20 +98,30 @@ export function authMessage(error: unknown): string {
   if (code) console.warn(`[nursia] auth error: ${code}`, error);
 
   /**
-   * `auth/operation-not-allowed` covers two completely different problems and
-   * the code alone cannot tell them apart: the provider being switched off, and
-   * the SMS region allowlist not including the country somebody just picked.
-   * Only the message says which, so it is read.
+   * Read the payload before the code, because for phone sign-in the code is
+   * frequently the wrong thing to read.
    *
-   * Worth the special case because the second one is a normal thing for a real
-   * candidate to hit — the allowlist exists to stop SMS-pumping fraud, so it is
-   * always narrower than the world — and "that sign-in method is switched off"
-   * sends them to support over a country we simply do not text yet.
+   * Two ways it misleads. `auth/operation-not-allowed` covers both "the
+   * provider is switched off" and "this country is not on the SMS allowlist",
+   * which need opposite advice. And the SDK has no mapping at all for some
+   * backend refusals — a project without billing gets BILLING_NOT_ENABLED
+   * wrapped in `auth/internal-error`, which lands in the default case below and
+   * tells a candidate to try again in a moment, forever.
+   *
+   * The backend spells out what it refused in the message. So: match on that
+   * first, and fall through to the code when it says nothing useful.
    */
   const detail =
     typeof error === "object" && error && "message" in error ? String(error.message) : "";
-  if (code === "auth/operation-not-allowed" && /region/i.test(detail)) {
+
+  if (/BILLING_NOT_ENABLED/i.test(detail)) {
+    return "Text messages are not available here yet. Use your email or Google instead.";
+  }
+  if (/region/i.test(detail) && /SMS|not.*enabled/i.test(detail)) {
     return "We cannot text that country yet. Use your email or Google instead.";
+  }
+  if (/CAPTCHA/i.test(detail)) {
+    return "The robot check did not pass here. Use your email instead, or try again later.";
   }
 
   switch (code) {
