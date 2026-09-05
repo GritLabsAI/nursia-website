@@ -13,13 +13,16 @@
 
 import {
   GoogleAuthProvider,
+  RecaptchaVerifier,
   getAdditionalUserInfo,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithPhoneNumber,
   signInWithPopup,
   signOut as firebaseSignOut,
+  type ConfirmationResult,
   type User,
 } from "firebase/auth";
 import { setAuthHint } from "@/lib/auth-hint";
@@ -146,6 +149,97 @@ export async function signInWithGoogle(): Promise<{ isNew: boolean }> {
   /* One button covers signing up and signing in; only Firebase knows which
      this was. */
   return { isNew: getAdditionalUserInfo(credential)?.isNewUser ?? false };
+}
+
+/* ------------------------------------------------------------------ phone */
+
+/**
+ * Put a typed number into the shape Firebase requires.
+ *
+ * Firebase only accepts E.164 — a plus, a country code, then digits — and
+ * rejects anything else outright. People type numbers with spaces, dashes and
+ * brackets, and a form that refuses them for it is a form that loses signups.
+ *
+ * A bare ten-digit number is assumed to be American, because that is who sits
+ * the NCLEX-RN. Anyone outside the US has to type their country code, which is
+ * what the placeholder asks for, and any number that already starts with a plus
+ * is left exactly as it was.
+ */
+export function toE164(input: string): string {
+  const trimmed = input.trim();
+  if (trimmed.startsWith("+")) return "+" + trimmed.slice(1).replace(/\D/g, "");
+  const digits = trimmed.replace(/\D/g, "");
+  if (digits.length === 10) return `+1${digits}`;
+  /* 11 digits starting with a 1 is a US number typed with its country code but
+     no plus, which is the other way people write it. */
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return `+${digits}`;
+}
+
+/** Roughly E.164: a plus and 8–15 digits. Firebase does the real validation. */
+export const looksLikePhone = (value: string) => /^\+\d{8,15}$/.test(toE164(value));
+
+/**
+ * The reCAPTCHA that has to pass before Google will send an SMS.
+ *
+ * Invisible, so nobody sees anything unless Google decides this browser looks
+ * like a robot — at which point it puts up the picture puzzle itself. It is not
+ * optional and it cannot be faked: without a verifier, phone sign-in throws.
+ *
+ * One verifier per attempt. A verifier that has already produced a token cannot
+ * produce a second one, so a retry after a wrong number would fail forever if it
+ * were kept. Clearing it also removes the widget it appended to the container.
+ */
+let verifier: RecaptchaVerifier | null = null;
+
+function resetVerifier() {
+  try {
+    verifier?.clear();
+  } catch {
+    /* already gone, or the container was unmounted from under it */
+  }
+  verifier = null;
+}
+
+/**
+ * Send the code. `containerId` is an empty div the widget can live in.
+ *
+ * The returned object is what carries the confirmation back — hold it, and
+ * hand it to `confirmPhoneCode` with whatever they type.
+ */
+export async function startPhoneSignIn(
+  phone: string,
+  containerId: string,
+): Promise<ConfirmationResult> {
+  const auth = requireAuth();
+  resetVerifier();
+  verifier = new RecaptchaVerifier(auth, containerId, { size: "invisible" });
+  try {
+    return await signInWithPhoneNumber(auth, toE164(phone), verifier);
+  } catch (error) {
+    /* A failed send leaves a spent verifier behind; the next attempt needs a
+       fresh one or it fails for a reason that has nothing to do with the code. */
+    resetVerifier();
+    throw error;
+  }
+}
+
+/**
+ * Check the six digits. Like Google, one flow covers signing up and signing in,
+ * so which it was is only known afterwards.
+ */
+export async function confirmPhoneCode(
+  confirmation: ConfirmationResult,
+  code: string,
+): Promise<{ isNew: boolean }> {
+  const credential = await confirmation.confirm(code.trim());
+  resetVerifier();
+  return { isNew: getAdditionalUserInfo(credential)?.isNewUser ?? false };
+}
+
+/** Drop the widget when the form leaves the page or switches away from phone. */
+export function cancelPhoneSignIn() {
+  resetVerifier();
 }
 
 export async function resetPassword(email: string) {

@@ -60,7 +60,10 @@ export function getFirebaseAuth(): Auth | null {
   if (!instance) return null;
   if (!auth) {
     auth = getAuth(instance);
-    if (useEmulators) connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+    if (useEmulators)
+      connectAuthEmulator(auth, "http://127.0.0.1:9099", {
+        disableWarnings: true,
+      });
   }
   return auth;
 }
@@ -86,8 +89,7 @@ export function getDb(): Firestore | null {
  * spend ten minutes resetting a password that was never the problem.
  */
 export function authMessage(error: unknown): string {
-  const code =
-    typeof error === "object" && error && "code" in error ? String(error.code) : "";
+  const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
 
   switch (code) {
     case "auth/email-already-in-use":
@@ -102,6 +104,23 @@ export function authMessage(error: unknown): string {
       return "That email and password do not match an account.";
     case "auth/too-many-requests":
       return "Too many attempts. Wait a minute and try again.";
+
+    /* Phone sign-in. The code cases are the two a person meets constantly, and
+       they need to say which of the two happened — retyping a code that has
+       already expired is a loop somebody can sit in for a while. */
+    case "auth/invalid-phone-number":
+    case "auth/missing-phone-number":
+      return "That does not look like a mobile number. Include the country code, like +1.";
+    case "auth/invalid-verification-code":
+      return "That code is not right. Check the six digits and try again.";
+    case "auth/code-expired":
+      return "That code has expired. Ask for a new one.";
+    case "auth/missing-verification-code":
+      return "Enter the six-digit code we sent you.";
+    case "auth/quota-exceeded":
+      return "We have sent too many codes today. Use your email instead, or try tomorrow.";
+    case "auth/captcha-check-failed":
+      return "The robot check did not pass. Reload the page and try again.";
     case "auth/network-request-failed":
       return "We could not reach the server. Check your connection and try again.";
     case "auth/popup-closed-by-user":

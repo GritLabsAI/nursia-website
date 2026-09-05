@@ -126,13 +126,16 @@ function adsConversion(sendTo: string | undefined) {
   }
 }
 
+/** How the account was made. Google and phone are one flow for both paths. */
+export type AuthMethod = "email" | "google" | "phone";
+
 /** GA4 recognises sign_up and login by name and reports on them specially. */
-export function signedUp(method: "email" | "google") {
+export function signedUp(method: AuthMethod) {
   track("sign_up", { method });
   /* The campaign's PRIMARY conversion — this is what Google Ads bids toward. */
   adsConversion(process.env.NEXT_PUBLIC_ADS_SIGNUP_LABEL);
 }
 
-export function loggedIn(method: "email" | "google") {
+export function loggedIn(method: AuthMethod) {
   track("login", { method });
 }
