@@ -13,7 +13,7 @@ import { GUIDES, SITE, TOPICS, guideModified } from "@/lib/content";
  */
 
 /** The site's own last structural change. Bump when pages are added. */
-const SITE_UPDATED = new Date("2026-08-27");
+const SITE_UPDATED = new Date("2026-09-06");
 /** Topic pages change when the bank does. */
 const BANK_UPDATED = new Date("2026-08-01");
 

@@ -9,6 +9,7 @@
 import type { IconKey } from "@/lib/icons";
 import { BANK_COUNTS } from "@/lib/bank/counts";
 import { EXTRA_GUIDES } from "@/lib/guides-content";
+import { TREND_GUIDES } from "@/lib/guides-trends";
 
 export const SITE = {
   name: "Nursia",
@@ -1038,8 +1039,8 @@ const CORE_GUIDES: Guide[] = [
   },
 ];
 
-/** The published set: the original nine plus everything in guides-content.ts. */
-export const GUIDES: Guide[] = [...CORE_GUIDES, ...EXTRA_GUIDES];
+/** The published set: the original nine, then each later wave in its own file. */
+export const GUIDES: Guide[] = [...CORE_GUIDES, ...EXTRA_GUIDES, ...TREND_GUIDES];
 
 export const guideBySlug = (slug: string) => GUIDES.find((g) => g.slug === slug);
 
