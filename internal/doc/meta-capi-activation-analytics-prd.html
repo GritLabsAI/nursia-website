@@ -977,6 +977,139 @@ export default async function SignupPage({
   </div>
 </section>
 
+<!-- ================================================ posthog install -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Implementation spec &middot; NUR-05, NUR-06</p>
+      <h2>PostHog on the marketing site</h2>
+      <p class="lede">
+        The single change that makes eight of the outcome rows answerable. The product app has
+        been reporting to project 595036 for a while; this side has not, which is why neither half
+        can describe a whole customer. Written out here because the order and the option values
+        both matter, and because two of them are easy to get wrong in ways that cost money rather
+        than throwing an error.
+      </p>
+    </div>
+
+    <div class="stack">
+
+      <div class="callout">
+        <h3>Step 1 &mdash; Serve it from our own origin</h3>
+        <p>
+          Two rewrites in <code>next.config.ts</code>, plus
+          <code>skipTrailingSlashRedirect: true</code>. The asset host and the ingestion host are
+          different and must stay so: the SDK bundle and the replay recorder come from
+          <code>us-assets.i.posthog.com</code>, everything else from <code>us.i.posthog.com</code>.
+          Pointing both at one destination silently breaks one of them.
+        </p>
+      </div>
+
+      <div class="finding sev2">
+        <p class="eyebrow">Why the proxy is not optional</p>
+        <h2>Blocking is not evenly distributed, and it follows the comparison.</h2>
+        <p>
+          <code>us.i.posthog.com</code> is on every blocklist worth the name. Paid, mobile and
+          privacy-conscious traffic is blocked at a far higher rate than organic desktop traffic.
+          A dashboard whose entire job is comparing paid against organic therefore cannot use a
+          third-party host: part of the gap it reports would be real and part would be an artefact
+          of who runs a blocker, with no way to separate the two. Same-origin requests are not
+          blocked. This is also what DOD-3's 75% coverage floor depends on.
+        </p>
+      </div>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Option</th><th>Value</th><th>Why this value</th></tr></thead>
+          <tbody>
+            <tr><td class="m">api_host</td><td class="m">/ingest</td><td>Same-origin, per the block above. Not the PostHog host.</td></tr>
+            <tr><td class="m">ui_host</td><td class="m">https://us.posthog.com</td><td>Where "open in PostHog" links resolve. Without it they point at the proxy path and 404.</td></tr>
+            <tr><td class="m">capture_pageview</td><td class="m">'history_change'</td><td>The SDK watches the History API itself, so App Router navigations produce a pageview with no router subscription. The hand-rolled <code>usePathname</code> effect double-fires on first render and misses <code>replaceState</code>.</td></tr>
+            <tr><td class="m">person_profiles</td><td class="m">'identified_only'</td><td>Most traffic here never signs up. A profile for every browser that reads one guide costs money and answers nothing.</td></tr>
+            <tr><td class="m">capture_performance</td><td class="m">{ web_vitals: true }</td><td>Field Core Web Vitals. DOD-5 is enforced against this, not a Lighthouse run &mdash; a lab number cannot tell you what a nurse on hospital wifi sees.</td></tr>
+            <tr><td class="m">defaults</td><td class="m">'2026-08-30'</td><td>Pin it. Leaving it unset silently changes behaviour on SDK upgrades.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <h3>Step 2 &mdash; First touch, written once</h3>
+        <p>
+          Read <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>,
+          <code>utm_content</code>, <code>utm_term</code>, <code>gclid</code>,
+          <code>gbraid</code>, <code>wbraid</code>, <code>fbclid</code> and <code>src</code> from
+          the landing URL, prefix them <code>initial_</code>, and store them with
+          <code>register_once</code>.
+        </p>
+        <p>
+          PostHog sets its own <code>$initial_*</code> properties and they are not sufficient
+          alone: a reader who arrives from an ad, leaves, and returns a week later through search
+          has a first touch the browser has already forgotten. More to the point, activation
+          happens days and several sessions after the click that paid for it, and person-on-events
+          stamps values as they were at ingestion &mdash; so a channel written once at first touch
+          stays readable on the activation event itself.
+        </p>
+      </div>
+
+      <div class="finding sev2">
+        <p class="eyebrow">The mistake to avoid</p>
+        <h2>Use <code>register_once</code>, not <code>setPersonProperties</code>.</h2>
+        <p>
+          <code>setPersonProperties</code> is the obvious-looking call and the wrong one under
+          <code>identified_only</code>: it either does nothing, or it creates the person profile
+          for an anonymous reader that the setting exists to avoid. <code>register_once</code>
+          stores super properties &mdash; written only if absent, so "first touch wins" is true at
+          the storage layer rather than something the code has to remember; attached to every later
+          event from that browser; carried through the eventual <code>$identify</code>; and costing
+          no profile in the meantime.
+        </p>
+      </div>
+
+      <div class="callout">
+        <h3>Step 3 &mdash; Dual-send the events that already exist</h3>
+        <p>
+          Every analytics call on this site funnels through one <code>track()</code> in
+          <code>src/lib/analytics.ts</code>. Adding a PostHog capture inside it sends all nine
+          existing events &mdash; <code>guide_viewed</code>, <code>resource_offered</code>,
+          <code>resource_clicked</code>, <code>resource_unlocked</code>,
+          <code>question_answered</code> and the rest &mdash; with no change to any of the nine
+          call sites. That single-funnel design is why this step is one edit rather than a sweep.
+        </p>
+      </div>
+
+      <div class="callout">
+        <h3>Step 4 &mdash; Environment and verification</h3>
+        <p>
+          <code>NEXT_PUBLIC_POSTHOG_KEY</code> holds the project token for
+          <code>NCLEX-Nursia</code> (595036). It is public by design, exactly like the GA4 and
+          Meta pixel ids already in <code>.env.example</code> &mdash; what protects the project is
+          that an ingestion token cannot read data back.
+        </p>
+        <p>
+          Gate the provider on the key alone, <strong>not</strong> on
+          <code>NODE_ENV === "production"</code> as the other three tags are. PostHog is now the
+          system of record, and being unable to see events in development is precisely how
+          instrumentation ships broken &mdash; which is the failure this document exists to
+          document.
+        </p>
+      </div>
+
+      <div class="finding sev2">
+        <p class="eyebrow">The constraint on this ticket</p>
+        <h2>This is the fourth script on the page. DOD-5 applies to it.</h2>
+        <p>
+          PostHog joins GA4, the Ads tag, Clarity and the Meta pixel on every marketing page.
+          Measure p75 LCP for seven days after release and compare against the baseline NUR-22
+          establishes; a regression past +100 ms reverts the ticket. NUR-21 &mdash; moving Clarity
+          off <code>beforeInteractive</code>, where it currently executes ahead of hydration
+          &mdash; should land first, so the budget has headroom before anything is added to it.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ====================================================== revenue -->
 <section>
   <div class="wrap">
