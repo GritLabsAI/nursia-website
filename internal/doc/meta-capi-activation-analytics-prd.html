@@ -557,8 +557,8 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <table>
         <thead><tr><th>System</th><th>Installed on</th><th>Sees</th><th>Blind to</th><th>Role after this sprint</th></tr></thead>
         <tbody>
-          <tr><td><strong>PostHog</strong><br>project 595036</td><td class="m">app.nursia.io</td><td>App funnel, web vitals, replay, autocapture</td><td>All marketing pages, all ad traffic</td><td><strong>System of record</strong> — full funnel, activation, dashboards</td></tr>
-          <tr><td><strong>GA4</strong></td><td class="m">nursia.io</td><td>Content and LPs. Preview questions until they are withdrawn</td><td>Registration, activation, purchase</td><td>Channel classification and SEO reporting</td></tr>
+          <tr><td><strong>PostHog</strong><br>project 595036</td><td class="m">app.nursia.io</td><td>App funnel, web vitals, replay, autocapture</td><td>All marketing pages, all ad traffic</td><td><strong>Reporting surface &mdash; settled.</strong> Full funnel, activation, dashboards, vitals gate</td></tr>
+          <tr><td><strong>GA4</strong></td><td class="m">nursia.io</td><td>Content and LPs. Preview questions until they are withdrawn</td><td>Registration, activation, purchase</td><td>Channel classification and SEO reporting. Possibly cross-domain identity &mdash; engineering's call</td></tr>
           <tr><td><strong>Meta Pixel</strong></td><td class="m">nursia.io</td><td>PageView, Lead</td><td>The conversion it optimises toward</td><td>Delivery optimisation, fed by CAPI</td></tr>
           <tr><td><strong>Google Ads</strong></td><td class="m">nursia.io</td><td>Secondary conversion only</td><td>Primary conversion (records zero)</td><td>Bidding, on a conversion that fires</td></tr>
           <tr><td><strong>Clarity</strong></td><td class="m">nursia.io</td><td>Heatmaps, session video</td><td>Anything past the redirect</td><td>Unchanged. PostHog replay covers the app</td></tr>
@@ -567,15 +567,26 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
     </div>
 
     <div class="callout" style="margin-top:22px">
-      <h3>Recommendation — PostHog becomes the system of record</h3>
+      <h3>Two decisions, and only one of them is open</h3>
       <p>
-        Earlier advice in this project was to build the activation funnel in GA4, on the reasoning
-        that it was already installed and PostHog had nothing in it. The live data changes that:
-        PostHog is already collecting on the side of the boundary where activation and high intent
-        occur, and GA4 is not and cannot easily be. Put <code>posthog-js</code> on
-        <code>nursia.io</code>, keep GA4 for channel classification and search reporting, and keep
-        gtag for the Ads conversions Smart Bidding reads. Three systems, three jobs, one of them
-        able to answer the question you actually asked.
+        <strong>Reporting is settled: the dashboards are built in PostHog.</strong> That is a
+        business requirement, not a technical preference &mdash; it is where the funnel, the
+        activation rates and the web-vitals gate are specified, and where the team will actually
+        look on a Monday.
+      </p>
+      <p>
+        <strong>Collection is engineering's call.</strong> Whether cross-domain unified analytics
+        is solved with GA4's linker or with PostHog's own cross-subdomain identity handling is a
+        question about cookies, redirects and session stitching, and the people who own those
+        should choose. Both can work.
+      </p>
+      <p>
+        One implication is worth stating plainly rather than discovering in week three: a
+        dashboard can only report on data the system holds. <strong>So PostHog has to receive the
+        funnel events whichever route is chosen.</strong> The open question is therefore narrower
+        than it first looks &mdash; it is about which system resolves identity across the domain
+        boundary, not about which system the events land in. If GA4 wins the identity question,
+        PostHog still needs the same events alongside it.
       </p>
     </div>
   </div>
@@ -997,6 +1008,98 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
           and treating it as a tagging problem would spend the sprint in the wrong place.
         </p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== engineering calls -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Before ticket one</p>
+      <h2>Eight calls engineering makes before the sprint starts</h2>
+      <p class="lede">
+        Each of these changes what gets built. Left undecided, each has a default that will happen
+        anyway &mdash; usually the worse one, chosen by whoever picks up the ticket first. The
+        growth column is why a non-engineer should care about the outcome.
+      </p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Call</th><th>Options</th><th>Why it matters commercially</th><th>If nobody decides</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="m">E-01</td>
+            <td><strong>Cross-domain unified analytics</strong></td>
+            <td>GA4 linker, or PostHog cross-subdomain identity, or both</td>
+            <td>This is what makes one person one person across the redirect. Get it wrong and every activation is credited to "direct", and no channel can be compared to another. <em>Dashboards are PostHog either way, so PostHog must receive the events regardless.</em></td>
+            <td class="bad">Two half-funnels, permanently</td>
+          </tr>
+          <tr>
+            <td class="m">E-02</td>
+            <td><strong>The canonical user id</strong></td>
+            <td>Supabase user id (natural — it is already the auth system) or something new</td>
+            <td>The join key for every future question, including anything a warehouse is ever asked. Costs nothing now; costs fuzzy email-matching forever if skipped.</td>
+            <td class="bad">Guesswork joins later</td>
+          </tr>
+          <tr>
+            <td class="m">E-03</td>
+            <td><strong>CAPI transport</strong></td>
+            <td>Own route handler on Railway, or PostHog's Meta Ads destination, or both</td>
+            <td>Decides how much is built versus configured. The destination may remove most of NUR-08; the route is still needed for hashed identifiers on registration.</td>
+            <td class="warn">NUR-08 built, possibly needlessly</td>
+          </tr>
+          <tr>
+            <td class="m">E-04</td>
+            <td><strong>Tag manager</strong></td>
+            <td>None (recommended for now), client GTM, or server-side GTM with first-party serving</td>
+            <td>Marketing autonomy versus load speed and measurement reliability. See the GTM brief; the recommendation is "not this sprint" and engineering may overrule it.</td>
+            <td class="good">Status quo, which is fine</td>
+          </tr>
+          <tr>
+            <td class="m">E-05</td>
+            <td><strong>Cookie strategy across the boundary</strong></td>
+            <td>Apex-scoped <code>.nursia.io</code> cookies, or forward <code>fbclid</code> and mint <code>_fbc</code> on the far side</td>
+            <td>Determines whether Meta can attribute a registration at all. The forwarding route is simpler and is what this PRD assumes; apex cookies need both hosts to agree.</td>
+            <td class="bad">Meta attribution stays broken</td>
+          </tr>
+          <tr>
+            <td class="m">E-06</td>
+            <td><strong>PostHog environment gating</strong></td>
+            <td>Key only (recommended), or <code>NODE_ENV === "production"</code> like the other tags</td>
+            <td>Whether anyone can verify an event before it reaches production. Not seeing events in development is how instrumentation ships broken.</td>
+            <td class="warn">Copies the other three tags</td>
+          </tr>
+          <tr>
+            <td class="m">E-07</td>
+            <td><strong>Pre-registration engagement signal</strong></td>
+            <td>Keep one ungated question, or accept the blind spot</td>
+            <td>Product and growth as much as engineering. Decides whether "tried it, did not sign up" is ever visible again, and whether Meta gets a mid-funnel event. See Finding 05 and NUR-27.</td>
+            <td class="bad">Signal lost silently</td>
+          </tr>
+          <tr>
+            <td class="m">E-08</td>
+            <td><strong>Server-event reliability</strong></td>
+            <td>Fire-and-forget, retry queue, or a durable queue</td>
+            <td>A dropped server conversion is a conversion Meta and Google never learn from. Decides whether DOD-3's 75% floor is reachable on a bad day.</td>
+            <td class="warn">Fire-and-forget by default</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <h3>What is not an engineering call</h3>
+      <p>
+        Three things are settled and should not be reopened at ticket level. <strong>Dashboards
+        are built in PostHog.</strong> <strong>The Google Ads conversions stay on gtag</strong>
+        &mdash; Smart Bidding reads them and nothing else does. And <strong>the six gates in the
+        next section are the definition of done</strong>; if one is judged unreachable, that is a
+        conversation about the gate, not a ticket that quietly ships without meeting it.
+      </p>
     </div>
   </div>
 </section>
