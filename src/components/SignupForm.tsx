@@ -25,6 +25,13 @@ import {
   nationalError,
   toE164,
 } from "@/lib/phone";
+import {
+  handoffEnabled,
+  handoffMessage,
+  signInWithEmailToApp,
+  signInWithGoogleToApp,
+  signUpWithEmailToApp,
+} from "@/lib/supabaseAuth";
 
 /**
  * The gate. An email and a password, Google, or a mobile number. Nothing else
@@ -153,7 +160,12 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
       await action();
     } catch (err) {
       signingIn.current = false;
-      if (err instanceof AuthUnavailable) {
+      if (handoffEnabled() && which !== "sms" && which !== "code") {
+        /* Supabase errors carry no Firebase `auth/...` code, so authMessage()
+           would send every one of them to its generic default. */
+        const message = handoffMessage(err);
+        if (message) setError(message);
+      } else if (err instanceof AuthUnavailable) {
         setError("Accounts are not switched on yet. Practice questions work without one.");
       } else {
         /* An empty message means the person cancelled — a closed Google window
@@ -174,6 +186,24 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
       return;
     }
     void run("email", async () => {
+      if (handoffEnabled()) {
+        if (mode === "signup") {
+          const signedIn = await signUpWithEmailToApp(email.trim(), password);
+          signedUp("email");
+          if (!signedIn) {
+            /* Supabase accepted the account but issued no session — email
+               confirmation is on. Say so rather than appearing to do nothing. */
+            signingIn.current = false;
+            setNote("Check your email to confirm your account, then log in.");
+            return;
+          }
+        } else {
+          loggedIn("email");
+          await signInWithEmailToApp(email.trim(), password);
+        }
+        /* redirectToApp() has navigated; nothing below would run. */
+        return;
+      }
       if (mode === "signup") {
         await signUpWithEmail(email.trim(), password);
         signedUp("email");
@@ -187,6 +217,16 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
 
   function google() {
     void run("google", async () => {
+      /* Handoff: Supabase navigates the whole page to Google and then to the
+         app's callback. Nothing after this line runs, which is why the
+         analytics call sits before it — the app fires its own
+         LOGIN_COMPLETED/SIGNUP_COMPLETED on arrival, and "which was it" is not
+         knowable here the way Firebase's isNewUser told us. */
+      if (handoffEnabled()) {
+        loggedIn("google");
+        await signInWithGoogleToApp();
+        return;
+      }
       const { isNew } = await signInWithGoogle();
       /* Google is one button for both, so which event it was is only known
          after the fact, from whether Firebase had seen this account before. */
