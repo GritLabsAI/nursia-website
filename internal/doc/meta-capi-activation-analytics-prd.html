@@ -319,8 +319,8 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <div class="vital"><dt>Marketing site</dt><dd>nursia.io · this repo</dd></div>
       <div class="vital"><dt>Product app</dt><dd>app.nursia.io · external</dd></div>
       <div class="vital"><dt>PostHog project</dt><dd>NCLEX-Nursia · 595036</dd></div>
-      <div class="vital"><dt>Sprint size</dt><dd class="num">71 points</dd></div>
-      <div class="vital"><dt>P0 items</dt><dd class="num">14 of 33</dd></div>
+      <div class="vital"><dt>Sprint size</dt><dd class="num">79 points</dd></div>
+      <div class="vital"><dt>P0 items</dt><dd class="num">13 of 36</dd></div>
     </dl>
   </div>
 </header>
@@ -362,7 +362,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <p class="eyebrow">What this document asks for</p>
       <ol>
         <li><strong>One security fix, today.</strong> Auth tokens are being written into analytics storage. It is one SDK hook, and it should not wait for a sprint boundary.</li>
-        <li><strong>One sprint, 71 points, 33 tickets</strong> &mdash; of which 14 are P0 and stop money being spent blind. Twelve of the 33 belong to the <code>app.nursia.io</code> team and are a hard dependency.</li>
+        <li><strong>One sprint, 79 points, 36 tickets</strong> &mdash; of which 13 are P0 and stop money being spent blind. Fifteen of the 36 belong to the <code>app.nursia.io</code> team and are a hard dependency.</li>
         <li><strong>A decision on the system of record.</strong> The recommendation is PostHog, because it already collects on the side where activation happens and GA4 cannot reach it.</li>
         <li><strong>Agreement on six numeric gates</strong> for what "done" means, including 75% attribution coverage and a Meta match quality of 7.5.</li>
       </ol>
@@ -1646,9 +1646,9 @@ export default async function SignupPage({
           <tr>
             <td><strong>Google Ads</strong></td>
             <td class="m">Purchase</td>
-            <td><strong>Offline Conversion Import</strong></td>
+            <td><strong>Enhanced Conversions, or Zapier</strong></td>
             <td class="m">gclid / gbraid / wbraid</td>
-            <td>The conversion happens where the Ads tag never loads, hours or days after the click. OCI is built for exactly that.</td>
+            <td>The conversion happens where the Ads tag never loads, hours or days after the click. Neither route needs API access — see the correction below.</td>
           </tr>
           <tr>
             <td><strong>GA4</strong></td>
@@ -1661,8 +1661,41 @@ export default async function SignupPage({
       </table>
     </div>
 
-    <div class="callout" style="margin-top:22px">
-      <h3>Google Ads: an upload, not a container</h3>
+    <div class="finding sev2" style="margin-top:22px">
+      <p class="eyebrow">Correction to an earlier draft</p>
+      <h2>The Google Ads API is not on the critical path.</h2>
+      <p>
+        An earlier version of this document made the Google Ads API developer token a P0
+        dependency and called it the long pole, on the grounds that its review takes days to
+        weeks. That was wrong, and it would have put a multi-week approval in front of a problem
+        a spreadsheet solves in an afternoon.
+      </p>
+      <p>
+        Offline conversion import does not require the API. Google Ads accepts the same
+        <code>gclid</code> + timestamp + value payload from a manual upload, a scheduled Google
+        Sheet, or a Zapier action &mdash; none of which need a developer token or an approval.
+        There are four routes and only one of them is gated:
+      </p>
+      <div class="scroll" style="margin-top:4px">
+        <table>
+          <thead><tr><th>Route</th><th>Dev token</th><th>When it fits</th></tr></thead>
+          <tbody>
+            <tr><td><strong>gtag + Enhanced Conversions</strong> on the purchase page</td><td class="good">Not needed</td><td>Simplest, once <code>gclid</code> survives NUR-01. Start here</td></tr>
+            <tr><td><strong>Zapier offline conversion</strong></td><td class="good">Not needed</td><td>Webhook from purchase &rarr; Zapier &rarr; Ads. Also covers Meta offline conversions with the same pattern</td></tr>
+            <tr><td><strong>Scheduled Google Sheets import</strong></td><td class="good">Not needed</td><td>Fine at current volume. Least code of the three</td></tr>
+            <tr><td><strong>Ads API offline conversion import</strong></td><td class="bad">Required</td><td>Only when upload frequency makes the others a chore, or conversion adjustments and retries need handling programmatically</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        So the developer token moves from P0 to P2: apply when volume justifies automation, not
+        before. At 24 users and five days of data, building an automated upload pipeline is
+        building for a volume that does not exist yet.
+      </p>
+    </div>
+
+    <div class="callout" style="margin-top:16px">
+      <h3>Whichever route: it is an upload, not a container</h3>
       <p>
         This does not reopen the GTM decision. That rejection was about a <em>client-side</em>
         container loading tags in a browser. What purchase needs is the opposite of a browser tag:
@@ -1726,6 +1759,94 @@ export default async function SignupPage({
         <code>order_id</code>. It is what stops a purchase counting twice when both the browser and
         the server report it, and what lets the four systems be reconciled against each other
         afterwards &mdash; which is the whole of DOD-3 and DOD-4.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================== ga4 events + onboarding -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Event vocabulary</p>
+      <h2>Use GA4's own names, or its reports stay empty</h2>
+      <p class="lede">
+        GA4 recognises a specific set of event names and builds reports on them automatically.
+        An event called <code>registration_completed</code> is a custom event: it works in
+        Explorations and populates nothing else. The same event called <code>sign_up</code>
+        lights up User Acquisition, Conversions and the default funnel without configuration.
+        So the wire name is GA4's; the internal name can be whatever the code prefers.
+      </p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Moment</th><th>GA4 name</th><th>Required parameters</th><th>What it unlocks in GA4</th></tr></thead>
+        <tbody>
+          <tr><td>Account created</td><td class="m">sign_up</td><td class="m">method, value, currency</td><td>Recognised conversion; User Acquisition reporting by channel</td></tr>
+          <tr><td>Returning session</td><td class="m">login</td><td class="m">method</td><td>Returning-user segmentation</td></tr>
+          <tr><td>Onboarding begins</td><td class="m">tutorial_begin</td><td class="m">—</td><td>Pairs with tutorial_complete for a built-in completion rate</td></tr>
+          <tr><td>Onboarding finishes</td><td class="m">tutorial_complete</td><td class="m">—</td><td>As above</td></tr>
+          <tr><td>Paywall viewed</td><td class="m">begin_checkout</td><td class="m">value, currency, items</td><td>Enters the standard ecommerce funnel</td></tr>
+          <tr><td><strong>Payment taken</strong></td><td class="m">purchase</td><td class="m">transaction_id, value, currency, items</td><td><strong>Monetisation reports, ROAS, LTV.</strong> None of it works without transaction_id and value</td></tr>
+          <tr><td>Refund</td><td class="m">refund</td><td class="m">transaction_id, value, currency</td><td>Keeps revenue honest rather than cumulative</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <h3><code>transaction_id</code> is what stops revenue being counted twice</h3>
+      <p>
+        GA4 deduplicates purchases on <code>transaction_id</code> the way Meta deduplicates on
+        <code>event_id</code>. Without it, a customer who refreshes a confirmation page books the
+        revenue again, and every downstream number &mdash; ROAS, LTV, value-based bidding &mdash;
+        inherits the error. Use the same id across all four systems: PostHog, GA4
+        <code>transaction_id</code>, Meta <code>event_id</code>, Ads <code>order_id</code>.
+      </p>
+    </div>
+
+    <div class="sec-head" style="margin-top:40px;margin-bottom:18px">
+      <p class="eyebrow">Area E &middot; The step funnel</p>
+      <h2 style="font-size:24px">Onboarding, measured step by step</h2>
+      <p class="lede" style="font-size:16px">
+        <code>onboarding_step_viewed</code> has fired 26 times across 5 people and carries
+        <strong>no step index</strong>. A five-step funnel therefore reports as one step repeated
+        five times: you can see that people are in onboarding and never where they stop.
+      </p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Event</th><th>Parameters</th><th>Fires</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="m">onboarding_started</td><td class="m">source, step_total</td><td>First step rendered, once per person</td><td class="bad">Missing</td></tr>
+          <tr><td class="m">onboarding_step_viewed</td><td class="m">step_index, step_name, step_total</td><td>Each step shown</td><td class="warn">Exists, no index</td></tr>
+          <tr><td class="m">onboarding_step_completed</td><td class="m">step_index, step_name, seconds_on_step</td><td>Each step advanced past</td><td class="bad">Missing</td></tr>
+          <tr><td class="m">onboarding_completed</td><td class="m">step_total, minutes_taken</td><td>Final step done</td><td class="good">Exists — 2 events</td></tr>
+          <tr><td class="m">onboarding_skipped</td><td class="m">last_step_index, last_step_name</td><td>Abandoned or dismissed</td><td class="warn">Exists, no index</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <h3>Viewed and completed, not just viewed</h3>
+      <p>
+        The pair is the point. <code>step_viewed</code> alone cannot distinguish someone who read
+        a step and moved on from someone who read it and quit &mdash; both produce exactly one
+        view event. With the completion event, the drop at each step is the difference between
+        the two, and <code>seconds_on_step</code> separates a confusing step from a boring one.
+        That is what turns Area E from "26 events" into an answer about which step to rewrite.
+      </p>
+    </div>
+
+    <div class="callout" style="margin-top:16px">
+      <h3>Where it lands</h3>
+      <p>
+        All of this is <code>app.nursia.io</code> and therefore contract work &mdash; C-09 on the
+        app contract sheet. In GA4 it rides the <code>tutorial_begin</code> /
+        <code>tutorial_complete</code> pair above; in PostHog it becomes dashboard tile 7, a
+        funnel broken by <code>step_index</code>. Neither is buildable until the index exists,
+        which is why a one-point ticket blocks a whole area.
       </p>
     </div>
   </div>
@@ -1831,7 +1952,7 @@ export default async function SignupPage({
     <div class="callout" style="margin-top:16px">
       <h3>Delivery</h3>
       <p>
-        Thirty-three tickets across six workstreams, sequenced by dependency, live on the
+        Thirty-six tickets across six workstreams, sequenced by dependency, live on the
         <em>Sprint board</em> sheet of <code>nursia-analytics-sprint-tracker.xlsx</code> with
         owners, points and status. P0 is now NUR-00 to NUR-10 plus NUR-28 to NUR-30: the security fix, the redirect, the
         target event, the Ads conversion, ad tagging, PostHog on the marketing site, and the whole
@@ -1854,7 +1975,7 @@ export default async function SignupPage({
       <table>
         <thead><tr><th>Risk</th><th>Effect</th><th>Mitigation</th></tr></thead>
         <tbody>
-          <tr><td><strong>The app team does not implement the contract</strong></td><td>Areas C, F, G and H stay unmeasured regardless of anything in this repo</td><td>Twelve of thirty-three tickets are theirs. Confirm ownership before sprint start.</td></tr>
+          <tr><td><strong>The app team does not implement the contract</strong></td><td>Areas C, F, G and H stay unmeasured regardless of anything in this repo</td><td>Fifteen of thirty-six tickets are theirs. Confirm ownership before sprint start.</td></tr>
           <tr><td><strong>Dedup misconfigured</strong></td><td>Every conversion counts twice; bidding over-corrects</td><td>DOD-4 gates the sprint at ±2%.</td></tr>
           <tr><td><strong>Meta ads stay untagged</strong></td><td>Paid Social reports as Referral; the channel split is silently wrong</td><td>NUR-04 is one point and blocks the whole dashboard.</td></tr>
           <tr><td><strong>Four analytics scripts on one page</strong></td><td>LCP regresses on exactly the pages bought with ad money</td><td>DOD-5 is a hard gate measured on field data, and NUR-21 buys headroom first.</td></tr>
