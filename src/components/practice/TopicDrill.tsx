@@ -5,7 +5,8 @@ import Link from "next/link";
 import { TopicIcon } from "@/components/TopicIcon";
 import { Cross, LETTERS, Tick, WhyBlock } from "@/components/practice/Rationale";
 import { drillCompleted, questionAnswered } from "@/lib/analytics";
-import { recordAnswer } from "@/lib/stats";
+import { recordAttempt } from "@/lib/attempts";
+import { FREE_PREVIEW, useMaybeSignedIn } from "@/lib/gate";
 import type { BankQuestion } from "@/lib/bank/types";
 import type { IconKey } from "@/lib/icons";
 
@@ -288,7 +289,10 @@ export function TopicDrill({
   const [done, setDone] = useState(false);
   /** bumped on retry so every QuestionCard remounts with empty state */
   const [run, setRun] = useState(0);
+  /** the preview ran out and there is no account behind it */
+  const [locked, setLocked] = useState(false);
 
+  const signedIn = useMaybeSignedIn();
   const total = questions.length;
   const answered = done ? total : i;
 
@@ -345,7 +349,30 @@ export function TopicDrill({
         />
       </div>
 
-      {done ? (
+      {locked ? (
+        <div className="reveal px-5 py-8 sm:px-7">
+          <p className="eyebrow">That is the free preview</p>
+          <h3 className="mt-2 font-display text-[1.375rem] font-bold leading-snug tracking-[-0.02em] text-ink sm:text-2xl">
+            The rest of this set needs an account
+          </h3>
+          <p className="mt-3 max-w-md font-body text-[0.9375rem] leading-relaxed text-ink-2">
+            An email and a password, no card. It opens the other {total - FREE_PREVIEW}{" "}
+            {topic.name.toLowerCase()} questions, keeps every answer you give, and works out which
+            category is costing you the most marks.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+            <Link href="/signup" className="btn btn-primary">
+              Start free →
+            </Link>
+            <Link
+              href="/pricing"
+              className="font-mono text-[11px] text-muted underline decoration-rule underline-offset-4 transition-colors hover:text-teal"
+            >
+              → What an account gets you
+            </Link>
+          </div>
+        </div>
+      ) : done ? (
         <Results
           topicName={topic.name}
           questions={questions}
@@ -373,10 +400,28 @@ export function TopicDrill({
                   correct,
                   index: idx,
                 });
-                recordAnswer(topic.slug, correct);
+                recordAttempt({
+                  questionId: q.id,
+                  surface: "drill",
+                  topic: topic.slug,
+                  correct,
+                  picked: [p],
+                  answer: [q.answer],
+                  index: idx,
+                });
                 setPicks((prev) => [...prev, p]);
               }}
-              onNext={() => (idx === total - 1 ? finish(picks) : setI(idx + 1))}
+              onNext={() => {
+                /* The preview runs out mid-set for anyone without an account.
+                   The rest of the questions are still in the markup for a
+                   crawler; what stops is the drill. */
+                if (!signedIn && idx + 1 >= FREE_PREVIEW && idx < total - 1) {
+                  setLocked(true);
+                  return;
+                }
+                if (idx === total - 1) finish(picks);
+                else setI(idx + 1);
+              }}
             />
           </div>
         ))

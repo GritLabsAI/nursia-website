@@ -9,7 +9,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:questions": "node scripts/seed-questions.mjs",
+    "test:rules": "node scripts/test-rules.mjs"
   },
   "dependencies": {
     "@next/third-parties": "^16.3.3",
@@ -19,12 +21,14 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "firebase-admin": "^14.3.0",
     "firebase-tools": "^15.28.1",
     "opentype.js": "^2.0.0",
     "sharp": "^0.35.3",

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layout patterns — Flowsheet</title>
+<link rel="icon" href="../logos/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="guide.css">
+</head>
+<body>
+<div class="shell">
+<main class="main">
+<div class="page">
+
+  <header class="pagehead">
+    <p class="eyebrow">Applying it · 05</p>
+    <h1>Layout patterns</h1>
+    <p class="lede">
+      A page is a stack of bands inside a 1140px container. Each band holds one
+      idea, opens with a mono eyebrow, and is separated from the next by space
+      rather than by a box.
+    </p>
+  </header>
+
+  <section class="block">
+    <p class="eyebrow">Anatomy</p>
+    <h2>How a page is built</h2>
+    <table>
+      <thead><tr><th style="width:180px">Band</th><th style="width:130px">Ground</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Header</td><td class="k">paper</td><td>Wordmark left, two or three links, one teal button. A hairline under it, never a shadow.</td></tr>
+        <tr><td class="name">Hero</td><td class="k">paper</td><td>Eyebrow, one display headline with the single highlighter stroke, one serif line, one button. Often a question card beside or below it.</td></tr>
+        <tr><td class="name">Proof</td><td class="k">ink + flowsheet grid</td><td>The stat strip. One dark band per page, and this is usually it.</td></tr>
+        <tr><td class="name">Explain</td><td class="k">paper</td><td>Two or three bands of serif prose at a 42rem measure, each with its own eyebrow and head.</td></tr>
+        <tr><td class="name">Index</td><td class="k">paper-2</td><td>A grid of cells — topics, item types, guides. Quiet, scannable, no illustration.</td></tr>
+        <tr><td class="name">Questions</td><td class="k">paper</td><td>The accordion. Native details, crawlable, no more than eight.</td></tr>
+        <tr><td class="name">Close</td><td class="k">ink or photo</td><td>One line, one button, the reverse or white wordmark.</td></tr>
+        <tr><td class="name">Footer</td><td class="k">paper</td><td>Mono links in columns, fine print, the legal notice that Nursia is not affiliated with the NCSBN.</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <strong>One dark band per page.</strong> The ink ground is a punctuation
+      mark. Two of them and the page stops feeling like paper.
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <section class="block">
+    <p class="eyebrow">Pattern 01</p>
+    <h2>Hero — headline beside the object</h2>
+    <div class="demo on-paper" style="padding:36px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+        <div>
+          <p class="eyebrow">NCLEX-RN practice questions</p>
+          <h3 style="font-size:40px;font-weight:800;letter-spacing:-0.022em;line-height:1.06;margin:12px 0 0">
+            Fifty questions, <span class="mark">free</span>, with the reasoning on every one.
+          </h3>
+          <p style="font-family:var(--font-body);font-size:17px;line-height:1.7;color:var(--ink-2);margin:18px 0 24px;max-width:26rem">
+            Written and reviewed by nurses. No credit card, no trial that turns
+            into a subscription.
+          </p>
+          <span class="btn btn-primary">Start free</span>
+        </div>
+        <div class="qcard" style="padding:18px">
+          <p class="eyebrow">Management of care</p>
+          <p class="stem" style="font-size:15.5px">Which client should the nurse assess first?</p>
+          <div class="qopt" style="font-size:14.5px;padding:11px 13px"><span class="qkey">A</span><span>Post-op pain rated 6 of 10</span></div>
+          <div class="qopt" data-state="correct" style="font-size:14.5px;padding:11px 13px"><span class="qkey">B</span><span>New shortness of breath, SpO₂ 88%</span></div>
+          <div class="qopt" style="font-size:14.5px;padding:11px 13px"><span class="qkey">C</span><span>Awaiting discharge teaching</span></div>
+          <div class="qopt" style="font-size:14.5px;padding:11px 13px;margin-bottom:0"><span class="qkey">D</span><span>Requesting a PRN antiemetic</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      The strongest layout the brand has: the claim on the left, the proof of
+      the claim on the right, in the shape of the product itself.
+    </p>
+  </section>
+
+  <section class="block">
+    <p class="eyebrow">Pattern 02</p>
+    <h2>The split rule</h2>
+    <div class="demo on-paper" style="padding:36px">
+      <h3 style="font-size:30px;font-weight:800;letter-spacing:-0.022em;margin:0 0 26px">One of these teaches you something.</h3>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:32px">
+        <div style="border-right:1px solid var(--rule);padding-right:32px">
+          <p class="eyebrow">Answer</p>
+          <p class="mono" style="font-size:44px;font-weight:600;margin:8px 0 0;color:var(--correct)">B</p>
+        </div>
+        <div>
+          <p style="font-family:var(--font-body);font-size:16px;line-height:1.7;color:var(--ink-2);margin:0 0 12px"><strong style="color:var(--ink)">A</strong> — pain matters, but it is expected two days post-op and does not outrank breathing.</p>
+          <p style="font-family:var(--font-body);font-size:16px;line-height:1.7;color:var(--ink-2);margin:0 0 12px"><strong style="color:var(--ink)">C</strong> — teaching is important and can wait fifteen minutes.</p>
+          <p style="font-family:var(--font-body);font-size:16px;line-height:1.7;color:var(--ink-2);margin:0"><strong style="color:var(--ink)">D</strong> — mild nausea with a PRN available is the definition of not first.</p>
+        </div>
+      </div>
+    </div>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      A single hairline does the work a panel would do badly. Mono on the left,
+      serif on the right — the type split carrying the information split.
+    </p>
+  </section>
+
+  <section class="block">
+    <p class="eyebrow">Pattern 03</p>
+    <h2>The dark band</h2>
+    <div class="demo on-ink flowsheet" style="padding:44px">
+      <p class="eyebrow" style="color:#9a978f">What you get free</p>
+      <h3 style="font-size:34px;font-weight:800;letter-spacing:-0.022em;line-height:1.1;margin:12px 0 0;max-width:22rem">
+        Fifty questions and <span style="background-image:linear-gradient(var(--highlight),var(--highlight));background-repeat:no-repeat;background-position:0 88%;background-size:100% .42em;color:var(--ink)">no credit card</span>.
+      </h3>
+      <p style="font-family:var(--font-body);font-size:16.5px;line-height:1.7;color:#b9bcc2;margin:18px 0 24px;max-width:28rem">
+        The rationale is on every one, including the ones you get right.
+      </p>
+      <span class="btn btn-invert">Start free</span>
+      <img src="../logos/nursia-wordmark-reverse.svg" alt="Nursia" style="width:96px;margin-top:36px">
+    </div>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      Ink ground, faint chart-paper grid, highlighter button, reverse wordmark
+      bottom-left. Teal never appears here.
+    </p>
+  </section>
+
+  <section class="block">
+    <p class="eyebrow">Pattern 04</p>
+    <h2>The index grid</h2>
+    <div class="demo on-paper-2" style="padding:36px">
+      <p class="eyebrow">Coverage</p>
+      <h3 style="font-size:26px;font-weight:700;margin:10px 0 0">Every client-needs category, mapped</h3>
+      <div class="grid g4" style="margin-top:26px">
+        <a class="cell" href="#"><p class="eyebrow">01</p><h4 style="font-size:15.5px;margin:8px 0 6px">Management of care</h4><p class="mono" style="font-size:11.5px;color:var(--muted);margin:0">312</p></a>
+        <a class="cell" href="#"><p class="eyebrow">02</p><h4 style="font-size:15.5px;margin:8px 0 6px">Safety &amp; infection control</h4><p class="mono" style="font-size:11.5px;color:var(--muted);margin:0">176</p></a>
+        <a class="cell" href="#"><p class="eyebrow">03</p><h4 style="font-size:15.5px;margin:8px 0 6px">Pharmacological therapies</h4><p class="mono" style="font-size:11.5px;color:var(--muted);margin:0">284</p></a>
+        <a class="cell" href="#"><p class="eyebrow">04</p><h4 style="font-size:15.5px;margin:8px 0 6px">Physiological adaptation</h4><p class="mono" style="font-size:11.5px;color:var(--muted);margin:0">198</p></a>
+      </div>
+    </div>
+    <p class="prose" style="font-size:14px;margin-top:14px">
+      Sits on <code>paper-2</code> so the white cells separate without needing a
+      shadow. Four across on desktop, two on tablet, one on phone.
+    </p>
+  </section>
+
+  <hr class="hr">
+
+  <section class="block">
+    <p class="eyebrow">Breakpoints</p>
+    <h2>Responsive behaviour</h2>
+    <table>
+      <thead><tr><th style="width:150px">Width</th><th style="width:130px">Container</th><th>What changes</th></tr></thead>
+      <tbody>
+        <tr><td class="name">&lt; 560px</td><td class="k">100% − 48px</td><td>Every grid collapses to one column. Hero card moves below the headline. Band padding drops to 48px.</td></tr>
+        <tr><td class="name">560–900px</td><td class="k">100% − 64px</td><td>Four-up grids become two-up. The split rule stacks: mono block above, serif below.</td></tr>
+        <tr><td class="name">900–1140px</td><td class="k">100% − 64px</td><td>Full layout, container fluid.</td></tr>
+        <tr><td class="name">&gt; 1140px</td><td class="k">1140px fixed</td><td>The container stops growing. Bands still run full-bleed; only their contents are capped.</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      Type does not scale down much — the hero uses
+      <code>clamp(38px, 5vw, 56px)</code> and body copy stays at 17px on a
+      phone. People read rationales on phones; shrinking the serif is the one
+      change that would actually hurt.
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Things that are never on a page</h2>
+    <div class="prose">
+      <ul>
+        <li>A carousel of testimonials, or any testimonial that was not actually said.</li>
+        <li>A countdown, a "only 3 spots left", or any urgency device.</li>
+        <li>A pass-rate figure, a score claim, or a number of users.</li>
+        <li>An illustration of a cartoon nurse. There are no illustrations at all.</li>
+        <li>Two accent colours, two dark bands, or a shadow on anything that is not the card.</li>
+        <li>A modal that interrupts someone mid-question.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="pagefoot"></footer>
+</div>
+</main>
+</div>
+<script src="guide.js"></script>
+</body>
+</html>

@@ -13,13 +13,16 @@
 
 import {
   GoogleAuthProvider,
+  RecaptchaVerifier,
   getAdditionalUserInfo,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithPhoneNumber,
   signInWithPopup,
   signOut as firebaseSignOut,
+  type ConfirmationResult,
   type User,
 } from "firebase/auth";
 import { setAuthHint } from "@/lib/auth-hint";
@@ -146,6 +149,73 @@ export async function signInWithGoogle(): Promise<{ isNew: boolean }> {
   /* One button covers signing up and signing in; only Firebase knows which
      this was. */
   return { isNew: getAdditionalUserInfo(credential)?.isNewUser ?? false };
+}
+
+/* ------------------------------------------------------------------ phone */
+
+/**
+ * The reCAPTCHA that has to pass before Google will send an SMS.
+ *
+ * Invisible, so nobody sees anything unless Google decides this browser looks
+ * like a robot — at which point it puts up the picture puzzle itself. It is not
+ * optional and it cannot be faked: without a verifier, phone sign-in throws.
+ *
+ * One verifier per attempt. A verifier that has already produced a token cannot
+ * produce a second one, so a retry after a wrong number would fail forever if it
+ * were kept. Clearing it also removes the widget it appended to the container.
+ */
+let verifier: RecaptchaVerifier | null = null;
+
+function resetVerifier() {
+  try {
+    verifier?.clear();
+  } catch {
+    /* already gone, or the container was unmounted from under it */
+  }
+  verifier = null;
+}
+
+/**
+ * Send the code. `e164` is already in Firebase's shape — see lib/phone, which
+ * owns the country codes and the length rules. `containerId` is an empty div
+ * the widget can live in.
+ *
+ * The returned object is what carries the confirmation back — hold it, and
+ * hand it to `confirmPhoneCode` with whatever they type.
+ */
+export async function startPhoneSignIn(
+  e164: string,
+  containerId: string,
+): Promise<ConfirmationResult> {
+  const auth = requireAuth();
+  resetVerifier();
+  verifier = new RecaptchaVerifier(auth, containerId, { size: "invisible" });
+  try {
+    return await signInWithPhoneNumber(auth, e164, verifier);
+  } catch (error) {
+    /* A failed send leaves a spent verifier behind; the next attempt needs a
+       fresh one or it fails for a reason that has nothing to do with the code. */
+    resetVerifier();
+    throw error;
+  }
+}
+
+/**
+ * Check the six digits. Like Google, one flow covers signing up and signing in,
+ * so which it was is only known afterwards.
+ */
+export async function confirmPhoneCode(
+  confirmation: ConfirmationResult,
+  code: string,
+): Promise<{ isNew: boolean }> {
+  const credential = await confirmation.confirm(code.trim());
+  resetVerifier();
+  return { isNew: getAdditionalUserInfo(credential)?.isNewUser ?? false };
+}
+
+/** Drop the widget when the form leaves the page or switches away from phone. */
+export function cancelPhoneSignIn() {
+  resetVerifier();
 }
 
 export async function resetPassword(email: string) {

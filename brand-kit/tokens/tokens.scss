@@ -1,0 +1,82 @@
+// ============================================================
+// Nursia — Flowsheet design tokens (Sass)
+// Mirrors src/app/globals.css, which is the source of truth.
+// ============================================================
+
+// --- ground ------------------------------------------------
+$ns-paper: #fbfaf6;
+$ns-paper-2: #f4f2eb;
+$ns-white: #ffffff;
+
+// --- ink ---------------------------------------------------
+$ns-ink: #14161a;
+$ns-ink-2: #3a3d44;
+$ns-muted: #6e6b63;
+$ns-rule: #e3dfd4;
+
+// --- action ------------------------------------------------
+$ns-teal: #0b6b62;
+$ns-teal-dark: #084f49;
+$ns-highlight: #f5e85c;
+$ns-highlight-dark: #efe04a;
+
+// --- state -------------------------------------------------
+$ns-correct: #157f52;
+$ns-correct-fill: #f3faf5;
+$ns-wrong: #b23a2e;
+$ns-wrong-fill: #fdf5f3;
+
+// --- type --------------------------------------------------
+$ns-font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+$ns-font-ui: $ns-font-display;
+$ns-font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+$ns-font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+$ns-tracking-display: -0.022em;
+$ns-tracking-ui: -0.01em;
+$ns-tracking-eyebrow: 0.14em;
+$ns-leading-display: 1.06;
+$ns-leading-body: 1.72;
+
+$ns-size-hero: clamp(38px, 5vw, 56px);
+$ns-size-section: 25px;
+$ns-size-subhead: 18px;
+$ns-size-body: 17px;
+$ns-size-body-sm: 15px;
+$ns-size-ui: 15px;
+$ns-size-eyebrow: 11px;
+
+// --- space -------------------------------------------------
+$ns-space-tight: 8px;
+$ns-space-inner: 16px;
+$ns-space-card: 22px;
+$ns-space-group: 44px;
+$ns-space-band: 80px;
+
+$ns-container: 1140px;
+$ns-measure: 42rem;
+$ns-tap-min: 44px;
+
+// --- shape -------------------------------------------------
+$ns-radius-card: 4px;
+$ns-radius-control: 3px;
+$ns-radius-chip: 2px;
+$ns-shadow-card:
+  0 1px 0 rgba(20, 22, 26, 0.04),
+  0 10px 24px -18px rgba(20, 22, 26, 0.35);
+
+// --- motion ------------------------------------------------
+$ns-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+$ns-dur-state: 160ms;
+$ns-dur-reveal: 380ms;
+$ns-dur-swipe: 620ms;
+
+// --- the eyebrow, since it is a fixed recipe ---------------
+@mixin ns-eyebrow {
+  font-family: $ns-font-mono;
+  font-size: $ns-size-eyebrow;
+  font-weight: 500;
+  letter-spacing: $ns-tracking-eyebrow;
+  text-transform: uppercase;
+  color: $ns-muted;
+}

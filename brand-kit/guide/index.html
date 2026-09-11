@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flowsheet — the Nursia design language</title>
+<meta name="description" content="Nursia's design language: clinical paper ground, ink type, scrub-teal actions, and one highlighter stroke.">
+<link rel="icon" href="../logos/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="guide.css">
+</head>
+<body>
+<div class="shell">
+<main class="main">
+<div class="page">
+
+  <header class="pagehead">
+    <p class="eyebrow">Nursia · design language · v1.1</p>
+    <h1>Flowsheet</h1>
+    <p class="lede">
+      A flowsheet is the chart at the end of a hospital bed: ruled paper, small
+      neat labels, one thing circled because it matters. That is the whole
+      design language. <span class="mark">Clinical paper ground, ink type,
+      scrub-teal actions</span>, and a single highlighter stroke held back for
+      the one thing on a surface that deserves it.
+    </p>
+  </header>
+
+  <section class="block">
+    <p class="eyebrow">The idea</p>
+    <h2>Editorial print, not SaaS</h2>
+    <div class="prose">
+      <p>
+        Nursia sells NCLEX-RN practice questions written and reviewed by nurses.
+        The people using it are tired, studying at eleven at night, and have
+        already been sold to by six other prep companies with purple gradients
+        and a countdown timer. The design has one job: <strong>look like
+        something a nurse wrote, not something a growth team shipped.</strong>
+      </p>
+      <p>
+        Everything else follows from that. Paper instead of white. A serif that
+        explains instead of a sans that shouts. Hairlines instead of shadows.
+        Numbers instead of adjectives. Empty space instead of a fourth module.
+      </p>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Five rules that decide almost everything</h2>
+    <div class="grid g5" style="margin-top:26px">
+      <div>
+        <p class="eyebrow">01</p>
+        <p class="prose" style="font-size:15px;margin-top:8px">
+          <strong>Paper, not white.</strong> <code>#FBFAF6</code> is the
+          default ground. White is reserved for cards, so a card always reads
+          as an object sitting on the page.
+        </p>
+      </div>
+      <div>
+        <p class="eyebrow">02</p>
+        <p class="prose" style="font-size:15px;margin-top:8px">
+          <strong>Three faces, one job each.</strong> Sans shouts, serif
+          explains, mono labels. Never swap them.
+        </p>
+      </div>
+      <div>
+        <p class="eyebrow">03</p>
+        <p class="prose" style="font-size:15px;margin-top:8px">
+          <strong>One accent, one highlighter.</strong> Teal for actions,
+          yellow for the single most important phrase. Never a third colour,
+          and never the two touching.
+        </p>
+      </div>
+      <div>
+        <p class="eyebrow">04</p>
+        <p class="prose" style="font-size:15px;margin-top:8px">
+          <strong>Hairlines, not boxes.</strong> 1px <code>#E3DFD4</code>
+          separates things. No panel inside a panel, no shadow except the
+          card's.
+        </p>
+      </div>
+      <div>
+        <p class="eyebrow">05</p>
+        <p class="prose" style="font-size:15px;margin-top:8px">
+          <strong>Underfilled beats packed.</strong> If a surface feels a
+          little empty, it is right. One idea per screen.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <section class="block">
+    <p class="eyebrow">The signature object</p>
+    <h2>Everything is built around a question card</h2>
+    <div class="prose">
+      <p>
+        There is one recognisable thing the brand owns, and it is the question
+        card: white, one hairline border, four bordered answer rows with a
+        small mono key. It is the product, so it is also the marketing. Most
+        pages and most ads should be built around one.
+      </p>
+    </div>
+
+    <div class="demo on-paper">
+      <p class="caption">The signature object</p>
+      <div class="qcard">
+        <p class="eyebrow">Management of care · Prioritization</p>
+        <p class="stem">
+          A nurse receives handoff on four clients. Which client should the
+          nurse assess first?
+        </p>
+        <div class="qopt"><span class="qkey">A</span><span>A client 2 days post-op reporting incisional pain rated 6 of 10.</span></div>
+        <div class="qopt" data-state="correct"><span class="qkey">B</span><span>A client with new-onset shortness of breath and an oxygen saturation of 88%.</span></div>
+        <div class="qopt"><span class="qkey">C</span><span>A client scheduled for discharge who has not received teaching.</span></div>
+        <div class="qopt" style="margin-bottom:0"><span class="qkey">D</span><span>A client requesting a PRN antiemetic for mild nausea.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <section class="block">
+    <h2>What is in this kit</h2>
+    <table>
+      <thead><tr><th style="width:190px">Where</th><th>What it holds</th></tr></thead>
+      <tbody>
+        <tr><td class="name">guide/</td><td>These eight pages. The design language, rendered in itself — so what you are looking at is also the reference implementation.</td></tr>
+        <tr><td class="name">logos/</td><td>Every logo cut, SVG and PNG, plus <code>logos/README.md</code> with the full usage rules.</td></tr>
+        <tr><td class="name">fonts/</td><td>Bricolage Grotesque, Source Serif 4 and IBM Plex Mono, with their OFL licences. All three are free to embed and ship.</td></tr>
+        <tr><td class="name">photos/</td><td>The photography already shot for the site — the look any new photography has to match.</td></tr>
+        <tr><td class="name">tokens/</td><td>The palette and scale as <code>tokens.css</code>, <code>tokens.json</code> and <code>tokens.scss</code>, generated from the same source of truth as the site.</td></tr>
+        <tr><td class="name">BRAND.md</td><td>The one-page written summary. Read it if you have two minutes instead of twenty.</td></tr>
+        <tr><td class="name">DESIGN-LANGUAGE.md</td><td>The long-form written spec, matching these pages, for anyone working in plain text or feeding an LLM.</td></tr>
+        <tr><td class="name">AD-CONTEXT.md<br>for-chatgpt/</td><td>Copy-paste briefs for generating static ad creative in ChatGPT or any image model, plus the three logo PNGs to upload with them.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>Where to go next</h2>
+    <div class="grid g3">
+      <a class="cell" href="foundations.html">
+        <p class="eyebrow">01</p>
+        <h3 style="font-size:18px;margin:8px 0 6px">Colour, type, space</h3>
+        <p class="prose" style="font-size:14px;margin:0">Every token, what it is for, and where it must not be used.</p>
+      </a>
+      <a class="cell" href="components.html">
+        <p class="eyebrow">04</p>
+        <h3 style="font-size:18px;margin:8px 0 6px">Components</h3>
+        <p class="prose" style="font-size:14px;margin:0">The card, the buttons, the answer states, the small furniture.</p>
+      </a>
+      <a class="cell" href="ads.html">
+        <p class="eyebrow">07</p>
+        <h3 style="font-size:18px;margin:8px 0 6px">Ad creative</h3>
+        <p class="prose" style="font-size:14px;margin:0">Six concepts, the copy rules, and what gets a Meta rejection.</p>
+      </a>
+    </div>
+  </section>
+
+  <div class="note">
+    <strong>Opening this offline.</strong> The pages work straight from the file
+    system, but Chrome refuses to load local font files over
+    <code>file://</code>, so the three faces come from Google Fonts there. For a
+    fully offline render, serve the folder — <code>npx serve brand-kit</code> or
+    <code>python -m http.server</code> — and the bundled fonts in
+    <code>fonts/</code> are used instead.
+  </div>
+
+  <footer class="pagefoot"></footer>
+</div>
+</main>
+</div>
+<script src="guide.js"></script>
+</body>
+</html>

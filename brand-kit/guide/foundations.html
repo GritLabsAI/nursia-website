@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colour, type, space — Flowsheet</title>
+<link rel="icon" href="../logos/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="guide.css">
+</head>
+<body>
+<div class="shell">
+<main class="main">
+<div class="page">
+
+  <header class="pagehead">
+    <p class="eyebrow">Foundations · 01</p>
+    <h1>Colour, type, space</h1>
+    <p class="lede">
+      Eleven colours, three faces, one spacing rhythm. The system is small on
+      purpose — there is no variant you can reach for to get out of a hard
+      layout problem.
+    </p>
+  </header>
+
+  <!-- ================= COLOUR ================= -->
+  <section class="block">
+    <p class="eyebrow">Colour</p>
+    <h2>The ground</h2>
+    <div class="prose">
+      <p>
+        Paper is the default background of every surface, in the product and in
+        the marketing. Pure white is reserved for cards, which is what makes a
+        card read as an object lying on a page rather than a rectangle drawn on
+        one.
+      </p>
+    </div>
+    <div class="grid g4">
+      <div class="swatch"><div class="chip" style="background:#fbfaf6;border-bottom:1px solid var(--rule)"></div><div class="meta"><b>paper</b><code data-copy="#FBFAF6">#FBFAF6</code><p>The default background. Almost everything sits on this.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#f4f2eb"></div><div class="meta"><b>paper-2</b><code data-copy="#F4F2EB">#F4F2EB</code><p>Second surface — inset panels, quiet blocks, a picked answer row.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#ffffff;border-bottom:1px solid var(--rule)"></div><div class="meta"><b>white</b><code data-copy="#FFFFFF">#FFFFFF</code><p>Cards only. Never a page background.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#14161a"></div><div class="meta"><b>ink</b><code data-copy="#14161A">#14161A</code><p>Headlines, the wordmark, and the dark ground for one band per page.</p></div></div>
+    </div>
+
+    <h2 style="margin-top:40px">Type and rules</h2>
+    <div class="grid g4">
+      <div class="swatch"><div class="chip" style="background:#14161a"></div><div class="meta"><b>ink</b><code data-copy="#14161A">#14161A</code><p>Headlines and anything that must be read first.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#3a3d44"></div><div class="meta"><b>ink-2</b><code data-copy="#3A3D44">#3A3D44</code><p>Body copy. Softer than the headline so the hierarchy holds without size alone.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#6e6b63"></div><div class="meta"><b>muted</b><code data-copy="#6E6B63">#6E6B63</code><p>Mono labels, eyebrows, captions, fine print. Warm grey, never blue-grey.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#e3dfd4"></div><div class="meta"><b>rule</b><code data-copy="#E3DFD4">#E3DFD4</code><p>Hairlines and card borders. 1px, never thicker, never a second tone.</p></div></div>
+    </div>
+
+    <h2 style="margin-top:40px">Action and emphasis</h2>
+    <div class="grid g4">
+      <div class="swatch"><div class="chip" style="background:#0b6b62"></div><div class="meta"><b>teal</b><code data-copy="#0B6B62">#0B6B62</code><p>Buttons, links, ticks, the full stop in the logo. Scrub teal, not brand blue.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#084f49"></div><div class="meta"><b>teal-dark</b><code data-copy="#084F49">#084F49</code><p>Hover and pressed only. It is a state, not a colour you design with.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#f5e85c"></div><div class="meta"><b>highlight</b><code data-copy="#F5E85C">#F5E85C</code><p>The highlighter stroke. One per surface, maximum, behind one phrase.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#157f52"></div><div class="meta"><b>correct</b><code data-copy="#157F52">#157F52</code><p>Correct answer border, on a <code>#F3FAF5</code> fill. Nothing else.</p></div></div>
+    </div>
+
+    <div class="grid g4" style="margin-top:16px">
+      <div class="swatch"><div class="chip" style="background:#b23a2e"></div><div class="meta"><b>wrong</b><code data-copy="#B23A2E">#B23A2E</code><p>Wrong answer border on <code>#FDF5F3</code>, and the exam clock in its last five minutes.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#f3faf5;border-bottom:1px solid var(--rule)"></div><div class="meta"><b>correct-fill</b><code data-copy="#F3FAF5">#F3FAF5</code><p>The pale green behind a correct row.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:#fdf5f3;border-bottom:1px solid var(--rule)"></div><div class="meta"><b>wrong-fill</b><code data-copy="#FDF5F3">#FDF5F3</code><p>The pale red behind a wrong row.</p></div></div>
+      <div class="swatch"><div class="chip" style="background:linear-gradient(90deg,#0b6b62 50%,#f5e85c 50%)"></div><div class="meta"><b>never adjacent</b><code>teal + highlight</code><p>Teal and highlighter never touch. Put paper or ink between them.</p></div></div>
+    </div>
+
+    <div class="note">
+      <strong>Colour rules, in full.</strong> No gradients. No drop shadows
+      except the card's. No glow. No third accent. Green and red are
+      <em>states</em> — they may never be used as decoration, and a correct
+      answer is the only thing on the site allowed to be green.
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <!-- ================= TYPE ================= -->
+  <section class="block">
+    <p class="eyebrow">Type</p>
+    <h2>Sans shouts, serif explains, mono labels</h2>
+    <div class="prose">
+      <p>
+        That split is the whole personality. Body copy is never set in the
+        display face, headlines are never set in the serif, and mono is never
+        used for a sentence. All three faces are open-licence and shipped in
+        <code>fonts/</code>.
+      </p>
+    </div>
+
+    <div class="demo">
+      <p class="caption">Display · Bricolage Grotesque · 700–800 · tracking −0.022em · leading 1.06</p>
+      <p style="font-family:var(--font-display);font-weight:800;font-size:54px;letter-spacing:-0.022em;line-height:1.06;margin:0">
+        Which one first?
+      </p>
+      <p style="font-family:var(--font-display);font-weight:700;font-size:28px;letter-spacing:-0.022em;line-height:1.1;margin:18px 0 0;color:var(--ink-2)">
+        Fifty free NCLEX questions, with the rationale on every one
+      </p>
+      <p class="prose" style="font-size:15px;margin:20px 0 0">
+        Headlines, section heads, buttons and UI labels. At 600 it is the
+        interface face. It is never used below about 14px and never used for
+        more than two consecutive lines of running text.
+      </p>
+    </div>
+
+    <div class="demo">
+      <p class="caption">Body · Source Serif 4 · 400 · 17px / 1.68</p>
+      <p style="font-family:var(--font-body);font-size:17px;line-height:1.72;color:var(--ink-2);max-width:42rem;margin:0">
+        The client with new-onset shortness of breath and an oxygen saturation
+        of 88% is the priority. Airway and breathing outrank pain, teaching and
+        comfort, and a saturation in the eighties is a change from baseline
+        rather than an expected post-operative finding. <em>Every rationale on
+        the site is written like this</em> — the reason first, then why the
+        distractors were tempting.
+      </p>
+      <p class="prose" style="font-size:15px;margin:20px 0 0">
+        Sentences, rationales, guide bodies, ad supporting lines. Set at 17px
+        with a 42rem measure. It carries the calm; it never carries a headline.
+      </p>
+    </div>
+
+    <div class="demo">
+      <p class="caption">Mono · IBM Plex Mono · 400–600</p>
+      <p class="eyebrow" style="margin:0 0 14px">Management of care · Prioritization</p>
+      <p style="font-family:var(--font-mono);font-weight:600;font-size:64px;letter-spacing:-0.03em;line-height:1;margin:0">50</p>
+      <p style="font-family:var(--font-mono);font-size:13px;color:var(--muted);margin:14px 0 0">
+        NCLEX-RN · item&nbsp;#4127 · 00:41 remaining · A B C D
+      </p>
+      <p class="prose" style="font-size:15px;margin:20px 0 0">
+        Numbers, eyebrows, labels, keys, timers, question IDs. Eyebrows are the
+        fixed recipe: <strong>11px, uppercase, letter-spacing 0.14em, muted</strong>.
+        Mono is never used for a sentence someone has to read.
+      </p>
+    </div>
+
+    <h2 style="margin-top:44px">The type scale</h2>
+    <table>
+      <thead><tr><th style="width:150px">Role</th><th style="width:120px">Face</th><th style="width:150px">Size / leading</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Hero</td><td class="k">Display 800</td><td class="k">clamp 38–56px / 1.06</td><td>One per page, at the top. Tracking −0.022em.</td></tr>
+        <tr><td class="name">Section head</td><td class="k">Display 700</td><td class="k">25–34px / 1.1</td><td>Opens a band. Always preceded by a mono eyebrow.</td></tr>
+        <tr><td class="name">Sub-head</td><td class="k">Display 600</td><td class="k">18px / 1.25</td><td>Card titles, cell titles, accordion summaries.</td></tr>
+        <tr><td class="name">Body</td><td class="k">Serif 400</td><td class="k">17px / 1.72</td><td>Everything anyone actually reads. Measure 42rem.</td></tr>
+        <tr><td class="name">Small body</td><td class="k">Serif 400</td><td class="k">15px / 1.55</td><td>Card copy, captions under a figure, footnotes.</td></tr>
+        <tr><td class="name">UI / button</td><td class="k">Display 600</td><td class="k">15px / 1</td><td>Buttons, nav, tabs. Tracking −0.01em.</td></tr>
+        <tr><td class="name">Eyebrow</td><td class="k">Mono 500</td><td class="k">11px / 1.3</td><td>Uppercase, 0.14em tracking, muted. Labels a section or a card.</td></tr>
+        <tr><td class="name">Data</td><td class="k">Mono 400–600</td><td class="k">13–72px</td><td>Counts, timers, IDs, answer keys, prices.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid g2" style="margin-top:28px">
+      <div class="demo judged" style="margin-top:0">
+        <p class="verdict">Do</p>
+        <h3 style="font-size:22px;font-weight:800;letter-spacing:-0.022em">The item types that catch people out</h3>
+        <p style="font-family:var(--font-body);font-size:15.5px;line-height:1.6;color:var(--ink-2);margin:10px 0 0">
+          Matrix, bowtie and select-all questions are scored partially, so a
+          near-miss still costs you.
+        </p>
+      </div>
+      <div class="demo judged no" style="margin-top:0">
+        <p class="verdict">Don't</p>
+        <h3 style="font-family:var(--font-body);font-size:22px;font-weight:600;letter-spacing:0">The item types that catch people out</h3>
+        <p style="font-family:var(--font-display);font-size:15.5px;line-height:1.6;color:var(--ink-2);margin:10px 0 0">
+          Matrix, bowtie and select-all questions are scored partially, so a
+          near-miss still costs you.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <!-- ================= SPACE ================= -->
+  <section class="block">
+    <p class="eyebrow">Space</p>
+    <h2>A 4px grid and a lot of restraint</h2>
+    <div class="prose">
+      <p>
+        Every measurement is a multiple of 4. The site runs on Tailwind's
+        default scale, which is the same thing said differently. What matters
+        more than the numbers is the ratio: <strong>the gap between two bands
+        should be larger than anything inside either of them</strong>, so the
+        page reads as a stack of ideas rather than a wall.
+      </p>
+    </div>
+    <table>
+      <thead><tr><th style="width:150px">Step</th><th style="width:110px">Value</th><th>Used for</th></tr></thead>
+      <tbody>
+        <tr><td class="name">hairline</td><td class="k">1px</td><td>Every border and rule in the system. There is no 2px border.</td></tr>
+        <tr><td class="name">tight</td><td class="k">8px</td><td>Between stacked answer rows, between a key and its label.</td></tr>
+        <tr><td class="name">inner</td><td class="k">16px</td><td>Padding inside a small cell; gap in a card grid.</td></tr>
+        <tr><td class="name">card</td><td class="k">22–24px</td><td>Padding inside the question card and any card-like panel.</td></tr>
+        <tr><td class="name">group</td><td class="k">40–48px</td><td>Between a heading block and the thing it introduces.</td></tr>
+        <tr><td class="name">band</td><td class="k">64–96px</td><td>Vertical padding on a page section. <code>py-16</code> to <code>py-24</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 style="margin-top:40px">Measure and container</h2>
+    <table>
+      <thead><tr><th style="width:150px">Constraint</th><th style="width:110px">Value</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Page container</td><td class="k">1140px</td><td>The outer width of every band. Side padding 24px mobile, 32px up.</td></tr>
+        <tr><td class="name">Reading measure</td><td class="k">42rem</td><td>Roughly 68 characters at 17px. All prose is capped here, including inside wide bands.</td></tr>
+        <tr><td class="name">Card width</td><td class="k">560px max</td><td>A question card wider than this stops looking like a card.</td></tr>
+        <tr><td class="name">Tap target</td><td class="k">44px min</td><td>Every button and answer row. Non-negotiable — people answer questions on phones in bed.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 style="margin-top:40px">Radius, borders, shadow</h2>
+    <table>
+      <thead><tr><th style="width:150px">Token</th><th style="width:170px">Value</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td class="name">radius-card</td><td class="k">4px</td><td>The question card, and only card-sized surfaces.</td></tr>
+        <tr><td class="name">radius-control</td><td class="k">3px</td><td>Buttons, answer rows, cells, calculator keys.</td></tr>
+        <tr><td class="name">radius-chip</td><td class="k">2px</td><td>The answer key square and anything smaller than 32px.</td></tr>
+        <tr><td class="name">border</td><td class="k">1px #E3DFD4</td><td>Everything. A darker border means a state, not a level.</td></tr>
+        <tr><td class="name">shadow-card</td><td class="k">0 1px 0 rgba(20,22,26,.04),<br>0 10px 24px −18px rgba(20,22,26,.35)</td><td>The only shadow in the system. Nothing else casts one.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 style="margin-top:40px">Motion</h2>
+    <div class="prose">
+      <p>
+        Motion exists to confirm something happened, never to entertain. Three
+        durations, one easing curve, and full respect for
+        <code>prefers-reduced-motion</code>.
+      </p>
+    </div>
+    <table>
+      <thead><tr><th style="width:150px">Move</th><th style="width:230px">Timing</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td class="name">State change</td><td class="k">120–160ms ease</td><td>Hover and press on buttons, rows, keys.</td></tr>
+        <tr><td class="name">Reveal</td><td class="k">380ms cubic-bezier(.2,.7,.3,1)<br>opacity + 4px rise</td><td>A rationale appearing after an answer is submitted.</td></tr>
+        <tr><td class="name">Highlighter swipe</td><td class="k">620ms cubic-bezier(.2,.7,.3,1)</td><td>The stroke drawing itself in, once, on the hero only.</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      Nothing loops. Nothing parallaxes. Nothing animates on scroll more than
+      once. If motion would still be running while someone is trying to read a
+      rationale, it is wrong.
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <section class="block">
+    <p class="eyebrow">Accessibility</p>
+    <h2>The floor, not the aspiration</h2>
+    <div class="prose">
+      <ul>
+        <li><strong>Contrast.</strong> Measured against paper <code>#FBFAF6</code>: ink 17.3:1, ink-2 10.4:1, teal 6.1:1, wrong 5.7:1, muted 5.1:1, correct 4.8:1. White on teal is 6.4:1, paper on ink 17.3:1, ink on the highlighter 14.3:1. Everything clears AA; <code>muted</code> and <code>correct</code> are the two that sit closest to the line, so neither is ever used below 11px or for body copy.</li>
+        <li><strong>Never colour alone.</strong> A correct row carries a border, a fill <em>and</em> a coloured key. Red and green are reinforced by position and wording so a colour-blind user loses nothing.</li>
+        <li><strong>Focus is visible and teal.</strong> 2px outline, 2px offset, 2px radius. It is never removed.</li>
+        <li><strong>44px targets everywhere</strong>, including answer rows, which are buttons.</li>
+        <li><strong>Reduced motion cuts everything to 0.001ms</strong> and disables smooth scrolling.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="pagefoot"></footer>
+</div>
+</main>
+</div>
+<script src="guide.js"></script>
+</body>
+</html>

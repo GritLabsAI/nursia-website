@@ -60,7 +60,10 @@ export function getFirebaseAuth(): Auth | null {
   if (!instance) return null;
   if (!auth) {
     auth = getAuth(instance);
-    if (useEmulators) connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+    if (useEmulators)
+      connectAuthEmulator(auth, "http://127.0.0.1:9099", {
+        disableWarnings: true,
+      });
   }
   return auth;
 }
@@ -86,8 +89,40 @@ export function getDb(): Firestore | null {
  * spend ten minutes resetting a password that was never the problem.
  */
 export function authMessage(error: unknown): string {
-  const code =
-    typeof error === "object" && error && "code" in error ? String(error.code) : "";
+  const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+
+  /* The friendly message is for the candidate; this is for whoever has to fix
+     it. Several of these codes mean a console setting rather than anything the
+     person typed, and translating them into calm prose without leaving the real
+     one somewhere is how a configuration bug turns into a week of guessing. */
+  if (code) console.warn(`[nursia] auth error: ${code}`, error);
+
+  /**
+   * Read the payload before the code, because for phone sign-in the code is
+   * frequently the wrong thing to read.
+   *
+   * Two ways it misleads. `auth/operation-not-allowed` covers both "the
+   * provider is switched off" and "this country is not on the SMS allowlist",
+   * which need opposite advice. And the SDK has no mapping at all for some
+   * backend refusals — a project without billing gets BILLING_NOT_ENABLED
+   * wrapped in `auth/internal-error`, which lands in the default case below and
+   * tells a candidate to try again in a moment, forever.
+   *
+   * The backend spells out what it refused in the message. So: match on that
+   * first, and fall through to the code when it says nothing useful.
+   */
+  const detail =
+    typeof error === "object" && error && "message" in error ? String(error.message) : "";
+
+  if (/BILLING_NOT_ENABLED/i.test(detail)) {
+    return "Text messages are not available here yet. Use your email or Google instead.";
+  }
+  if (/region/i.test(detail) && /SMS|not.*enabled/i.test(detail)) {
+    return "We cannot text that country yet. Use your email or Google instead.";
+  }
+  if (/CAPTCHA/i.test(detail)) {
+    return "The robot check did not pass here. Use your email instead, or try again later.";
+  }
 
   switch (code) {
     case "auth/email-already-in-use":
@@ -102,6 +137,31 @@ export function authMessage(error: unknown): string {
       return "That email and password do not match an account.";
     case "auth/too-many-requests":
       return "Too many attempts. Wait a minute and try again.";
+
+    /* Phone sign-in. The code cases are the two a person meets constantly, and
+       they need to say which of the two happened — retyping a code that has
+       already expired is a loop somebody can sit in for a while. */
+    case "auth/invalid-phone-number":
+    case "auth/missing-phone-number":
+      return "That does not look like a mobile number. Include the country code, like +1.";
+    case "auth/invalid-verification-code":
+      return "That code is not right. Check the six digits and try again.";
+    case "auth/code-expired":
+      return "That code has expired. Ask for a new one.";
+    case "auth/missing-verification-code":
+      return "Enter the six-digit code we sent you.";
+    case "auth/quota-exceeded":
+      return "We have sent too many codes today. Use your email instead, or try tomorrow.";
+    case "auth/captcha-check-failed":
+    case "auth/invalid-app-credential":
+      /* Nearly always this domain missing from the authorised list, or an API
+         key with referrer restrictions that do not include it. Nothing the
+         candidate can do, so point at the door that does open. */
+      return "The robot check did not pass here. Use your email instead, or try again later.";
+    case "auth/billing-not-enabled":
+      /* The project is on the free plan, which will not send SMS to most
+         countries at all. A console and billing problem, not theirs. */
+      return "Text messages are not available here yet. Use your email or Google instead.";
     case "auth/network-request-failed":
       return "We could not reach the server. Check your connection and try again.";
     case "auth/popup-closed-by-user":
