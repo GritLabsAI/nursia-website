@@ -256,7 +256,7 @@ function Results({
             {closeLabel}
           </button>
         ) : (
-          <Link href="/signup" className="btn btn-ghost">
+          <Link href="https://app.nursia.io" className="btn btn-ghost">
             Unlock 50 more, free →
           </Link>
         )}

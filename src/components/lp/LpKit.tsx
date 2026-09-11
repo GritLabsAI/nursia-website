@@ -19,7 +19,7 @@ export function LpHeader({ src }: { src: string }) {
         </Link>
         <span className="ml-auto flex items-center gap-5">
           <Link
-            href="/login"
+            href="https://app.nursia.io"
             className="text-[0.9375rem] font-medium text-ink-2 transition-colors hover:text-teal"
           >
             Log in

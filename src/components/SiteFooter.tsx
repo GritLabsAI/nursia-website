@@ -97,7 +97,7 @@ export function SiteFooter() {
             </p>
             <p className="text-[0.875rem] text-white/55">No card. Cancel anytime.</p>
           </div>
-          <Link href="/signup" className="btn btn-invert sm:ml-auto">
+          <Link href="https://app.nursia.io" className="btn btn-invert sm:ml-auto">
             Start free →
           </Link>
         </div>

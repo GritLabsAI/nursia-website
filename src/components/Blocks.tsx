@@ -71,7 +71,7 @@ export function Breadcrumbs({ trail }: { trail: { label: string; href?: string }
 export function PrimaryCta({ className = "" }: { className?: string }) {
   return (
     <div className={`flex flex-wrap items-center gap-x-5 gap-y-3 ${className}`}>
-      <Link href="/signup" className="btn btn-primary">
+      <Link href="https://app.nursia.io" className="btn btn-primary">
         Start free →
       </Link>
       <span className="font-mono text-[11px] text-muted">No card needed</span>
@@ -94,7 +94,7 @@ export function InlineCta({ prompt, action }: { prompt: string; action: string }
           {prompt}
         </p>
       </div>
-      <Link href="/signup" className="btn btn-ghost shrink-0 sm:ml-auto">
+      <Link href="https://app.nursia.io" className="btn btn-ghost shrink-0 sm:ml-auto">
         {action}
       </Link>
     </aside>
@@ -117,7 +117,7 @@ export function CtaBand({
           <p className="mt-4 font-body text-base leading-relaxed text-white/65">{sub}</p>
         </div>
         <div className="md:ml-auto md:shrink-0">
-          <Link href="/signup" className="btn btn-invert">
+          <Link href="https://app.nursia.io" className="btn btn-invert">
             Start free →
           </Link>
           <p className="mt-3 font-mono text-[11px] text-white/45">
