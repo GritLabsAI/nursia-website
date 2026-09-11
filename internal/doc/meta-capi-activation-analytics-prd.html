@@ -1,0 +1,1135 @@
+<title>Attribution Flowsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+
+<style>
+/* ============================================================
+   Nursia — Flowsheet. Tokens mirror src/app/globals.css.
+   Light is the authored ground; dark is a full re-spec, not an
+   inversion — the highlighter has to stay a highlighter.
+   ============================================================ */
+:root {
+  --paper: #fbfaf6;
+  --paper-2: #f4f2eb;
+  --surface: #ffffff;
+  --ink: #14161a;
+  --ink-2: #3a3d44;
+  --muted: #6e6b63;
+  --rule: #e3dfd4;
+  --rule-strong: #14161a;
+  --teal: #0b6b62;
+  --teal-soft: #e6f0ee;
+  --highlight: #f5e85c;
+  --on-highlight: #14161a;
+  --live: #157f52;
+  --live-fill: #f3faf5;
+  --broken: #b23a2e;
+  --broken-fill: #fdf5f3;
+  --gap: #9a6212;
+  --gap-fill: #fdf7ec;
+
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --container: 1080px;
+  --measure: 40rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101216;
+    --paper-2: #171a1f;
+    --surface: #191c22;
+    --ink: #f2efe6;
+    --ink-2: #c3bfb4;
+    --muted: #8b877d;
+    --rule: #2c3038;
+    --rule-strong: #6d7683;
+    --teal: #58b8ab;
+    --teal-soft: #13302d;
+    --highlight: #f5e85c;
+    --on-highlight: #14161a;
+    --live: #4cc186;
+    --live-fill: #12241b;
+    --broken: #e2705f;
+    --broken-fill: #2a1714;
+    --gap: #d9a34e;
+    --gap-fill: #271d0f;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #101216;
+  --paper-2: #171a1f;
+  --surface: #191c22;
+  --ink: #f2efe6;
+  --ink-2: #c3bfb4;
+  --muted: #8b877d;
+  --rule: #2c3038;
+  --rule-strong: #6d7683;
+  --teal: #58b8ab;
+  --teal-soft: #13302d;
+  --highlight: #f5e85c;
+  --on-highlight: #14161a;
+  --live: #4cc186;
+  --live-fill: #12241b;
+  --broken: #e2705f;
+  --broken-fill: #2a1714;
+  --gap: #d9a34e;
+  --gap-fill: #271d0f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.72;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-inline: 20px;
+}
+
+/* ---------------------------------------------------------- type */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.022em;
+  line-height: 1.06;
+  text-wrap: balance;
+  margin: 0;
+}
+h1 { font-size: clamp(34px, 5.2vw, 54px); font-weight: 800; }
+h2 { font-size: clamp(25px, 3vw, 31px); font-weight: 700; }
+h3 { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.25; }
+h4 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
+
+p { margin: 0; max-width: var(--measure); }
+.prose > * + * { margin-top: 14px; }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+.mark {
+  background: linear-gradient(transparent 62%, var(--highlight) 62%, var(--highlight) 94%, transparent 94%);
+  color: var(--ink);
+  padding-inline: 1px;
+}
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: var(--ink);
+  word-break: break-word;
+}
+a { color: var(--teal); text-underline-offset: 3px; }
+strong { font-weight: 600; color: var(--ink); }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+/* ------------------------------------------------------- masthead */
+.masthead {
+  border-bottom: 2px solid var(--rule-strong);
+  background: var(--paper-2);
+}
+.masthead .wrap { padding-block: 40px 26px; }
+.masthead h1 { margin-top: 14px; max-width: 17ch; }
+.standfirst {
+  font-size: 19px;
+  color: var(--ink-2);
+  margin-top: 18px;
+  max-width: 46rem;
+}
+
+/* The chart header strip — label over value, the way an obs chart is read. */
+.vitals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0;
+  margin-top: 32px;
+  border-top: 1px solid var(--rule);
+}
+.vital {
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  padding: 12px 14px 13px;
+}
+.vital:last-child { border-right: 0; }
+.vital dt {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.vital dd {
+  margin: 5px 0 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------- sections */
+section { padding-block: 56px; border-bottom: 1px solid var(--rule); }
+section:last-of-type { border-bottom: 0; }
+.sec-head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.sec-head .lede { font-size: 18px; color: var(--ink-2); }
+
+/* ------------------------------------------------------ the finding */
+.finding {
+  border: 2px solid var(--broken);
+  background: var(--broken-fill);
+  border-radius: 2px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.finding h2 { color: var(--ink); max-width: 22ch; }
+.finding p { color: var(--ink-2); max-width: 44rem; }
+.finding .eyebrow { color: var(--broken); }
+
+.chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-top: 4px;
+}
+.chain span {
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  border-radius: 2px;
+  padding: 5px 9px;
+  color: var(--ink-2);
+}
+.chain span.lost {
+  border-color: var(--broken);
+  color: var(--broken);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.chain i { color: var(--muted); font-style: normal; }
+
+/* ------------------------------------------------------ status rows
+   The stripe encodes real state: shipping, broken, or absent. */
+.rows { border-top: 1px solid var(--rule-strong); }
+.row {
+  display: grid;
+  grid-template-columns: 4px 1fr;
+  border-bottom: 1px solid var(--rule);
+}
+.row > .stripe { background: var(--muted); }
+.row.is-live > .stripe { background: var(--live); }
+.row.is-broken > .stripe { background: var(--broken); }
+.row.is-gap > .stripe { background: var(--gap); }
+.row-body {
+  padding: 16px 0 17px 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) auto;
+  gap: 6px 20px;
+  align-items: start;
+}
+.row-body .where {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+  min-width: 0;
+  word-break: break-word;
+}
+.row-name { font-family: var(--font-mono); font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.row-note { font-size: 15px; color: var(--ink-2); grid-column: 1 / -1; max-width: 52rem; margin-top: 2px; }
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+  white-space: nowrap;
+  align-self: start;
+}
+.t-live { background: var(--live-fill); color: var(--live); border: 1px solid var(--live); }
+.t-broken { background: var(--broken-fill); color: var(--broken); border: 1px solid var(--broken); }
+.t-gap { background: var(--gap-fill); color: var(--gap); border: 1px solid var(--gap); }
+
+/* ---------------------------------------------------------- tables */
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 2px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 640px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--paper-2);
+  white-space: nowrap;
+}
+td { font-family: var(--font-display); font-weight: 500; color: var(--ink-2); letter-spacing: -0.005em; }
+td.m { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink); }
+td strong { color: var(--ink); }
+tbody tr:last-child td { border-bottom: 0; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------- funnel */
+.funnel { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--rule-strong); }
+.step {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: start;
+}
+.step-side { display: flex; flex-direction: column; gap: 4px; }
+.step-n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--teal);
+}
+.step-host {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  word-break: break-all;
+}
+.step h3 { margin-bottom: 6px; }
+.step p { font-size: 15.5px; color: var(--ink-2); max-width: 46rem; }
+.leak {
+  margin-top: 10px;
+  border-left: 3px solid var(--broken);
+  background: var(--broken-fill);
+  padding: 9px 14px;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  max-width: 46rem;
+}
+.leak b { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--broken); display: block; margin-bottom: 2px; }
+
+/* ------------------------------------------------------ workstreams */
+.ws-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+.ws {
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--teal);
+  background: var(--surface);
+  border-radius: 2px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ws.p0 { border-top-color: var(--broken); }
+.ws-id { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: var(--muted); }
+.ws p { font-size: 15px; color: var(--ink-2); }
+.ws ul { margin: 0; padding-left: 18px; font-size: 14.5px; color: var(--ink-2); }
+.ws ul li + li { margin-top: 5px; }
+.ws-foot {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* ----------------------------------------------------------- code */
+pre {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--teal);
+  border-radius: 2px;
+  padding: 16px 18px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+pre .c { color: var(--muted); }
+
+/* --------------------------------------------------------- callout */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--highlight);
+  background: var(--surface);
+  border-radius: 2px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.callout p { font-size: 15.5px; color: var(--ink-2); max-width: 48rem; }
+
+.stack { display: flex; flex-direction: column; gap: 22px; }
+.stack-lg { display: flex; flex-direction: column; gap: 34px; }
+
+/* --------------------------------------------------------- sprint */
+.tickets { border-top: 1px solid var(--rule-strong); }
+.ticket {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr) auto;
+  gap: 8px 18px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.ticket-id { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--teal); }
+.ticket-t { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--ink); letter-spacing: -0.01em; }
+.ticket-d { grid-column: 2 / -1; font-size: 14.5px; color: var(--ink-2); max-width: 50rem; }
+.ticket-pts { font-family: var(--font-mono); font-size: 11px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+footer { background: var(--paper-2); border-top: 2px solid var(--rule-strong); }
+footer .wrap { padding-block: 30px 40px; }
+footer p { font-size: 13.5px; color: var(--muted); max-width: 46rem; }
+
+@media (max-width: 720px) {
+  .row-body { grid-template-columns: 1fr; }
+  .row-body .tag { justify-self: start; }
+  .step { grid-template-columns: 1fr; gap: 8px; }
+  .ticket { grid-template-columns: 1fr auto; }
+  .ticket-d { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Nursia · Growth engineering · Sprint PRD</p>
+    <h1>Every paid click loses its name at the door.</h1>
+    <p class="standfirst">
+      Meta Pixel is installed and firing. Google Ads is configured and bidding. Neither can
+      currently attribute a signup, because the handoff from <code>nursia.io</code> to
+      <code>app.nursia.io</code> is a bare server redirect that discards the query string —
+      and with it every click identifier the ad platforms rely on. This document specifies the
+      fix, the Conversions API build on top of it, and the activation and high-intent
+      measurement that has nowhere to land until both are done.
+    </p>
+
+    <dl class="vitals">
+      <div class="vital"><dt>Status</dt><dd>Draft for sprint planning</dd></div>
+      <div class="vital"><dt>Marketing site</dt><dd>nursia.io · this repo</dd></div>
+      <div class="vital"><dt>Product app</dt><dd>app.nursia.io · external</dd></div>
+      <div class="vital"><dt>Sprint size</dt><dd class="num">34 points</dd></div>
+      <div class="vital"><dt>Blocking items</dt><dd class="num">3 of 18</dd></div>
+    </dl>
+  </div>
+</header>
+
+<!-- ====================================================== the finding -->
+<section>
+  <div class="wrap">
+    <div class="finding">
+      <p class="eyebrow">Finding 01 · Ship before anything else</p>
+      <h2>The redirect throws away the query string.</h2>
+      <p>
+        <code>src/app/(funnel)/signup/page.tsx</code> is four lines:
+        <code>redirect("https://app.nursia.io")</code>. Next's <code>redirect()</code> issues a
+        307 to exactly that URL. Nothing on the incoming URL survives it.
+      </p>
+      <p>
+        <code>CtaLink</code> does careful work to carry <code>utm_source</code>,
+        <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_content</code>,
+        <code>utm_term</code>, <code>gclid</code> and <code>fbclid</code> from the ad click
+        through to the signup link. All of it is discarded one hop later.
+      </p>
+      <div class="chain">
+        <span>ad click · gclid + fbclid</span><i>→</i>
+        <span>/lp/meta · CtaLink collects</span><i>→</i>
+        <span>/signup?utm_source=…&amp;fbclid=…</span><i>→</i>
+        <span class="lost">307 · params dropped</span><i>→</i>
+        <span class="lost">app.nursia.io · anonymous</span>
+      </div>
+      <p>
+        Three consequences, all live right now. <strong>Google Ads</strong> receives no
+        <code>gclid</code> at the point of signup, so the campaign's primary conversion cannot be
+        attributed to a click. <strong>Meta</strong> sets no <code>_fbc</code> cookie on the app
+        domain, so pixel and CAPI events arrive without click attribution and delivery
+        optimisation degrades toward broad targeting. <strong>GA4</strong> gets no linker
+        parameter, so the app is counted as a separate session referred by your own marketing
+        site — which is also why organic and paid look closer than they are.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== finding two -->
+<section>
+  <div class="wrap">
+    <div class="finding">
+      <p class="eyebrow">Finding 02 · Ship before anything else</p>
+      <h2>The conversion the campaign bids toward can no longer fire.</h2>
+      <p>
+        <code>signedUp()</code> in <code>src/lib/analytics.ts</code> fires three things: the GA4
+        <code>sign_up</code> event, the Google Ads <em>primary</em> conversion
+        (<code>AW-18411895345/SfHmCJ…</code>), and the Meta standard event
+        <code>CompleteRegistration</code>. It is called from exactly one place —
+        <code>src/components/SignupForm.tsx</code>.
+      </p>
+      <p>
+        <code>SignupForm</code> is rendered by <code>src/app/(funnel)/signup/page.tsx</code>,
+        which is now a redirect stub with its original body commented out. The component never
+        mounts on <code>nursia.io</code>. <strong>All three events are unreachable code.</strong>
+      </p>
+      <p>
+        Smart Bidding is currently optimising against a conversion that records zero. The same
+        is true of <code>loggedIn()</code>, <code>examStarted()</code> and
+        <code>examCompleted()</code>, whose call sites live in components behind the same stubs.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================== the audit -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Instrumentation audit</p>
+      <h2>What fires, where it fires, and whether anyone receives it</h2>
+      <p class="lede">
+        Every analytics call in the repo, its call site, and its real status after the app split.
+        The stripe is the state: shipping, broken, or not built.
+      </p>
+    </div>
+
+    <div class="rows">
+      <div class="row is-live"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">page_view · PageView</span>
+        <span class="where">layout.tsx:159 → MetaPixel.tsx</span>
+        <span class="tag t-live">Live</span>
+        <p class="row-note">GA4 via <code>@next/third-parties</code>; Meta via <code>MetaPixel</code>, which correctly re-fires on App Router navigation rather than once per hard load.</p>
+      </div></div>
+
+      <div class="row is-live"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">guide_viewed</span>
+        <span class="where">components/GuideView.tsx</span>
+        <span class="tag t-live">Live</span>
+        <p class="row-note">GA4 only. Top of the content funnel, fires on every guide page.</p>
+      </div></div>
+
+      <div class="row is-live"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">resource_offered</span>
+        <span class="where">components/ResourceGate.tsx</span>
+        <span class="tag t-live">Live</span>
+        <p class="row-note">GA4 only, fires on visibility rather than render — the distinction that makes the gate-placement experiment answerable. Also sets the experiment arm as a GA4 user property.</p>
+      </div></div>
+
+      <div class="row is-live"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">resource_clicked → Meta <code>Lead</code></span>
+        <span class="where">components/ResourceGate.tsx</span>
+        <span class="tag t-live">Live</span>
+        <p class="row-note">The only Meta conversion signal currently reaching Ads Manager at volume. Browser-side only, so roughly a third of it is lost to blockers and ITP.</p>
+      </div></div>
+
+      <div class="row is-live"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">question_answered</span>
+        <span class="where">QuestionSet.tsx · practice/TopicDrill.tsx</span>
+        <span class="tag t-live">Live</span>
+        <p class="row-note">Fires on <code>nursia.io</code> for public preview items, capped at <code>FREE_PREVIEW = 2</code> per set (<code>lib/gate.ts:20</code>). Also fires the Ads <em>secondary</em> conversion. Cannot reach the activation threshold of five on this domain.</p>
+      </div></div>
+
+      <div class="row is-broken"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">sign_up · Ads primary · CompleteRegistration</span>
+        <span class="where">SignupForm.tsx — never mounts</span>
+        <span class="tag t-broken">Broken</span>
+        <p class="row-note">Unreachable behind the <code>/signup</code> redirect stub. This is the campaign's bidding target.</p>
+      </div></div>
+
+      <div class="row is-broken"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">login</span>
+        <span class="where">SignupForm.tsx — never mounts</span>
+        <span class="tag t-broken">Broken</span>
+        <p class="row-note">Unreachable behind the <code>/login</code> redirect stub.</p>
+      </div></div>
+
+      <div class="row is-broken"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">exam_started · exam_completed</span>
+        <span class="where">exam/ExamClient.tsx — never mounts</span>
+        <span class="tag t-broken">Broken</span>
+        <p class="row-note">Unreachable behind the <code>/exam</code> redirect stub. This is one of the two high-intent signals.</p>
+      </div></div>
+
+      <div class="row is-gap"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">activated</span>
+        <span class="where">not built</span>
+        <span class="tag t-gap">Missing</span>
+        <p class="row-note">No event marks the fifth attempted question. <code>question_index</code> cannot substitute — it is zero-based per set and per surface, so six questions across two surfaces never produces an index above two.</p>
+      </div></div>
+
+      <div class="row is-gap"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">practice_session_completed</span>
+        <span class="where">partially — drill only</span>
+        <span class="tag t-gap">Missing</span>
+        <p class="row-note"><code>drillCompleted()</code> exists and fires from <code>TopicDrill</code>; <code>examCompleted()</code> is stubbed out. There is no single high-intent event covering both.</p>
+      </div></div>
+
+      <div class="row is-gap"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">Conversions API (server-side)</span>
+        <span class="where">not built</span>
+        <span class="tag t-gap">Missing</span>
+        <p class="row-note">No server endpoint, no <code>event_id</code> deduplication, no <code>_fbp</code>/<code>_fbc</code> forwarding, no hashed user data. Everything Meta knows comes from the browser.</p>
+      </div></div>
+
+      <div class="row is-gap"><div class="stripe"></div><div class="row-body">
+        <span class="row-name">Cross-domain identity</span>
+        <span class="where">not built</span>
+        <span class="tag t-gap">Missing</span>
+        <p class="row-note">No cookie-domain sharing, no linker, no parameter forwarding between <code>nursia.io</code> and <code>app.nursia.io</code>.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== definitions -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Definitions</p>
+      <h2>Activation and high intent, stated precisely enough to build</h2>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Stage</th><th>Definition</th><th>Event</th><th>Fires where</th><th>Counted</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Acquired</strong></td>
+            <td>Landed on any Nursia page from a recognised channel</td>
+            <td class="m">page_view</td>
+            <td class="m">nursia.io</td>
+            <td>Per session</td>
+          </tr>
+          <tr>
+            <td><strong>Engaged</strong></td>
+            <td>Answered at least one question anywhere</td>
+            <td class="m">question_answered</td>
+            <td class="m">both</td>
+            <td>Per person, first only</td>
+          </tr>
+          <tr>
+            <td><strong>Registered</strong></td>
+            <td>Account created</td>
+            <td class="m">sign_up</td>
+            <td class="m">app.nursia.io</td>
+            <td>Per person, once</td>
+          </tr>
+          <tr>
+            <td><strong>Activated</strong></td>
+            <td>Cumulative attempted questions crosses five</td>
+            <td class="m">activated</td>
+            <td class="m">app.nursia.io</td>
+            <td>Per person, once ever</td>
+          </tr>
+          <tr>
+            <td><strong>High intent</strong></td>
+            <td>Completed one full practice session — a topic drill or a scored exam</td>
+            <td class="m">practice_session_completed</td>
+            <td class="m">app.nursia.io</td>
+            <td>Per person, first only</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <h3>Why activation is an event and not a cohort</h3>
+      <p>
+        Both GA4 and PostHog can express "performed <code>question_answered</code> at least five
+        times" as an audience or behavioural cohort. Both re-evaluate it on a schedule, neither
+        gives it a timestamp, and neither can sit cleanly as a step inside a funnel exploration.
+        A milestone event fired once, at the moment the counter crosses five, is a real funnel
+        step, carries the channel properties of the person who earned it, and can be sent to Meta
+        as a conversion. The counter itself is cheap: the attempt queue in
+        <code>src/lib/attempts.ts</code> already persists every answer to <code>localStorage</code>,
+        and <code>src/lib/experiment.ts</code> already holds a stable anonymous id to hang a
+        fired-once flag on.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= funnel -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Drop-off map</p>
+      <h2>Where people leave, and what breaks at each boundary</h2>
+      <p class="lede">
+        Six steps, two domains. Steps one to three are instrumented and ours; four onward are
+        behind the split and currently invisible.
+      </p>
+    </div>
+
+    <div class="funnel">
+      <div class="step">
+        <div class="step-side"><span class="step-n">STEP 1</span><span class="step-host">nursia.io</span></div>
+        <div>
+          <h3>Ad click lands on a landing page</h3>
+          <p>
+            Six LPs: <code>/lp/meta</code>, <code>/lp/meta-ten-minutes</code>,
+            <code>/lp/meta-prioritisation</code>, <code>/lp/meta-why</code>,
+            <code>/lp/google</code>, <code>/lp/reddit</code>. Each carries a distinct
+            <code>src</code>, so arriving traffic stays separable by creative cluster.
+          </p>
+          <div class="leak"><b>Measured — no leak</b>Pixel PageView and GA4 page_view both fire. Channel is readable from the landing URL.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-side"><span class="step-n">STEP 2</span><span class="step-host">nursia.io</span></div>
+        <div>
+          <h3>Two preview questions, then a gate</h3>
+          <p>
+            <code>QuestionSet</code> renders inline on every LP, guide and topic page.
+            <code>FREE_PREVIEW = 2</code> caps the preview, so the ceiling on this domain is two
+            attempted questions — three short of activation by design.
+          </p>
+          <div class="leak"><b>Partial leak</b>question_answered reaches GA4 and the Ads secondary conversion, but Meta is never told. There is no Meta signal between PageView and Lead, which starves delivery optimisation of mid-funnel learning.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-side"><span class="step-n">STEP 3</span><span class="step-host">nursia.io</span></div>
+        <div>
+          <h3>The CTA is clicked</h3>
+          <p>
+            <code>CtaLink</code> assembles the outbound URL with every UTM, <code>gclid</code> and
+            <code>fbclid</code> present on the current page, plus the LP's own <code>src</code>.
+            The link target is <code>LP_CTA_HREF = "/signup"</code>.
+          </p>
+          <div class="leak"><b>Measured — no leak yet</b>Meta Lead fires here on the resource gate path. The attribution payload is intact at this instant and destroyed at the next.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-side"><span class="step-n">STEP 4</span><span class="step-host">the boundary</span></div>
+        <div>
+          <h3>307 redirect to the product app</h3>
+          <p>
+            <code>/signup</code>, <code>/login</code>, <code>/exam</code> and <code>/try</code>
+            are all four-line stubs calling <code>redirect("https://app.nursia.io")</code>. The
+            redirect is server-side, so no client script runs: no pixel event, no GA4 hit, no
+            chance to persist anything before the browser leaves.
+          </p>
+          <div class="leak"><b>Total loss</b>Query string discarded. gclid, fbclid, all five UTMs and src are gone. GA4 starts a new session attributed to a nursia.io referral. Meta's _fbc is never set on the app domain. This single line is the largest measurable problem in the stack.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-side"><span class="step-n">STEP 5</span><span class="step-host">app.nursia.io</span></div>
+        <div>
+          <h3>Account created</h3>
+          <p>
+            Signup happens entirely in the product app. The events that used to mark it —
+            GA4 <code>sign_up</code>, the Ads primary conversion, Meta
+            <code>CompleteRegistration</code> — all live in code that no longer runs.
+          </p>
+          <div class="leak"><b>Total loss</b>Zero conversions recorded for the primary bidding target. Meta receives no CompleteRegistration. Any signup volume you see in the platforms today is modelled, not measured.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-side"><span class="step-n">STEP 6</span><span class="step-host">app.nursia.io</span></div>
+        <div>
+          <h3>Fifth question, then a completed session</h3>
+          <p>
+            Activation and high intent both occur here, several sessions after the click that paid
+            for them. Nothing currently connects the two.
+          </p>
+          <div class="leak"><b>Not built</b>No activated event, no unified practice_session_completed, and no identity carried across the boundary to attribute either one back to a channel.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================== workstreams -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Scope</p>
+      <h2>Six workstreams, in dependency order</h2>
+      <p class="lede">
+        W1 and W2 unblock everything else and are worth shipping on their own. W5 is a written
+        contract for the <code>app.nursia.io</code> team rather than work in this repo.
+      </p>
+    </div>
+
+    <div class="ws-grid">
+      <div class="ws p0">
+        <span class="ws-id">W1 · P0</span>
+        <h3>Preserve attribution across the redirect</h3>
+        <p>Forward the incoming query string on every stub, so identifiers survive the hop.</p>
+        <ul>
+          <li>Read <code>searchParams</code> in each stub page and append to the target URL</li>
+          <li>Add a first-party <code>_fbc</code> / <code>_fbp</code> cookie on the apex domain so both hosts can read it</li>
+          <li>Register <code>app.nursia.io</code> for GA4 cross-domain measurement</li>
+        </ul>
+        <div class="ws-foot"><span>4 repo files</span><span>5 pts</span></div>
+      </div>
+
+      <div class="ws p0">
+        <span class="ws-id">W2 · P0</span>
+        <h3>Restore the broken conversions</h3>
+        <p>The bidding target must record again before any optimisation work means anything.</p>
+        <ul>
+          <li>Fire <code>sign_up</code> server-side from CAPI, or hand the event to the app team</li>
+          <li>Re-point the Ads primary conversion at an event that can actually fire</li>
+          <li>Verify in Ads Manager and GA4 DebugView before closing</li>
+        </ul>
+        <div class="ws-foot"><span>Depends on W1</span><span>5 pts</span></div>
+      </div>
+
+      <div class="ws">
+        <span class="ws-id">W3 · P1</span>
+        <h3>Meta Conversions API</h3>
+        <p>A server route that mirrors every browser event, deduplicated by <code>event_id</code>.</p>
+        <ul>
+          <li><code>/api/meta/capi</code> route handler on Railway</li>
+          <li>Shared <code>event_id</code> generated once, sent to both pixel and server</li>
+          <li>Forward <code>_fbp</code>, <code>_fbc</code>, IP and user agent</li>
+          <li>SHA-256 hashed email and phone where consented</li>
+        </ul>
+        <div class="ws-foot"><span>New route + lib</span><span>8 pts</span></div>
+      </div>
+
+      <div class="ws">
+        <span class="ws-id">W4 · P1</span>
+        <h3>Activation and high-intent events</h3>
+        <p>The two milestones that make channel quality legible rather than guessed.</p>
+        <ul>
+          <li><code>activated</code> once per person at the fifth attempt</li>
+          <li><code>practice_session_completed</code> unifying drill and exam</li>
+          <li>Both to GA4, and to Meta as custom conversions</li>
+        </ul>
+        <div class="ws-foot"><span>analytics.ts + attempts.ts</span><span>5 pts</span></div>
+      </div>
+
+      <div class="ws">
+        <span class="ws-id">W5 · P1</span>
+        <h3>Contract for app.nursia.io</h3>
+        <p>Not our repo. A written spec the product team implements, with a shared test plan.</p>
+        <ul>
+          <li>Accept and persist inbound attribution parameters on first load</li>
+          <li>Emit the five events in the spec table with agreed names and properties</li>
+          <li>Call our CAPI route, or their own, with the same <code>event_id</code> scheme</li>
+        </ul>
+        <div class="ws-foot"><span>Spec + review</span><span>3 pts</span></div>
+      </div>
+
+      <div class="ws">
+        <span class="ws-id">W6 · P2</span>
+        <h3>Channel dashboards</h3>
+        <p>One funnel exploration, broken by channel, plus a weekly tracker.</p>
+        <ul>
+          <li>Register event-scoped custom dimensions in GA4 Admin</li>
+          <li>Raise data retention from 2 to 14 months</li>
+          <li>Build the funnel and the channel comparison</li>
+        </ul>
+        <div class="ws-foot"><span>GA4 config</span><span>3 pts</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== the fix code -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">W1 · Reference implementation</p>
+      <h2>What the redirect stubs should look like</h2>
+      <p class="lede">
+        Four files, one shape. The stub keeps its job — send people to the app — and stops
+        throwing away the reason they came.
+      </p>
+    </div>
+
+    <pre><span class="c">// src/app/(funnel)/signup/page.tsx</span>
+import { redirect } from "next/navigation";
+
+const APP = "https://app.nursia.io";
+
+<span class="c">/* Everything the ad platforms and our own funnel need on the far side.
+   A bare redirect() drops all of it, which is how a campaign ends up
+   bidding toward a conversion it can no longer attribute. */</span>
+const CARRY = [
+  "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
+  "gclid", "fbclid", "src", "guide", "resource", "experiment", "variant",
+] as const;
+
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams: Promise&lt;Record&lt;string, string | string[] | undefined&gt;&gt;;
+}) {
+  const from = await searchParams;
+  const out = new URLSearchParams();
+  for (const key of CARRY) {
+    const v = from[key];
+    const one = Array.isArray(v) ? v[0] : v;
+    if (one) out.set(key, one);
+  }
+  const qs = out.toString();
+  redirect(qs ? `${APP}/signup?${qs}` : `${APP}/signup`);
+}</pre>
+
+    <div class="callout" style="margin-top:22px">
+      <h3>Two things this does not fix on its own</h3>
+      <p>
+        <strong>The cookie boundary.</strong> Meta's <code>_fbp</code> and <code>_fbc</code> are
+        first-party cookies written by <code>fbevents.js</code> on the host that set them. A
+        cookie set on <code>nursia.io</code> is not readable by <code>app.nursia.io</code> unless
+        its domain attribute is <code>.nursia.io</code>. Forwarding <code>fbclid</code> lets the
+        app mint its own <code>_fbc</code>, which is the simpler path and the one this PRD
+        recommends; setting the cookie at apex scope is the alternative and needs both hosts to
+        agree.
+      </p>
+      <p>
+        <strong>GA4 session continuity.</strong> Forwarded UTMs will make the app's traffic
+        <em>look</em> right, but GA4 still starts a new session unless
+        <code>app.nursia.io</code> is added to the cross-domain list in Admin → Data streams →
+        Configure tag settings. Do that before reading any cross-domain funnel, or the numbers
+        will be confidently wrong.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== CAPI choice -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">W3 · Decision</p>
+      <h2>Where the server-side events should come from</h2>
+      <p class="lede">You asked for the call to be made here rather than left open. It is made below, with the reasoning.</p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Option</th><th>Cost</th><th>Control of <code>event_id</code></th><th>Ops burden</th><th>Verdict</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Route handler in this repo</strong><br>/api/meta/capi on Railway</td>
+            <td>None beyond existing hosting</td>
+            <td>Total — you generate and match it</td>
+            <td>You own retries and failures</td>
+            <td><strong>Recommended</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Meta Conversions API Gateway</strong><br>Meta-hosted on your cloud</td>
+            <td>Cloud instance, roughly $40–90/mo</td>
+            <td>Partial — the gateway derives it</td>
+            <td>Low, but opaque when wrong</td>
+            <td>Reject at this stage</td>
+          </tr>
+          <tr>
+            <td><strong>Partner integration</strong><br>Segment, Stape or similar</td>
+            <td>Per-event pricing, scales badly</td>
+            <td>Good</td>
+            <td>Lowest</td>
+            <td>Revisit past ~1M events/mo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <h3>Recommendation — own the route</h3>
+      <p>
+        At your current volume the Gateway's monthly cost buys convenience you do not need, and
+        it takes deduplication partly out of your hands at exactly the moment deduplication is
+        the hard part. A route handler on the Railway deploy you already run costs nothing extra,
+        keeps the dedup contract in code that sits next to the pixel it is deduplicating against,
+        and matches how <code>src/lib/analytics.ts</code> already centralises every event in one
+        place. Revisit only if event volume or retry handling becomes a real operational load.
+      </p>
+    </div>
+
+    <div class="callout" style="margin-top:16px">
+      <h3>The deduplication contract</h3>
+      <p>
+        Meta collapses a browser event and a server event into one when <code>event_name</code>
+        matches <em>and</em> <code>event_id</code> matches. Generate the id once on the client,
+        pass it to <code>fbq</code> as <code>eventID</code>, and send the same string in the CAPI
+        payload's <code>event_id</code>. Getting this wrong double-counts every conversion, which
+        is worse than the under-counting it was meant to fix — so the acceptance test below
+        checks the dedup rate in Events Manager, not merely that events arrive.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== event spec -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Specification</p>
+      <h2>Event table</h2>
+      <p class="lede">The contract for both repos. Names are final; adding a property is cheap, renaming an event is not.</p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Event</th><th>Meta standard</th><th>Fires</th><th>Key properties</th><th>Server-side</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="m">page_view</td><td class="m">PageView</td><td>Every route change</td><td class="m">page_path, src</td><td>No</td></tr>
+          <tr><td class="m">question_answered</td><td class="m">ViewContent</td><td>Each answer</td><td class="m">surface, topic, correct, question_index</td><td>No</td></tr>
+          <tr><td class="m">resource_clicked</td><td class="m">Lead</td><td>Gate CTA click</td><td class="m">guide_slug, resource_slug, placement</td><td>Yes</td></tr>
+          <tr><td class="m">sign_up</td><td class="m">CompleteRegistration</td><td>Account created</td><td class="m">method, src, guide_slug</td><td><strong>Yes</strong></td></tr>
+          <tr><td class="m">activated</td><td class="m">Custom · Activated</td><td>5th question, once ever</td><td class="m">total_answered, days_since_signup</td><td><strong>Yes</strong></td></tr>
+          <tr><td class="m">practice_session_completed</td><td class="m">Custom · HighIntent</td><td>Drill or exam finished</td><td class="m">session_type, total, pct, minutes_taken</td><td><strong>Yes</strong></td></tr>
+          <tr><td class="m">purchase</td><td class="m">Purchase</td><td>Subscription starts</td><td class="m">value, currency</td><td><strong>Yes</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <h3>On channel properties</h3>
+      <p>
+        Do not hand-roll a channel classifier. GA4's <em>Default Channel Group</em> already
+        separates Organic Search, Paid Search and Paid Social, and it is the dimension the funnel
+        should break on. The one thing it needs from you is correct tagging: GA4 classifies from
+        <code>utm_source</code> and <code>utm_medium</code> and <strong>ignores
+        <code>fbclid</code> entirely</strong>. An untagged Meta ad lands in Referral or Direct, not
+        Paid Social. Every Meta ad URL needs
+        <code>utm_source=facebook</code> (or <code>instagram</code>) and
+        <code>utm_medium=paid_social</code> before this dashboard tells the truth.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================= sprint -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Sprint plan</p>
+      <h2>Eighteen tickets, 34 points</h2>
+      <p class="lede">
+        Sequenced by dependency. NUR-01 through NUR-03 are the ones that stop active
+        money loss; if the sprint is cut, it is cut after those.
+      </p>
+    </div>
+
+    <div class="tickets">
+      <div class="ticket"><span class="ticket-id">NUR-01</span><span class="ticket-t">Forward query params on all four redirect stubs</span><span class="ticket-pts">3 pts</span><p class="ticket-d">signup, login, exam, try. Carry the UTM set, gclid, fbclid, src and funnel context.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-02</span><span class="ticket-t">Add app.nursia.io to GA4 cross-domain measurement</span><span class="ticket-pts">1 pt</span><p class="ticket-d">Admin → Data streams → Configure tag settings. No code.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-03</span><span class="ticket-t">Re-point the Ads primary conversion to a firing event</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Smart Bidding is currently optimising against zero. Highest-value ticket in the sprint.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-04</span><span class="ticket-t">Tag every Meta ad URL with utm_source and utm_medium</span><span class="ticket-pts">1 pt</span><p class="ticket-d">Ads Manager work. Without it, Paid Social reports as Referral and the channel split is meaningless.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-05</span><span class="ticket-t">Generate and thread a shared event_id</span><span class="ticket-pts">3 pts</span><p class="ticket-d">One id per logical event, passed to fbq as eventID and to the server as event_id.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-06</span><span class="ticket-t">Build /api/meta/capi route handler</span><span class="ticket-pts">5 pts</span><p class="ticket-d">Accept an event, enrich with IP and user agent, forward _fbp and _fbc, POST to the Graph API.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-07</span><span class="ticket-t">SHA-256 user-data hashing helper</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Normalise then hash email and phone. Server-only; never ship raw identifiers from the browser.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-08</span><span class="ticket-t">Mirror Lead and CompleteRegistration through CAPI</span><span class="ticket-pts">2 pts</span><p class="ticket-d">First two events on the new path, with dedup verified in Events Manager.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-09</span><span class="ticket-t">Cumulative attempt counter with fired-once flag</span><span class="ticket-pts">3 pts</span><p class="ticket-d">Hang off the existing localStorage queue in attempts.ts and the anonymous id in experiment.ts.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-10</span><span class="ticket-t">Emit activated at the fifth attempt</span><span class="ticket-pts">2 pts</span><p class="ticket-d">GA4 plus a Meta custom conversion. Once per person, ever.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-11</span><span class="ticket-t">Unify drill and exam into practice_session_completed</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Keep the existing granular events; add the unified one alongside for funnel use.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-12</span><span class="ticket-t">Send question_answered to Meta as ViewContent</span><span class="ticket-pts">1 pt</span><p class="ticket-d">Gives delivery a mid-funnel signal with real volume, months before signups alone would.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-13</span><span class="ticket-t">Write the app.nursia.io instrumentation contract</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Event names, properties, id scheme, inbound parameter handling. Reviewed with that team.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-14</span><span class="ticket-t">Register event-scoped custom dimensions in GA4</span><span class="ticket-pts">1 pt</span><p class="ticket-d">surface, topic, src, guide_slug, variant, session_type. Skip question_id — too high-cardinality.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-15</span><span class="ticket-t">Raise GA4 data retention to 14 months</span><span class="ticket-pts">1 pt</span><p class="ticket-d">Default is two. A channel comparison needs history to compare against.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-16</span><span class="ticket-t">Build the channel funnel exploration</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Six steps, broken by Default Channel Group, open funnel, elapsed-time column on.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-17</span><span class="ticket-t">Verify dedup rate and CAPI event match quality</span><span class="ticket-pts">1 pt</span><p class="ticket-d">Events Manager should show deduplicated pairs, not doubled totals. Target match quality 6.0+.</p></div>
+      <div class="ticket"><span class="ticket-id">NUR-18</span><span class="ticket-t">Wire the weekly tracker to real numbers</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Populate the workbook shipped alongside this PRD; agree who fills it and when.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== acceptance -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Done means</p>
+      <h2>Acceptance criteria</h2>
+    </div>
+    <div class="stack">
+      <div class="callout">
+        <h3>Attribution survives the boundary</h3>
+        <p>A click on a Meta ad with <code>fbclid</code> present arrives at <code>app.nursia.io</code> with that parameter intact, and the resulting signup appears in Ads Manager attributed to the campaign — not in the modelled bucket.</p>
+      </div>
+      <div class="callout">
+        <h3>The primary conversion records again</h3>
+        <p>Google Ads shows a non-zero count for the signup conversion within 48 hours of NUR-03 shipping, and GA4 DebugView shows <code>sign_up</code> on a real signup.</p>
+      </div>
+      <div class="callout">
+        <h3>Server and browser events deduplicate</h3>
+        <p>Events Manager reports deduplicated pairs for Lead and CompleteRegistration rather than doubled totals, and event match quality is 6.0 or better on the server-side events.</p>
+      </div>
+      <div class="callout">
+        <h3>The funnel answers the question it was built for</h3>
+        <p>A single GA4 exploration shows landing → engaged → registered → activated → high intent, broken by channel, with organic, Paid Search and Paid Social each on their own line and each step's drop-off legible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================== risks -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Risks</p>
+      <h2>What could still make these numbers lie</h2>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Risk</th><th>Effect if it lands</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>The app team does not implement the contract</strong></td><td>Activation and high intent stay unmeasurable regardless of everything in this repo</td><td>W5 is a dependency, not a nice-to-have. Confirm ownership before sprint start.</td></tr>
+          <tr><td><strong>Dedup misconfigured</strong></td><td>Every conversion counts twice; bidding over-corrects and spend quality drops</td><td>NUR-17 gates the sprint. Verify before scaling budget.</td></tr>
+          <tr><td><strong>Meta ads stay untagged</strong></td><td>Paid Social reports as Referral; the channel comparison is silently wrong</td><td>NUR-04 is one point and blocks the entire dashboard. Do it first.</td></tr>
+          <tr><td><strong>Blocker asymmetry</strong></td><td>Paid traffic is blocked at a higher rate than organic, biasing exactly the comparison being drawn</td><td>CAPI closes most of this for Meta. Note the residual bias on the dashboard rather than pretending it is gone.</td></tr>
+          <tr><td><strong>Consent and PII</strong></td><td>Hashed email sent without a lawful basis</td><td>Hash server-side only, only for users who signed up, and document the basis before NUR-07 ships.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="eyebrow">Nursia · internal</p>
+    <p style="margin-top:10px">
+      Companion workbook: <code>internal/doc/nursia-analytics-sprint-tracker.xlsx</code> — sprint
+      board, event QA matrix, weekly channel tracker and the app.nursia.io contract checklist.
+      Every code reference in this document was verified against the repository at the commit that
+      introduced the app split.
+    </p>
+  </div>
+</footer>
