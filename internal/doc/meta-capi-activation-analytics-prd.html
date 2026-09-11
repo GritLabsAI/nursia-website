@@ -318,8 +318,8 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <div class="vital"><dt>Marketing site</dt><dd>nursia.io · this repo</dd></div>
       <div class="vital"><dt>Product app</dt><dd>app.nursia.io · external</dd></div>
       <div class="vital"><dt>PostHog project</dt><dd>NCLEX-Nursia · 595036</dd></div>
-      <div class="vital"><dt>Sprint size</dt><dd class="num">57 points</dd></div>
-      <div class="vital"><dt>P0 items</dt><dd class="num">11 of 26</dd></div>
+      <div class="vital"><dt>Sprint size</dt><dd class="num">60 points</dd></div>
+      <div class="vital"><dt>P0 items</dt><dd class="num">11 of 28</dd></div>
     </dl>
   </div>
 </header>
@@ -361,7 +361,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <p class="eyebrow">What this document asks for</p>
       <ol>
         <li><strong>One security fix, today.</strong> Auth tokens are being written into analytics storage. It is one SDK hook, and it should not wait for a sprint boundary.</li>
-        <li><strong>One sprint, 57 points, 26 tickets</strong> &mdash; of which 11 are P0 and stop money being spent blind. Twelve of the 26 belong to the <code>app.nursia.io</code> team and are a hard dependency.</li>
+        <li><strong>One sprint, 60 points, 28 tickets</strong> &mdash; of which 11 are P0 and stop money being spent blind. Twelve of the 28 belong to the <code>app.nursia.io</code> team and are a hard dependency.</li>
         <li><strong>A decision on the system of record.</strong> The recommendation is PostHog, because it already collects on the side where activation happens and GA4 cannot reach it.</li>
         <li><strong>Agreement on six numeric gates</strong> for what "done" means, including 75% attribution coverage and a Meta match quality of 7.5.</li>
       </ol>
@@ -481,8 +481,54 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
         </p>
       </div>
 
+      <div class="finding">
+        <p class="eyebrow">Finding 05 · Scope change · Decide deliberately</p>
+        <h2>Moving questions into the app inverts the funnel.</h2>
+        <p>
+          Questions are being withdrawn from <code>nursia.io</code>. The measurement loss is
+          small &mdash; <code>FREE_PREVIEW = 2</code> capped the public preview at two, so the
+          activation threshold of five was never reachable there, and GA4 was recording a teaser
+          rather than practice. Losing it costs little and makes PostHog the single source, which
+          the rest of this document already assumes.
+        </p>
+        <p>
+          The consequence that matters is order. If questions exist only in the app, they sit
+          <em>behind registration</em>:
+        </p>
+        <div class="chain">
+          <span>today · pageview</span><i>→</i><span>question</span><i>→</i><span>registration</span><i>→</i><span>activated</span>
+        </div>
+        <div class="chain">
+          <span>after · pageview</span><i>→</i><span>registration</span><i>→</i><span>question</span><i>→</i><span>activated</span>
+        </div>
+        <p>
+          That deletes the only pre-registration engagement signal there is. The segment it
+          measured &mdash; tried it, did not sign up &mdash; is exactly the one that separates
+          "the offer is wrong" from "the form is broken", and it is the denominator half of two
+          outcome rows below.
+        </p>
+        <p>
+          Three knock-on effects. <strong>Meta loses its mid-funnel signal:</strong> the plan sent
+          <code>question_answered</code> as <code>ViewContent</code> because
+          <code>CompleteRegistration</code> alone is too sparse for delivery to learn from early,
+          and app-only questions leave nothing between <code>PageView</code> and registration.
+          <strong>The Ads secondary conversion dies:</strong>
+          <code>NEXT_PUBLIC_ADS_QUESTION_LABEL</code> fires inside <code>questionAnswered</code>,
+          so that action joins the primary at zero. And <strong>the landing pages lose their
+          demo:</strong> <code>QuestionSet</code> renders on twelve page types including all six
+          LPs, where "pick an answer &mdash; the rationale opens underneath" <em>is</em> the
+          offer. <code>src/lib/content.ts</code> states the premise plainly: the SEO pages are the
+          product, and every public page ships real questions in static HTML.
+        </p>
+        <p>
+          None of that argues the decision is wrong &mdash; maintaining two question
+          implementations has a real cost. It argues the decision is a landing-page and SEO
+          change as much as a measurement one, and should be priced as such.
+        </p>
+      </div>
+
       <div class="finding sev2">
-        <p class="eyebrow">Finding 05 · Performance</p>
+        <p class="eyebrow">Finding 06 · Performance</p>
         <h2>The app entry page is in Google's “poor” band for LCP.</h2>
         <p>
           PostHog's <code>$web_vitals</code> stream gives a real baseline rather than a lab
@@ -512,7 +558,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
         <thead><tr><th>System</th><th>Installed on</th><th>Sees</th><th>Blind to</th><th>Role after this sprint</th></tr></thead>
         <tbody>
           <tr><td><strong>PostHog</strong><br>project 595036</td><td class="m">app.nursia.io</td><td>App funnel, web vitals, replay, autocapture</td><td>All marketing pages, all ad traffic</td><td><strong>System of record</strong> — full funnel, activation, dashboards</td></tr>
-          <tr><td><strong>GA4</strong></td><td class="m">nursia.io</td><td>Content, LPs, preview questions</td><td>Registration, activation, purchase</td><td>Channel classification and SEO reporting</td></tr>
+          <tr><td><strong>GA4</strong></td><td class="m">nursia.io</td><td>Content and LPs. Preview questions until they are withdrawn</td><td>Registration, activation, purchase</td><td>Channel classification and SEO reporting</td></tr>
           <tr><td><strong>Meta Pixel</strong></td><td class="m">nursia.io</td><td>PageView, Lead</td><td>The conversion it optimises toward</td><td>Delivery optimisation, fed by CAPI</td></tr>
           <tr><td><strong>Google Ads</strong></td><td class="m">nursia.io</td><td>Secondary conversion only</td><td>Primary conversion (records zero)</td><td>Bidding, on a conversion that fires</td></tr>
           <tr><td><strong>Clarity</strong></td><td class="m">nursia.io</td><td>Heatmaps, session video</td><td>Anything past the redirect</td><td>Unchanged. PostHog replay covers the app</td></tr>
@@ -562,6 +608,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
           <div><dt>Today</dt><dd>GA4 <code>page_view</code>, Meta <code>PageView</code></dd></div>
           <div><dt>Add</dt><dd>PostHog <code>$pageview</code>, <code>lp_viewed</code> with <code>src</code></dd></div>
           <div><dt>Gap</dt><dd>Meta ads are untagged — Paid Social lands in Referral</dd></div>
+          <div><dt>Changing</dt><dd>The interactive question is being removed. Every LP needs a new hook, and the page loses its only engagement event</dd></div>
           <div><dt>Owner</dt><dd>This repo + Ads Manager</dd></div>
         </dl>
       </div></div>
@@ -578,6 +625,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
           <div><dt>Today</dt><dd><code>guide_viewed</code>, <code>resource_offered</code>, <code>resource_clicked</code>, <code>resource_unlocked</code></dd></div>
           <div><dt>Add</dt><dd>Mirror to PostHog; send <code>Lead</code> via CAPI as well as pixel</dd></div>
           <div><dt>Gap</dt><dd><code>resource_unlocked</code> depends on a session, so it breaks past the redirect</dd></div>
+          <div><dt>Changing</dt><dd>Guides and topic pages lose their embedded questions too — an SEO decision as much as a measurement one</dd></div>
           <div><dt>Owner</dt><dd>This repo</dd></div>
         </dl>
       </div></div>
@@ -634,16 +682,16 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 
       <!-- F -->
       <div class="area none"><div class="rail"></div><div class="area-body">
-        <div class="area-top"><span class="area-id">AREA F</span><h3>Practice &amp; activation</h3><span class="tag t-broken">Unmeasured</span><span class="area-host">both</span></div>
+        <div class="area-top"><span class="area-id">AREA F</span><h3>Practice &amp; activation</h3><span class="tag t-broken">Unmeasured</span><span class="area-host">app.nursia.io</span></div>
         <p>
-          Activation is five attempted questions. On <code>nursia.io</code>,
-          <code>FREE_PREVIEW = 2</code> caps the public preview at two, so the threshold can only
-          be crossed in the app — where no question-level event exists at all. PostHog shows
-          <code>view_item</code> and <code>select_item</code>, which are not the same thing and
-          carry no correctness.
+          Activation is five attempted questions, and after the scope change in Finding 05 the
+          app is the only place any of them happen. It is also a place with no question-level
+          event at all: PostHog shows <code>view_item</code> and <code>select_item</code>, which
+          are not the same thing and carry no correctness. Until NUR-12 lands, practice is
+          entirely unmeasured rather than half-measured.
         </p>
         <dl class="kv">
-          <div><dt>Today</dt><dd>GA4 <code>question_answered</code> on nursia.io only, capped at 2</dd></div>
+          <div><dt>Today</dt><dd>GA4 <code>question_answered</code> on nursia.io, capped at 2 — and going away</dd></div>
           <div><dt>Add</dt><dd><code>question_answered</code> in the app; <code>activated</code> once per person at the 5th</dd></div>
           <div><dt>Rule</dt><dd>Cumulative and cross-surface. <code>question_index</code> cannot substitute — it is per-set and zero-based</dd></div>
           <div><dt>Owner</dt><dd>App team (contract C-05)</dd></div>
@@ -1035,7 +1083,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <table>
         <thead><tr><th>#</th><th>Tile</th><th>Insight type</th><th>Definition</th><th>Blocked on</th></tr></thead>
         <tbody>
-          <tr><td class="m">1</td><td><strong>Channel funnel</strong></td><td class="m">Funnel</td><td><code>$pageview</code> → <code>question_answered</code> → <code>registration_completed</code> → <code>activated</code> → <code>practice_session_completed</code>, breakdown by <code>utm_source</code></td><td>App contract</td></tr>
+          <tr><td class="m">1</td><td><strong>Channel funnel</strong></td><td class="m">Funnel</td><td><code>$pageview</code> → <code>registration_completed</code> → <code>question_answered</code> → <code>activated</code> → <code>practice_session_completed</code>, breakdown by <code>utm_source</code>. Note the order: questions now sit behind registration</td><td>App contract</td></tr>
           <tr><td class="m">2</td><td><strong>Activation rate by channel</strong></td><td class="m">Trends · formula</td><td><code>activated</code> ÷ <code>registration_completed</code>, weekly, broken down by initial UTM source</td><td>App contract</td></tr>
           <tr><td class="m">3</td><td><strong>High-intent rate by channel</strong></td><td class="m">Trends · formula</td><td><code>practice_session_completed</code> ÷ <code>activated</code></td><td>App contract</td></tr>
           <tr><td class="m">4</td><td><strong>Landing page performance</strong></td><td class="m">Trends</td><td><code>$pageview</code> by <code>src</code>, one line per LP — which creative cluster converts</td><td>posthog-js on nursia.io</td></tr>
@@ -1449,6 +1497,13 @@ export default async function SignupPage({
             <td>Decide where the next twenty guides go. The whole content programme rests on this row.</td>
             <td class="warn">Half &mdash; breaks at the redirect</td>
           </tr>
+          <tr>
+            <td><strong>Did someone try the product and decline to sign up?</strong></td>
+            <td>An engagement event that fires before registration, against <code>registration_completed</code></td>
+            <td class="m">Tile 1</td>
+            <td>Separates "the offer is wrong" from "the form is broken" — two problems with nothing in common except the number they move.</td>
+            <td class="bad">Going away — see Finding 05</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -1466,7 +1521,7 @@ export default async function SignupPage({
     <div class="callout" style="margin-top:16px">
       <h3>Delivery</h3>
       <p>
-        Twenty-six tickets across six workstreams, sequenced by dependency, live on the
+        Twenty-eight tickets across six workstreams, sequenced by dependency, live on the
         <em>Sprint board</em> sheet of <code>nursia-analytics-sprint-tracker.xlsx</code> with
         owners, points and status. P0 is now NUR-00 to NUR-10: the security fix, the redirect, the
         target event, the Ads conversion, ad tagging, PostHog on the marketing site, and the whole
@@ -1489,11 +1544,13 @@ export default async function SignupPage({
       <table>
         <thead><tr><th>Risk</th><th>Effect</th><th>Mitigation</th></tr></thead>
         <tbody>
-          <tr><td><strong>The app team does not implement the contract</strong></td><td>Areas C, F, G and H stay unmeasured regardless of anything in this repo</td><td>Twelve of twenty-six tickets are theirs. Confirm ownership before sprint start.</td></tr>
+          <tr><td><strong>The app team does not implement the contract</strong></td><td>Areas C, F, G and H stay unmeasured regardless of anything in this repo</td><td>Twelve of twenty-eight tickets are theirs. Confirm ownership before sprint start.</td></tr>
           <tr><td><strong>Dedup misconfigured</strong></td><td>Every conversion counts twice; bidding over-corrects</td><td>DOD-4 gates the sprint at ±2%.</td></tr>
           <tr><td><strong>Meta ads stay untagged</strong></td><td>Paid Social reports as Referral; the channel split is silently wrong</td><td>NUR-04 is one point and blocks the whole dashboard.</td></tr>
           <tr><td><strong>Four analytics scripts on one page</strong></td><td>LCP regresses on exactly the pages bought with ad money</td><td>DOD-5 is a hard gate measured on field data, and NUR-21 buys headroom first.</td></tr>
           <tr><td><strong>Consent and PII</strong></td><td>Hashed email sent without a lawful basis — on top of the tokens already stored</td><td>NUR-00 first. Hash server-side only, document the basis before NUR-09 ships.</td></tr>
+          <tr><td><strong>Removing try-before-signup</strong></td><td>Signup rate falls. The LP copy currently promises free questions, and the demo is the offer</td><td>Price it as a landing-page change, not a cleanup. Measure signup rate against the pre-change baseline before scaling spend.</td></tr>
+          <tr><td><strong>No pre-registration engagement event</strong></td><td>"Interested but did not sign up" becomes invisible, so an offer problem and a form problem look identical</td><td>Consider keeping one ungated question purely as an engagement signal, or accept the blind spot knowingly.</td></tr>
           <tr><td><strong>Five days of data</strong></td><td>Every baseline here rests on 23 people in a pre-launch window</td><td>Re-measure all baselines once real traffic arrives; treat current figures as directional.</td></tr>
         </tbody>
       </table>
