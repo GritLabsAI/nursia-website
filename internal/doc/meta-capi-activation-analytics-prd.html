@@ -1682,6 +1682,43 @@ export default async function SignupPage({
       </p>
     </div>
 
+    <div class="finding sev2" style="margin-top:22px">
+      <p class="eyebrow">Applies to every conversion, not only purchase</p>
+      <h2>A conversion without a value can only be counted, never weighed.</h2>
+      <p>
+        Both Meta and Google can bid toward <em>value</em> rather than volume, and both ignore the
+        option entirely if the events arrive without a <code>value</code> and a
+        <code>currency</code>. Count-based bidding treats every registration as identical, which
+        is precisely the assumption this whole document exists to disprove.
+      </p>
+      <p>
+        <code>purchase</code> carries the real amount. Everything upstream carries a
+        <strong>modelled</strong> value — the expected revenue of reaching that step — so delivery
+        can prefer the registration that becomes a customer over the one that does not. This
+        matters most right now, because purchase volume is far too low to optimise against
+        directly; a modelled value on registration is what lets the platforms learn months before
+        purchases alone would.
+      </p>
+      <div class="scroll" style="margin-top:4px">
+        <table>
+          <thead><tr><th>Event</th><th>Value</th><th>Derivation</th></tr></thead>
+          <tbody>
+            <tr><td class="m">registration_completed</td><td>Modelled</td><td>Purchase value &times; observed registration&rarr;purchase rate</td></tr>
+            <tr><td class="m">activated</td><td>Modelled, higher</td><td>Same, conditioned on having activated. This is the step that predicts revenue</td></tr>
+            <tr><td class="m">practice_session_completed</td><td>Modelled, higher still</td><td>Same, conditioned on high intent</td></tr>
+            <tr><td class="m">purchase</td><td class="good">Actual</td><td>The amount charged. Never modelled</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Two cautions. <strong>A wrong model is worse than a flat one:</strong> until there are
+        enough purchases to measure the rates honestly, send one conservative flat value per step
+        rather than a confident guess, and revisit once DOD-1 passes. And <strong>set
+        <code>currency</code> explicitly on every event</strong> — a missing currency is treated
+        as the account default, which silently mixes denominations the first time pricing changes.
+      </p>
+    </div>
+
     <div class="callout" style="margin-top:16px">
       <h3>One <code>event_id</code>, four destinations</h3>
       <p>
