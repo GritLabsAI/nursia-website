@@ -4,7 +4,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
 import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
-import { SITE } from "@/lib/content";
+import { SITE, SOCIAL } from "@/lib/content";
 
 /* Display and UI: a grotesque with a width axis and a little wonk — serious
    without reading like a bank. Body: a text serif, because question stems and
@@ -71,6 +71,11 @@ const graph = {
       description: SITE.tagline,
       email: SITE.email,
       logo: { "@type": "ImageObject", url: `${SITE.url}/icon.svg` },
+      /* The profiles that are the same entity as this organization. This is
+         how a search or answer engine reconciles the Instagram account with
+         the site rather than treating them as two unrelated Nursias. Only
+         claimed accounts belong here — see SOCIAL. */
+      sameAs: SOCIAL.map((s) => s.href),
       knowsAbout: [
         "NCLEX-RN",
         "Next Generation NCLEX",

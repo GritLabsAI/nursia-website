@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE, topicsIn } from "@/lib/content";
+import { SITE, SOCIAL, topicsIn } from "@/lib/content";
 import { sanityFetch, tags } from "@/sanity/client";
 import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
 import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
@@ -66,13 +66,15 @@ export async function SiteFooter() {
             <Logo tone="paper" tile="paper" label="Nursia" />
             <p className="mt-3 text-[0.875rem] leading-relaxed text-white/60">{SITE.tagline}</p>
             <div className="mt-5 flex gap-4">
-              {["Instagram", "TikTok", "YouTube"].map((s) => (
+              {SOCIAL.map((s) => (
                 <a
-                  key={s}
-                  href={`https://${s.toLowerCase()}.com/nursia`}
+                  key={s.name}
+                  href={s.href}
+                  rel="me noopener noreferrer"
+                  target="_blank"
                   className="text-[0.8125rem] text-white/55 underline decoration-white/25 underline-offset-4 transition-colors hover:text-highlight"
                 >
-                  {s}
+                  {s.name}
                 </a>
               ))}
             </div>

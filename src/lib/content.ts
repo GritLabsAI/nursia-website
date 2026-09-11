@@ -22,6 +22,22 @@ export const SITE = {
   price: 29,
 } as const;
 
+/**
+ * Accounts that actually exist.
+ *
+ * The footer used to build these from a list of network names, which produced
+ * a tidy row of three links to profiles nobody had registered. A dead social
+ * link is worse than no social link: it costs a click, and search engines read
+ * `sameAs` as a claim about identity, so pointing it at an unclaimed handle
+ * invites somebody else to claim it.
+ *
+ * So this list is the claimed set, and nothing more. Add a network here the
+ * day the account is live, not the day it is planned.
+ */
+export const SOCIAL = [
+  { name: "Instagram", href: "https://www.instagram.com/nursia.io/", handle: "@nursia.io" },
+] as const;
+
 /* ---------------------------------------------------------------- questions */
 
 export type Question = {
