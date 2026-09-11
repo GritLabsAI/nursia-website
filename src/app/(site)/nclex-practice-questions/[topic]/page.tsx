@@ -126,7 +126,7 @@ export default async function TopicPage({ params }: Params) {
                       eyebrow: "End of the free set",
                       headline: "Keep going",
                       body: `A free account opens 50 questions across every category, including more ${t.name.toLowerCase()}.`,
-                      cta: { label: "Start free →", href: "/signup" },
+                      cta: { label: "Start free →", href: "https://app.nursia.io" },
                       exits: [
                         { label: "Practise any topic", href: "/practice" },
                         { label: "See pricing", href: "/pricing" },

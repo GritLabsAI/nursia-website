@@ -69,13 +69,13 @@ export function AccountMenu() {
     return (
       <>
         <Link
-          href="/login"
+          href="https://app.nursia.io"
           className="text-sm font-medium text-ink-2 transition-colors hover:text-teal sm:text-[0.9375rem]"
         >
           Log in
         </Link>
         <Link
-          href="/signup"
+          href="https://app.nursia.io"
           className="btn btn-primary !min-h-0 !px-3.5 !py-2 !text-[0.8125rem] sm:!px-[1.375rem] sm:!py-2.5 sm:!text-sm"
         >
           Start free

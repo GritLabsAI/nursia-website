@@ -257,7 +257,7 @@ function Results({
             {closeLabel}
           </button>
         ) : (
-          <Link href="/signup" className="btn btn-ghost">
+          <Link href="https://app.nursia.io" className="btn btn-ghost">
             Unlock 50 more, free →
           </Link>
         )}
@@ -361,7 +361,7 @@ export function TopicDrill({
             category is costing you the most marks.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <Link href="/signup" className="btn btn-primary">
+            <Link href="https://app.nursia.io" className="btn btn-primary">
               Start free →
             </Link>
             <Link

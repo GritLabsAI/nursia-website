@@ -28,7 +28,7 @@ export function ContactForm() {
           Going to <span className="font-mono text-ink">{email}</span>, within one business day.
           If it is about a question that looks wrong, we will tell you what we changed.
         </p>
-        <Link href="/signup" className="btn btn-primary mt-6">
+        <Link href="https://app.nursia.io" className="btn btn-primary mt-6">
           While you wait — try it free →
         </Link>
       </div>

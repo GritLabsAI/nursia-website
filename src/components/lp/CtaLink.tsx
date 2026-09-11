@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
  * pages can be pointed somewhere else in a single edit — signup is the whole
  * reason these pages exist, so it is also the thing most likely to move.
  */
-export const LP_CTA_HREF = "/signup";
+export const LP_CTA_HREF = "https://app.nursia.io";
 
 /** The click ids worth carrying forward. Anything else is the platform's noise. */
 const CARRY = [
