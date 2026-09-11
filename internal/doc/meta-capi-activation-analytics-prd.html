@@ -247,25 +247,11 @@ pre .c { color: var(--muted); }
 .stack { display: flex; flex-direction: column; gap: 18px; }
 .stack-lg { display: flex; flex-direction: column; gap: 30px; }
 
-/* --------------------------------------------------------- tickets */
-.tickets { border-top: 1px solid var(--rule-strong); }
-.ticket {
-  display: grid; grid-template-columns: 78px minmax(0, 1fr) auto;
-  gap: 7px 18px; padding: 14px 0; border-bottom: 1px solid var(--rule); align-items: baseline;
-}
-.ticket-id { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--teal); }
-.ticket-id.p0 { color: var(--broken); }
-.ticket-t { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--ink); letter-spacing: -0.01em; }
-.ticket-d { grid-column: 2 / -1; font-size: 14.5px; color: var(--ink-2); max-width: 50rem; }
-.ticket-pts { font-family: var(--font-mono); font-size: 11px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
-
 footer { background: var(--paper-2); border-top: 2px solid var(--rule-strong); }
 footer .wrap { padding-block: 28px 40px; }
 footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 
 @media (max-width: 720px) {
-  .ticket { grid-template-columns: 1fr auto; }
-  .ticket-d { grid-column: 1 / -1; }
   .bar-row { grid-template-columns: 1fr 60px; }
   .bar-track { grid-column: 1 / -1; }
   .kv > div { border-right: 0; }
@@ -291,8 +277,8 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <div class="vital"><dt>Marketing site</dt><dd>nursia.io · this repo</dd></div>
       <div class="vital"><dt>Product app</dt><dd>app.nursia.io · external</dd></div>
       <div class="vital"><dt>PostHog project</dt><dd>NCLEX-Nursia · 595036</dd></div>
-      <div class="vital"><dt>Sprint size</dt><dd class="num">46 points</dd></div>
-      <div class="vital"><dt>P0 items</dt><dd class="num">6 of 24</dd></div>
+      <div class="vital"><dt>Sprint size</dt><dd class="num">57 points</dd></div>
+      <div class="vital"><dt>P0 items</dt><dd class="num">11 of 26</dd></div>
     </dl>
   </div>
 </header>
@@ -991,43 +977,189 @@ export default async function SignupPage({
   </div>
 </section>
 
-<!-- ========================================================= sprint -->
+<!-- ====================================================== revenue -->
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Sprint plan</p>
-      <h2>Twenty-four tickets, 46 points</h2>
+      <p class="eyebrow">Conversion events &middot; Areas C and H</p>
+      <h2>Purchase, and how it reaches each platform</h2>
       <p class="lede">
-        NUR-00 is a security fix and does not wait. NUR-01 to NUR-05 stop active money loss. If
-        the sprint is cut, it is cut after those.
+        Registration is the optimisation target. Purchase is the event that says whether the target
+        was worth optimising toward &mdash; and it happens on <code>app.nursia.io</code>, several
+        sessions after the click, where no browser tag from this repo will ever run.
       </p>
     </div>
 
-    <div class="tickets">
-      <div class="ticket"><span class="ticket-id p0">NUR-00</span><span class="ticket-t">Strip auth fragments from PostHog URL properties</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Security. 49 events hold live access and refresh tokens. Sanitise, purge, rotate. App team, today.</p></div>
-      <div class="ticket"><span class="ticket-id p0">NUR-01</span><span class="ticket-t">Forward query params on all four redirect stubs</span><span class="ticket-pts">3 pts</span><p class="ticket-d">signup, login, exam, try. Carry the UTM set, gclid, fbclid, src and funnel context.</p></div>
-      <div class="ticket"><span class="ticket-id p0">NUR-02</span><span class="ticket-t">Define and emit registration_completed</span><span class="ticket-pts">3 pts</span><p class="ticket-d">The target event. Does not exist anywhere today. PostHog first, then GA4 and Meta.</p></div>
-      <div class="ticket"><span class="ticket-id p0">NUR-03</span><span class="ticket-t">Re-point the Ads primary conversion at a firing event</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Smart Bidding is optimising against zero recorded conversions.</p></div>
-      <div class="ticket"><span class="ticket-id p0">NUR-04</span><span class="ticket-t">Tag every Meta ad URL with utm_source and utm_medium</span><span class="ticket-pts">1 pt</span><p class="ticket-d">GA4 ignores fbclid for channel. Untagged Meta traffic reports as Referral.</p></div>
-      <div class="ticket"><span class="ticket-id p0">NUR-05</span><span class="ticket-t">Install posthog-js on nursia.io behind a reverse proxy</span><span class="ticket-pts">3 pts</span><p class="ticket-d">Unifies the funnel and collects marketing-site web vitals. Must clear DOD-5.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-06</span><span class="ticket-t">Capture first-touch channel as person properties</span><span class="ticket-pts">2 pts</span><p class="ticket-d">initial_utm_*, initial_gclid, initial_fbclid. Written once, never overwritten.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-07</span><span class="ticket-t">Generate and thread a shared event_id</span><span class="ticket-pts">3 pts</span><p class="ticket-d">One id per logical event, to fbq as eventID and to the server as event_id. Gates DOD-4.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-08</span><span class="ticket-t">Build /api/meta/capi route handler</span><span class="ticket-pts">5 pts</span><p class="ticket-d">Enrich with IP and UA, forward _fbp and _fbc, POST to the Graph API.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-09</span><span class="ticket-t">SHA-256 user-data hashing helper</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Normalise then hash email and phone, server-side only. Required to reach DOD-2.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-10</span><span class="ticket-t">Send CompleteRegistration through pixel and CAPI</span><span class="ticket-pts">2 pts</span><p class="ticket-d">The target event, both paths, deduplicated. Verify EMQ ≥ 7.5 before closing.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-11</span><span class="ticket-t">Evaluate the PostHog Meta Ads CDP destination</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Spike. May remove most of NUR-08 for Lead and the custom conversions.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-12</span><span class="ticket-t">Emit question_answered in the app</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Prerequisite for activation. view_item and select_item are not equivalents.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-13</span><span class="ticket-t">Cumulative attempt counter with fired-once flag</span><span class="ticket-pts">3 pts</span><p class="ticket-d">Cross-surface and per person. Reuse the attempts.ts queue pattern.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-14</span><span class="ticket-t">Emit activated at the fifth attempt</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Once per person ever. PostHog plus a Meta custom conversion.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-15</span><span class="ticket-t">Emit practice_session_completed for drill and exam</span><span class="ticket-pts">2 pts</span><p class="ticket-d">Unified high-intent signal. Keep the granular events alongside it.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-16</span><span class="ticket-t">Add step_index to onboarding events</span><span class="ticket-pts">1 pt</span><p class="ticket-d">Without it a five-step funnel reports as one step repeated.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-17</span><span class="ticket-t">Add login_failed with a reason property</span><span class="ticket-pts">1 pt</span><p class="ticket-d">101 login_viewed to 1 login_completed is unexplainable without it.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-18</span><span class="ticket-t">Emit purchase with value and currency</span><span class="ticket-pts">2 pts</span><p class="ticket-d">No ROAS is computable for any channel until this exists.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-19</span><span class="ticket-t">Build the PostHog dashboard — tiles 6 and 10</span><span class="ticket-pts">1 pt</span><p class="ticket-d">Buildable now on existing data. Do it before the sprint starts.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-20</span><span class="ticket-t">Build the PostHog dashboard — remaining nine tiles</span><span class="ticket-pts">3 pts</span><p class="ticket-d">Fills in as the contract lands. Dashboard: Growth — channel to activation.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-21</span><span class="ticket-t">Move the Clarity tag off beforeInteractive</span><span class="ticket-pts">1 pt</span><p class="ticket-d">It currently blocks hydration on every marketing page. Straight LCP win.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-22</span><span class="ticket-t">Establish the LCP baseline for nursia.io</span><span class="ticket-pts">1 pt</span><p class="ticket-d">Seven days of field vitals after NUR-05, before any other LP change ships.</p></div>
-      <div class="ticket"><span class="ticket-id">NUR-23</span><span class="ticket-t">Verify all six gates and sign off</span><span class="ticket-pts">2 pts</span><p class="ticket-d">DOD-1 to DOD-6, each from its named surface, recorded in the tracker.</p></div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Platform</th><th>Event</th><th>Transport</th><th>Keyed on</th><th>Why this transport</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>PostHog</strong></td>
+            <td class="m">purchase</td>
+            <td>SDK, client</td>
+            <td class="m">person id</td>
+            <td>System of record. Carries <code>value</code>, <code>currency</code> and plan, against a person who already holds the first-touch channel.</td>
+          </tr>
+          <tr>
+            <td><strong>Meta</strong></td>
+            <td class="m">Purchase</td>
+            <td><strong>CAPI, server</strong></td>
+            <td class="m">_fbc / _fbp / hashed email</td>
+            <td>The browser is not trustworthy for a payment event and iOS strips most of it. Server-side is the only path that reaches DOD-2.</td>
+          </tr>
+          <tr>
+            <td><strong>Google Ads</strong></td>
+            <td class="m">Purchase</td>
+            <td><strong>Offline Conversion Import</strong></td>
+            <td class="m">gclid / gbraid / wbraid</td>
+            <td>The conversion happens where the Ads tag never loads, hours or days after the click. OCI is built for exactly that.</td>
+          </tr>
+          <tr>
+            <td><strong>GA4</strong></td>
+            <td class="m">purchase</td>
+            <td>Measurement Protocol</td>
+            <td class="m">client_id</td>
+            <td>Optional, and only worth it once cross-domain measurement is configured. Otherwise the session is already broken.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <h3>Google Ads: an upload, not a container</h3>
+      <p>
+        This does not reopen the GTM decision. That rejection was about a <em>client-side</em>
+        container loading tags in a browser. What purchase needs is the opposite of a browser tag:
+        an upload that never touches one.
+      </p>
+      <p>
+        Persist <code>gclid</code> at first touch &mdash; NUR-01 forwards it, C-02 stores it &mdash;
+        then upload the conversion through the Google Ads API with the click id, the conversion
+        action, the timestamp and the value. It is immune to ad blockers, immune to ITP, and works
+        however many days later the purchase lands. <strong>Enhanced Conversions for Web</strong> is
+        the fallback for purchases where no click id survived, matching on hashed email instead.
+      </p>
+      <p>
+        One thing the current <code>CtaLink</code> misses: iOS app-campaign traffic arrives carrying
+        <code>gbraid</code> or <code>wbraid</code> rather than <code>gclid</code>. Both have to be
+        carried and stored, or every iOS purchase is unattributable no matter how good the upload is.
+      </p>
+    </div>
+
+    <div class="callout" style="margin-top:16px">
+      <h3>One <code>event_id</code>, four destinations</h3>
+      <p>
+        The id generated for the PostHog event is also the Meta <code>event_id</code> and the Ads
+        <code>order_id</code>. It is what stops a purchase counting twice when both the browser and
+        the server report it, and what lets the four systems be reconciled against each other
+        afterwards &mdash; which is the whole of DOD-3 and DOD-4.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== outcomes -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Outcomes</p>
+      <h2>What you should be able to see, and what you would do about it</h2>
+      <p class="lede">
+        The ticket list lives in the tracker, where it can be reordered without reissuing this
+        document. What belongs here is the reason for it: eight questions the business cannot
+        currently answer, the data that answers each, and the decision it unblocks. A ticket that
+        serves no row below does not belong in the sprint.
+      </p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Question</th><th>What you look at</th><th>Where</th><th>Decision it drives</th><th>Today</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Which channel brings people who actually study?</strong></td>
+            <td>Activation rate &mdash; <code>activated</code> over <code>registration_completed</code> &mdash; split by first-touch channel</td>
+            <td class="m">Tile 2</td>
+            <td>Move budget between Meta, Google and organic. High signup with low activation means a channel is buying clicks, not users.</td>
+            <td class="bad">Cannot answer</td>
+          </tr>
+          <tr>
+            <td><strong>Which ad creative earns its spend?</strong></td>
+            <td>Registrations and activation by <code>src</code>, one line per creative cluster</td>
+            <td class="m">Tile 4</td>
+            <td>Kill or scale a cluster on downstream quality instead of on click-through rate.</td>
+            <td class="bad">Cannot answer</td>
+          </tr>
+          <tr>
+            <td><strong>Is Meta's delivery learning from the right signal?</strong></td>
+            <td><code>CompleteRegistration</code> volume and event match quality</td>
+            <td class="m">Events Manager</td>
+            <td>Whether to hold the target at registration or move it deeper, to <code>activated</code>, once volume supports it.</td>
+            <td class="bad">Cannot answer</td>
+          </tr>
+          <tr>
+            <td><strong>What is a registration worth, by channel?</strong></td>
+            <td>Purchase value over registrations, by first-touch channel</td>
+            <td class="m">Tile 9 + revenue</td>
+            <td>Set a target cost per registration per channel, rather than one blended number that flatters the worst one.</td>
+            <td class="bad">Cannot answer</td>
+          </tr>
+          <tr>
+            <td><strong>Where do paid users drop out of the product?</strong></td>
+            <td>The five-step funnel, filtered to paid traffic only</td>
+            <td class="m">Tile 1</td>
+            <td>Fix the step, not the ad. A drop at onboarding is a product ticket; a drop at registration is a landing-page one.</td>
+            <td class="bad">Cannot answer</td>
+          </tr>
+          <tr>
+            <td><strong>Is login broken, or is the login event broken?</strong></td>
+            <td><code>login_viewed</code> to <code>login_completed</code>, with <code>login_failed</code> carrying a reason</td>
+            <td class="m">Tile 6</td>
+            <td>Ship a login fix or an instrumentation fix. 101 views produced 1 completion and nothing distinguishes the two cases.</td>
+            <td class="warn">Half &mdash; no failure reason</td>
+          </tr>
+          <tr>
+            <td><strong>Are we buying clicks that land on a slow page?</strong></td>
+            <td>p75 LCP by landing page, cut by channel</td>
+            <td class="m">Tile 10</td>
+            <td>Choose between performance work and creative work. A 4.4 second entry page is not a copy problem.</td>
+            <td class="warn">App side only</td>
+          </tr>
+          <tr>
+            <td><strong>Which content pulls people into practice?</strong></td>
+            <td><code>guide_viewed</code> through to <code>activated</code>, by guide and topic</td>
+            <td class="m">Tiles 1 + 4</td>
+            <td>Decide where the next twenty guides go. The whole content programme rests on this row.</td>
+            <td class="warn">Half &mdash; breaks at the redirect</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:24px">
+      <h3>The order these arrive in</h3>
+      <p>
+        Rows six and seven are answerable this week on data already flowing &mdash; two dashboard
+        tiles, no new instrumentation. Rows one to five all wait on the same two things:
+        attribution surviving the redirect, and <code>registration_completed</code> existing at
+        all. Everything in the P0 block serves those two, which is what makes it the P0 block.
+      </p>
+    </div>
+
+    <div class="callout" style="margin-top:16px">
+      <h3>Delivery</h3>
+      <p>
+        Twenty-six tickets across six workstreams, sequenced by dependency, live on the
+        <em>Sprint board</em> sheet of <code>nursia-analytics-sprint-tracker.xlsx</code> with
+        owners, points and status. P0 is now NUR-00 to NUR-10: the security fix, the redirect, the
+        target event, the Ads conversion, ad tagging, PostHog on the marketing site, and the whole
+        Meta Conversions API path including hashing and deduplication. CAPI sits in P0 rather than
+        P1 because <code>CompleteRegistration</code> sent from the browser alone cannot reach a
+        match quality of 7.5, and DOD-2 is not optional.
+      </p>
     </div>
   </div>
 </section>
@@ -1043,7 +1175,7 @@ export default async function SignupPage({
       <table>
         <thead><tr><th>Risk</th><th>Effect</th><th>Mitigation</th></tr></thead>
         <tbody>
-          <tr><td><strong>The app team does not implement the contract</strong></td><td>Areas C, F, G and H stay unmeasured regardless of anything in this repo</td><td>Twelve of twenty-four tickets are theirs. Confirm ownership before sprint start.</td></tr>
+          <tr><td><strong>The app team does not implement the contract</strong></td><td>Areas C, F, G and H stay unmeasured regardless of anything in this repo</td><td>Twelve of twenty-six tickets are theirs. Confirm ownership before sprint start.</td></tr>
           <tr><td><strong>Dedup misconfigured</strong></td><td>Every conversion counts twice; bidding over-corrects</td><td>DOD-4 gates the sprint at ±2%.</td></tr>
           <tr><td><strong>Meta ads stay untagged</strong></td><td>Paid Social reports as Referral; the channel split is silently wrong</td><td>NUR-04 is one point and blocks the whole dashboard.</td></tr>
           <tr><td><strong>Four analytics scripts on one page</strong></td><td>LCP regresses on exactly the pages bought with ad money</td><td>DOD-5 is a hard gate measured on field data, and NUR-21 buys headroom first.</td></tr>
