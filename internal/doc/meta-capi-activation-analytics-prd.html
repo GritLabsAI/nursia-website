@@ -247,6 +247,47 @@ pre .c { color: var(--muted); }
 .stack { display: flex; flex-direction: column; gap: 18px; }
 .stack-lg { display: flex; flex-direction: column; gap: 30px; }
 
+/* ------------------------------------------------------- summary */
+.sum-figures {
+  display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  border-top: 2px solid var(--rule-strong); margin-block: 4px 26px;
+}
+.sum-fig { border-bottom: 1px solid var(--rule); border-right: 1px solid var(--rule); padding: 16px 18px 18px; }
+.sum-fig:last-child { border-right: 0; }
+.sum-fig .n {
+  font-family: var(--font-mono); font-size: 30px; font-weight: 600;
+  letter-spacing: -0.03em; line-height: 1; color: var(--ink);
+  font-variant-numeric: tabular-nums; display: block;
+}
+.sum-fig .n.bad { color: var(--broken); }
+.sum-fig .n.warn { color: var(--gap); }
+.sum-fig .l { display: block; margin-top: 9px; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.sum-lead { font-size: 19px; line-height: 1.6; color: var(--ink); max-width: 44rem; }
+.sum-lead + .sum-lead { margin-top: 14px; }
+.sum-ask {
+  border: 2px solid var(--rule-strong); border-radius: 2px; background: var(--surface);
+  padding: 22px 24px; display: flex; flex-direction: column; gap: 10px; margin-top: 26px;
+}
+.sum-ask ol { margin: 0; padding-left: 20px; font-size: 15.5px; color: var(--ink-2); }
+.sum-ask ol li + li { margin-top: 7px; }
+
+/* ------------------------------------------------------ option grid */
+.opts { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); }
+.opt {
+  border: 1px solid var(--rule); border-top: 3px solid var(--muted);
+  background: var(--surface); border-radius: 2px; padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.opt.best { border-top-color: var(--live); }
+.opt.maybe { border-top-color: var(--gap); }
+.opt.no { border-top-color: var(--broken); }
+.opt h4 { font-size: 16px; }
+.opt p { font-size: 14.5px; color: var(--ink-2); }
+.opt .verdict {
+  margin-top: auto; padding-top: 10px; border-top: 1px solid var(--rule);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--muted);
+}
+
 footer { background: var(--paper-2); border-top: 2px solid var(--rule-strong); }
 footer .wrap { padding-block: 28px 40px; }
 footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
@@ -282,6 +323,62 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
     </dl>
   </div>
 </header>
+
+<!-- ============================================== executive summary -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Executive summary</p>
+      <h2>Nursia is buying traffic it cannot measure</h2>
+    </div>
+
+    <div class="sum-figures">
+      <div class="sum-fig"><span class="n bad">0</span><span class="l">Registrations attributable to a campaign. The primary Google Ads conversion has recorded nothing since the app split.</span></div>
+      <div class="sum-fig"><span class="n bad">0</span><span class="l">Systems that can see a whole customer. Three are installed; each sees one half.</span></div>
+      <div class="sum-fig"><span class="n bad">49</span><span class="l">Stored analytics events holding a live auth token. A credential exposure, not a measurement gap.</span></div>
+      <div class="sum-fig"><span class="n warn">4461<span style="font-size:15px"> ms</span></span><span class="l">p75 LCP on the page every paid click lands on, against a 2,500 ms threshold.</span></div>
+    </div>
+
+    <p class="sum-lead">
+      Signup, login and practice moved to <code>app.nursia.io</code>. The handoff is a bare server
+      redirect that discards the query string, so every ad identifier &mdash; <code>gclid</code>,
+      <code>fbclid</code>, all five UTMs &mdash; dies at the boundary. The code that reported a
+      signup now sits behind that redirect and never runs. <strong>Google Ads is bidding toward a
+      conversion that records zero, and Meta is optimising delivery on an event that fires
+      nowhere.</strong>
+    </p>
+    <p class="sum-lead">
+      The estate is also split in half. GA4 and the Meta Pixel see only the marketing site;
+      PostHog sees only the product. Neither half can answer the question the marketing budget
+      depends on: <em>which channel brings people who actually study?</em>
+    </p>
+    <p class="sum-lead">
+      Nothing here is a forecast. Every figure was read from the repository and from live PostHog
+      data on 11 September 2026.
+    </p>
+
+    <div class="sum-ask">
+      <p class="eyebrow">What this document asks for</p>
+      <ol>
+        <li><strong>One security fix, today.</strong> Auth tokens are being written into analytics storage. It is one SDK hook, and it should not wait for a sprint boundary.</li>
+        <li><strong>One sprint, 57 points, 26 tickets</strong> &mdash; of which 11 are P0 and stop money being spent blind. Twelve of the 26 belong to the <code>app.nursia.io</code> team and are a hard dependency.</li>
+        <li><strong>A decision on the system of record.</strong> The recommendation is PostHog, because it already collects on the side where activation happens and GA4 cannot reach it.</li>
+        <li><strong>Agreement on six numeric gates</strong> for what "done" means, including 75% attribution coverage and a Meta match quality of 7.5.</li>
+      </ol>
+    </div>
+
+    <div class="callout" style="margin-top:20px">
+      <h3>What changes if it lands</h3>
+      <p>
+        Budget moves on evidence instead of on click-through rate. A creative cluster can be
+        killed or scaled on whether it produces people who study, not on whether it produces
+        clicks. Smart Bidding and Meta delivery both start learning from a real conversion. And
+        the eight questions in the Outcomes section &mdash; none of which can be answered today
+        &mdash; become a dashboard somebody checks on a Monday.
+      </p>
+    </div>
+  </div>
+</section>
 
 <!-- ====================================================== findings -->
 <section>
@@ -696,76 +793,160 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 <section>
   <div class="wrap">
     <div class="sec-head">
-      <p class="eyebrow">Decision · Area I</p>
-      <h2>Google Tag Manager: rejected</h2>
+      <p class="eyebrow">Decision brief &middot; Area I</p>
+      <h2>Google Tag Manager: engineering's call</h2>
       <p class="lede">
-        Raised as a way to protect Core Web Vitals. It would do the opposite, and it would put two
-        of the six gates at risk.
+        Raised as a way to protect Core Web Vitals. That specific reasoning does not hold &mdash;
+        a container makes load performance worse, not better &mdash; but GTM has real benefits
+        that have nothing to do with speed, and there are ways to load it that blunt most of the
+        cost. This section lays out the trade and the options. <strong>The final decision sits
+        with engineering.</strong>
       </p>
     </div>
 
     <div class="stack">
       <div class="callout">
-        <h3>GTM loads tags. It does not replace them.</h3>
+        <h3>First, the thing that is not true</h3>
         <p>
-          The container is a loader: the browser fetches <code>gtm.js</code> (tens of kilobytes
-          before a single tag), parses the container, evaluates triggers, and only then injects
-          <code>gtag.js</code>, <code>fbevents.js</code> and the rest. Those tags still execute on
-          the main thread — just later, behind an extra round trip, with container and trigger
-          evaluation added on top. Adopting it means putting a new script in front of every script
-          already loading, and calling the result an optimisation.
+          A container does not replace tags, it loads them. The browser fetches
+          <code>gtm.js</code> (tens of kilobytes before a single tag), parses the container,
+          evaluates triggers, and only then injects <code>gtag.js</code>,
+          <code>fbevents.js</code> and the rest. Those tags still execute on the main thread, just
+          later and behind an extra round trip. Adopting GTM <em>to improve</em> Core Web Vitals
+          means adding a script in front of every script already loading.
+        </p>
+      </div>
+
+      <div class="callout">
+        <h3>The real case for it, which is a good one</h3>
+        <p>
+          Autonomy. Marketing adds or changes a pixel without an engineer, a pull request and a
+          deploy. Consent logic, campaign-specific tags and short-lived measurement pixels stop
+          consuming engineering time. If the tag list is about to grow &mdash; new ad platforms,
+          affiliate pixels, a consent management platform &mdash; that benefit compounds, and it
+          is worth paying some performance for.
         </p>
       </div>
 
       <div class="finding sev2">
-        <p class="eyebrow">The reason it is rejected, not merely declined</p>
-        <h2>It converts partial measurement loss into total, correlated loss.</h2>
+        <p class="eyebrow">The risk to weigh, and it is not speed</p>
+        <h2>A container concentrates failure onto the traffic you are measuring.</h2>
         <p>
           <code>googletagmanager.com</code> is among the most heavily blocked domains on the web.
           Today a blocked GA4 request does not take down the Meta Pixel, and neither touches
-          PostHog — the failures are independent and partial. Behind one container, a single
-          blocked request removes every tag at once.
+          PostHog &mdash; failures are independent and partial. Behind one container, one blocked
+          request removes every tag at once.
         </p>
         <p>
-          That failure is not random. It concentrates in privacy-conscious, mobile and paid
-          traffic — precisely the segment DOD-1 and DOD-3 exist to count. It also defeats the
-          same-origin reverse proxy in NUR-05, whose entire purpose is being unblockable.
-        </p>
-      </div>
-
-      <div class="callout">
-        <h3>Next.js already provides the scheduling GTM would remove</h3>
-        <p>
-          <code>@next/third-parties</code> ships a GA4 component built for this, and
-          <code>next/script</code> places every other tag by strategy. That control is finer than a
-          container offers, and it is visible in code review. The one thing currently misusing it
-          is <code>src/app/layout.tsx:138</code>, where Clarity loads
-          <code>beforeInteractive</code> — injected into the initial HTML and executed ahead of
-          hydration. That single line costs more than tag management would recover, and NUR-21
-          fixes it.
+          That failure is not random: it concentrates in privacy-conscious, mobile and paid
+          traffic, which is exactly the segment DOD-1 and DOD-3 count. <strong>This is the item to
+          weigh hardest</strong>, and unlike the speed cost it is largely fixable &mdash; see the
+          first-party option below.
         </p>
       </div>
 
-      <div class="callout">
-        <h3>And tags are not what makes the app entry page slow</h3>
+      <div class="sec-head" style="margin-top:34px;margin-bottom:18px">
+        <p class="eyebrow">For engineering to explore</p>
+        <h2 style="font-size:24px">Ways to load GTM without paying full price</h2>
+        <p class="lede" style="font-size:16px">
+          If the autonomy case wins, these are the approaches worth prototyping. They are not
+          mutually exclusive; the strongest setup combines the first two.
+        </p>
+      </div>
+
+      <div class="opts">
+        <div class="opt best">
+          <h4>Server-side GTM</h4>
+          <p>
+            A container running on infrastructure you own. The browser makes one first-party
+            request; tags fire server-side and never ship JavaScript to the page. This is the only
+            option that genuinely removes main-thread work rather than rescheduling it, and it
+            solves the blocking problem at the same time.
+          </p>
+          <p class="verdict">Best outcome &middot; highest setup cost &middot; needs a hosting decision</p>
+        </div>
+
+        <div class="opt best">
+          <h4>First-party container serving</h4>
+          <p>
+            Serve <code>gtm.js</code> from your own domain through a Next.js rewrite &mdash; the
+            same technique NUR-05 uses for PostHog. Does nothing for main-thread cost, but removes
+            the correlated-blocking risk above, which is the more serious of the two problems.
+          </p>
+          <p class="verdict">Cheap &middot; fixes blocking, not speed &middot; do this either way</p>
+        </div>
+
+        <div class="opt maybe">
+          <h4>Deferred container load</h4>
+          <p>
+            Load the container after LCP has settled &mdash; on <code>requestIdleCallback</code>,
+            first interaction, or a short timer &mdash; via <code>next/script</code>'s
+            <code>lazyOnload</code>. Keeps the container off the critical path entirely. The cost
+            is real: events before the load are missed unless queued, and bounced sessions may
+            never fire at all.
+          </p>
+          <p class="verdict">Easy &middot; measurable speed win &middot; costs early events</p>
+        </div>
+
+        <div class="opt maybe">
+          <h4>Web worker (Partytown)</h4>
+          <p>
+            Moves third-party scripts off the main thread into a worker. Next.js exposes this as
+            an experimental <code>worker</code> script strategy. Attractive on paper and fragile in
+            practice: tags that touch the DOM or cookies frequently break, and debugging is
+            unpleasant. Prototype before committing to it.
+          </p>
+          <p class="verdict">Experimental &middot; verify every tag still fires</p>
+        </div>
+
+        <div class="opt maybe">
+          <h4>A deliberately small container</h4>
+          <p>
+            Most GTM performance complaints are really container-bloat complaints. No custom HTML
+            tags, no unused triggers, no vendor templates kept "just in case", and a periodic
+            prune. A lean container costs a fraction of a typical one.
+          </p>
+          <p class="verdict">Free &middot; requires ongoing discipline</p>
+        </div>
+
+        <div class="opt no">
+          <h4>Container in front of everything</h4>
+          <p>
+            Migrating GA4, Ads, Clarity, the Meta Pixel <em>and</em> PostHog behind one
+            client-side container. This is the configuration that is both slowest and most
+            fragile, and it defeats NUR-05's same-origin proxy. If GTM is adopted, keep PostHog
+            outside it.
+          </p>
+          <p class="verdict">Not recommended in any scenario</p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:24px">
+        <h3>Recommendation, for engineering to accept or overrule</h3>
         <p>
-          A p75 LCP of 4,461 ms is not recoverable by deferring analytics. Tags loaded
+          Not this sprint. With four stable tags and engineers already in the loop, the autonomy
+          benefit is not yet being paid for, and the sprint has a hard LCP gate running through
+          it. Revisit when the tag list approaches ten, or when non-engineers genuinely need to
+          ship pixels &mdash; and when you do, evaluate <strong>server-side GTM with first-party
+          serving</strong> rather than a plain client container, since that combination is the one
+          that avoids both problems above.
+        </p>
+        <p>
+          Whatever is decided, two things hold: <code>src/app/layout.tsx:138</code> loads Clarity
+          <code>beforeInteractive</code>, ahead of hydration, and fixing that (NUR-21) is worth
+          more than any tag-management change; and PostHog stays on its own same-origin path
+          regardless, because DOD-3 depends on it.
+        </p>
+      </div>
+
+      <div class="callout" style="margin-top:16px">
+        <h3>And separately: tags are not why the app entry page is slow</h3>
+        <p>
+          A p75 LCP of 4,461 ms is not recoverable by deferring analytics. Scripts loaded
           <code>afterInteractive</code> compete for bandwidth but do not block the largest
-          contentful paint; removing every one of them would not bring that page under 2,500 ms.
-          The cause is the hero render, an unoptimised image, or server response time. That is
-          C-12, and treating it as a tagging problem would waste the sprint.
-        </p>
-      </div>
-
-      <div class="callout">
-        <h3>When to revisit</h3>
-        <p>
-          The honest case for GTM is <em>autonomy</em>, never performance: marketing adding a pixel
-          without an engineer and a deploy. With four stable tags and engineers already in the
-          loop, that cost is not being paid yet. Revisit when the tag list grows past roughly ten,
-          or when non-engineers genuinely need to ship them. Server-side tagging — the real way to
-          move work off the browser — is already in this plan as NUR-08 and NUR-11, and needs no
-          container.
+          contentful paint; removing every tag on that page would not bring it under 2,500 ms. The
+          cause is the hero render, an unoptimised image, or server response time. That is C-12,
+          and treating it as a tagging problem would spend the sprint in the wrong place.
         </p>
       </div>
     </div>
@@ -845,8 +1026,8 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <h2>The PostHog dashboard</h2>
       <p class="lede">
         One dashboard, <strong>Growth — channel to activation</strong>, in project
-        <code>NCLEX-Nursia</code> (595036). Eleven tiles. Tiles 1–4 are buildable the moment
-        <code>posthog-js</code> lands on the marketing site; the rest wait on the app contract.
+        <code>NCLEX-Nursia</code> (595036). Eleven tiles. Tiles 4, 6 and 10 are the near-term ones;
+        the rest wait on the app contract.
       </p>
     </div>
 
