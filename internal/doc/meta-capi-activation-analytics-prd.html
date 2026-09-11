@@ -303,14 +303,15 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 <header class="masthead">
   <div class="wrap">
     <p class="eyebrow">Nursia · Marketing &amp; Growth · Sprint PRD</p>
-    <h1>Three systems are watching. None of them sees a customer.</h1>
+    <h1>We cannot grow what we cannot measure.</h1>
     <p class="standfirst">
-      GA4 and the Meta Pixel run on <code>nursia.io</code>. PostHog runs on
-      <code>app.nursia.io</code>. The redirect between them discards the query string, so no
-      identifier survives the hop — and the event every campaign is supposed to bid toward,
-      <code>CompleteRegistration</code>, does not exist in either system. This PRD specifies the
-      measurement estate area by area, sets numeric gates for done, and adds the performance
-      budget those pages have to stay inside while it happens.
+      Three systems are watching and none of them sees a whole customer. GA4 and the Meta Pixel
+      run on <code>nursia.io</code>; PostHog runs on <code>app.nursia.io</code>; the redirect
+      between them discards the query string, so no identifier survives the hop. The event every
+      campaign is supposed to bid toward, <code>CompleteRegistration</code>, exists in neither.
+      Until that is fixed, every budget decision is a guess wearing a number. This PRD specifies
+      the estate area by area, sets numeric gates for done, names the technical dependencies, and
+      adds the performance budget those pages have to stay inside while it happens.
     </p>
 
     <dl class="vitals">
@@ -318,8 +319,8 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <div class="vital"><dt>Marketing site</dt><dd>nursia.io · this repo</dd></div>
       <div class="vital"><dt>Product app</dt><dd>app.nursia.io · external</dd></div>
       <div class="vital"><dt>PostHog project</dt><dd>NCLEX-Nursia · 595036</dd></div>
-      <div class="vital"><dt>Sprint size</dt><dd class="num">60 points</dd></div>
-      <div class="vital"><dt>P0 items</dt><dd class="num">11 of 28</dd></div>
+      <div class="vital"><dt>Sprint size</dt><dd class="num">71 points</dd></div>
+      <div class="vital"><dt>P0 items</dt><dd class="num">14 of 33</dd></div>
     </dl>
   </div>
 </header>
@@ -361,7 +362,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <p class="eyebrow">What this document asks for</p>
       <ol>
         <li><strong>One security fix, today.</strong> Auth tokens are being written into analytics storage. It is one SDK hook, and it should not wait for a sprint boundary.</li>
-        <li><strong>One sprint, 60 points, 28 tickets</strong> &mdash; of which 11 are P0 and stop money being spent blind. Twelve of the 28 belong to the <code>app.nursia.io</code> team and are a hard dependency.</li>
+        <li><strong>One sprint, 71 points, 33 tickets</strong> &mdash; of which 14 are P0 and stop money being spent blind. Twelve of the 33 belong to the <code>app.nursia.io</code> team and are a hard dependency.</li>
         <li><strong>A decision on the system of record.</strong> The recommendation is PostHog, because it already collects on the side where activation happens and GA4 cannot reach it.</li>
         <li><strong>Agreement on six numeric gates</strong> for what "done" means, including 75% attribution coverage and a Meta match quality of 7.5.</li>
       </ol>
@@ -575,10 +576,11 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
         look on a Monday.
       </p>
       <p>
-        <strong>Collection is engineering's call.</strong> Whether cross-domain unified analytics
-        is solved with GA4's linker or with PostHog's own cross-subdomain identity handling is a
-        question about cookies, redirects and session stitching, and the people who own those
-        should choose. Both can work.
+        <strong>Collection is engineering's call, and GA4 is an acceptable answer.</strong> If the
+        team can genuinely maintain cross-domain unified analytics in GA4 — the linker, the domain
+        list, the session stitching, and the discipline to keep them working — then take that
+        route. PostHog then serves as the compilation layer: the place every event is assembled
+        into one person and one funnel, and the place the dashboards are built.
       </p>
       <p>
         One implication is worth stating plainly rather than discovering in week three: a
@@ -1012,6 +1014,77 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
   </div>
 </section>
 
+<!-- ============================================= P0 product requirements -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">P0 product requirements</p>
+      <h2>Three things that are requirements, not options</h2>
+      <p class="lede">
+        These are not engineering trade-offs to be weighed. They are the conditions under which
+        the rest of the document can be true.
+      </p>
+    </div>
+
+    <div class="stack">
+      <div class="finding">
+        <p class="eyebrow">P0 · Requirement 01</p>
+        <h2>Login lives on nursia.io, not app.nursia.io.</h2>
+        <p>
+          Today <code>src/app/(funnel)/login/page.tsx</code> is a redirect stub to the app. That
+          puts the single most identity-rich moment in the journey on the far side of the boundary
+          that destroys identity.
+        </p>
+        <p>
+          Bringing login back to <code>nursia.io</code> is worth more to measurement than any
+          other single change in this document. It is the point at which an anonymous browser
+          becomes a known person, and it is the natural place to call <code>identify</code> — on
+          the domain that still holds the first-touch attribution, the <code>_fbc</code> cookie
+          and the click ids. Do it there and the whole cross-domain identity problem shrinks to a
+          handoff of an already-identified user, which is a far easier thing to get right than
+          stitching two anonymous halves together afterwards.
+        </p>
+        <p>
+          It also fixes Area D on its own: <code>login_viewed</code> at 101 against
+          <code>login_completed</code> at 1 is currently unexplainable because the completion
+          happens somewhere nothing is watching.
+        </p>
+      </div>
+
+      <div class="finding">
+        <p class="eyebrow">P0 · Requirement 02</p>
+        <h2>Session recording on the marketing site.</h2>
+        <p>
+          PostHog session replay is already enabled on the product app. It is not on
+          <code>nursia.io</code>, which is where every paid click lands and where the drop-off
+          this sprint is trying to explain actually happens.
+        </p>
+        <p>
+          This is the difference between a number and a reason. The funnel will tell you that Meta
+          traffic drops at the gate; a replay tells you whether they scrolled past it, tapped it
+          and bounced, or never saw it. Clarity covers some of this today, but it cannot be
+          filtered by channel or joined to a person, which makes it useless for exactly the
+          question being asked. Enable it with NUR-05, sampled rather than at 100%, and with the
+          same fragment sanitiser NUR-00 installs.
+        </p>
+      </div>
+
+      <div class="finding">
+        <p class="eyebrow">P0 · Requirement 03</p>
+        <h2>The token leak is fixed before anything else ships.</h2>
+        <p>
+          Restated here because it is a requirement and not a ticket to be sequenced. 49 stored
+          events hold a live <code>access_token</code> and <code>refresh_token</code>; 42 hold a
+          Google <code>provider_token</code>. Sanitise, purge, rotate. Nothing else in this
+          document should ship first, and no data export or warehouse connection should run until
+          it is done — an export would replicate a credential leak into a second system with its
+          own access model.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============================================== engineering calls -->
 <section>
   <div class="wrap">
@@ -1034,8 +1107,8 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
           <tr>
             <td class="m">E-01</td>
             <td><strong>Cross-domain unified analytics</strong></td>
-            <td>GA4 linker, or PostHog cross-subdomain identity, or both</td>
-            <td>This is what makes one person one person across the redirect. Get it wrong and every activation is credited to "direct", and no channel can be compared to another. <em>Dashboards are PostHog either way, so PostHog must receive the events regardless.</em></td>
+            <td><strong>GA4 is acceptable</strong> if the team can genuinely maintain cross-domain identity there. Otherwise PostHog cross-subdomain identity.</td>
+            <td>This is what makes one person one person across the redirect. Get it wrong and every activation is credited to "direct", and no channel can be compared to another. <strong>Either way PostHog is the compilation layer and the dashboards are built there</strong> — so PostHog receives the events regardless of who resolves identity.</td>
             <td class="bad">Two half-funnels, permanently</td>
           </tr>
           <tr>
@@ -1442,6 +1515,103 @@ export default async function SignupPage({
   </div>
 </section>
 
+<!-- ============================================ technical dependencies -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Technical dependencies</p>
+      <h2>What has to exist before a ticket can close</h2>
+      <p class="lede">
+        Every one of these has blocked a sprint somewhere. They are cheap to arrange in advance
+        and expensive to discover on day four with a developer already assigned.
+      </p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Dependency</th><th>Needed for</th><th>Who provides it</th><th>Lead time</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Meta system user + CAPI access token</strong></td><td class="m">NUR-08, NUR-10, NUR-25</td><td>Business Manager admin</td><td>Same day, but needs the right admin role</td></tr>
+          <tr><td><strong>Google Ads API developer token</strong></td><td class="m">NUR-24 (offline conversion import)</td><td>Google, via the Ads account</td><td><strong>Days to weeks.</strong> Basic access needs an application — start now</td></tr>
+          <tr><td><strong>Google Ads OAuth client + refresh token</strong></td><td class="m">NUR-24</td><td>Cloud console + one consent flow</td><td>Hours</td></tr>
+          <tr><td><strong>A conversion action for purchase</strong></td><td class="m">NUR-24</td><td>Ads account</td><td>Minutes, but must exist before the first upload</td></tr>
+          <tr><td><strong>PostHog project token</strong></td><td class="m">NUR-05 and everything downstream</td><td>Already exists — project 595036</td><td>None</td></tr>
+          <tr><td><strong>Supabase service access</strong></td><td class="m">E-02 canonical id, later warehousing</td><td>App team</td><td>Hours</td></tr>
+          <tr><td><strong>app.nursia.io deploy slot</strong></td><td class="m">Twelve tickets in the contract</td><td>App team's release process</td><td><strong>Unknown — confirm before sprint start</strong></td></tr>
+          <tr><td><strong>Sanity write token</strong></td><td class="m">Content seeding pipeline</td><td>Sanity project admin</td><td>Minutes</td></tr>
+          <tr><td><strong>Search Console property + ownership</strong></td><td class="m">Sitemap submission</td><td>Whoever verified the domain</td><td>Minutes if already verified</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="finding sev2" style="margin-top:24px">
+      <p class="eyebrow">Start this one today</p>
+      <h2>The Google Ads developer token is the long pole.</h2>
+      <p>
+        Everything else on that list is hours. Basic access to the Google Ads API requires an
+        application that is reviewed by Google, and it is the only dependency here that can take
+        more than a day. NUR-24 — attributing revenue back to the Google click that earned it —
+        cannot start without it. Apply before sprint planning, not after.
+      </p>
+    </div>
+
+    <div class="sec-head" style="margin-top:40px;margin-bottom:18px">
+      <p class="eyebrow">Environment</p>
+      <h2 style="font-size:24px">Keys the sprint adds</h2>
+      <p class="lede" style="font-size:16px">
+        Public values ship to every browser and live in <code>.env.example</code> with their real
+        values, exactly as the GA4 and Meta pixel ids already do — what protects them is that they
+        cannot read anything back. Secrets never enter the repository.
+      </p>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Key</th><th>Kind</th><th>For</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="m">NEXT_PUBLIC_POSTHOG_KEY</td><td class="good">Public</td><td>NUR-05</td><td>Project token for NCLEX-Nursia (595036). Ships to the browser by design</td></tr>
+          <tr><td class="m">NEXT_PUBLIC_POSTHOG_HOST</td><td class="good">Public</td><td>NUR-05</td><td><code>/ingest</code> — the same-origin proxy path, not the PostHog host</td></tr>
+          <tr><td class="m">META_CAPI_ACCESS_TOKEN</td><td class="bad">SECRET</td><td>NUR-08</td><td>System user token. Server only. Never <code>NEXT_PUBLIC_</code></td></tr>
+          <tr><td class="m">META_TEST_EVENT_CODE</td><td class="warn">Dev only</td><td>NUR-10, NUR-17</td><td>Routes events to Test Events while verifying. Must be unset in production</td></tr>
+          <tr><td class="m">GOOGLE_ADS_DEVELOPER_TOKEN</td><td class="bad">SECRET</td><td>NUR-24</td><td>The long-pole dependency above</td></tr>
+          <tr><td class="m">GOOGLE_ADS_CLIENT_ID / _SECRET</td><td class="bad">SECRET</td><td>NUR-24</td><td>OAuth client for the upload job</td></tr>
+          <tr><td class="m">GOOGLE_ADS_REFRESH_TOKEN</td><td class="bad">SECRET</td><td>NUR-24</td><td>Long-lived. Rotate if it ever reaches a browser or a log</td></tr>
+          <tr><td class="m">GOOGLE_ADS_CUSTOMER_ID</td><td class="warn">Internal</td><td>NUR-24</td><td>Account 6331825613</td></tr>
+          <tr><td class="m">GOOGLE_ADS_PURCHASE_ACTION_ID</td><td class="warn">Internal</td><td>NUR-24</td><td>The conversion action the upload targets</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <h3>And the ones already in the repository that are not documented</h3>
+      <p>
+        The seeding pipeline reads a dozen variables that appear nowhere in
+        <code>.env.example</code>: <code>CONTENT_DB</code>, <code>NURSING_DB</code>,
+        <code>NCLEX_DB</code>, <code>NCLEX_CSV</code>, <code>KW_DIR</code>,
+        <code>KW_SEEDS</code>, <code>KW_GEO</code>, <code>TRENDS_CSV</code>,
+        <code>TRENDS_GEO</code>, <code>TRENDS_SOURCE</code>, <code>TRENDS_ANCHOR</code>,
+        <code>TRENDS_HEADLESS</code>, <code>TRENDS_PAUSE</code>, <code>ADS_CUSTOMER</code>,
+        <code>ADS_BROWSER_PROFILE</code>, <code>ADS_DOWNLOAD_DIR</code> and
+        <code>SIGNIN_WAIT_MINUTES</code>. Nobody but the person who wrote the pipeline can run it
+        today. Documenting them is NUR-31 and costs an hour.
+      </p>
+    </div>
+
+    <div class="callout" style="margin-top:16px">
+      <h3>Sanity Studio</h3>
+      <p>
+        The Studio under <code>studio/</code> is the CMS behind the guides, the nursing library
+        and the topic pages, and it now ships in the repository with its schema. Three things it
+        needs that are not yet settled: a <strong>deployed Studio URL</strong> so editors do not
+        run it locally, the <strong>write token</strong> scoped to the seeding pipeline rather
+        than shared, and the <strong>revalidate webhook</strong> pointed at
+        <code>/api/revalidate</code> with <code>SANITY_REVALIDATE_SECRET</code> set on both sides
+        — without which an edit reaches the live site on the next deploy rather than in seconds.
+      </p>
+    </div>
+  </div>
+</section>
+
 <!-- ====================================================== revenue -->
 <section>
   <div class="wrap">
@@ -1624,9 +1794,9 @@ export default async function SignupPage({
     <div class="callout" style="margin-top:16px">
       <h3>Delivery</h3>
       <p>
-        Twenty-eight tickets across six workstreams, sequenced by dependency, live on the
+        Thirty-three tickets across six workstreams, sequenced by dependency, live on the
         <em>Sprint board</em> sheet of <code>nursia-analytics-sprint-tracker.xlsx</code> with
-        owners, points and status. P0 is now NUR-00 to NUR-10: the security fix, the redirect, the
+        owners, points and status. P0 is now NUR-00 to NUR-10 plus NUR-28 to NUR-30: the security fix, the redirect, the
         target event, the Ads conversion, ad tagging, PostHog on the marketing site, and the whole
         Meta Conversions API path including hashing and deduplication. CAPI sits in P0 rather than
         P1 because <code>CompleteRegistration</code> sent from the browser alone cannot reach a
@@ -1647,7 +1817,7 @@ export default async function SignupPage({
       <table>
         <thead><tr><th>Risk</th><th>Effect</th><th>Mitigation</th></tr></thead>
         <tbody>
-          <tr><td><strong>The app team does not implement the contract</strong></td><td>Areas C, F, G and H stay unmeasured regardless of anything in this repo</td><td>Twelve of twenty-eight tickets are theirs. Confirm ownership before sprint start.</td></tr>
+          <tr><td><strong>The app team does not implement the contract</strong></td><td>Areas C, F, G and H stay unmeasured regardless of anything in this repo</td><td>Twelve of thirty-three tickets are theirs. Confirm ownership before sprint start.</td></tr>
           <tr><td><strong>Dedup misconfigured</strong></td><td>Every conversion counts twice; bidding over-corrects</td><td>DOD-4 gates the sprint at ±2%.</td></tr>
           <tr><td><strong>Meta ads stay untagged</strong></td><td>Paid Social reports as Referral; the channel split is silently wrong</td><td>NUR-04 is one point and blocks the whole dashboard.</td></tr>
           <tr><td><strong>Four analytics scripts on one page</strong></td><td>LCP regresses on exactly the pages bought with ad money</td><td>DOD-5 is a hard gate measured on field data, and NUR-21 buys headroom first.</td></tr>
