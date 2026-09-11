@@ -56,8 +56,8 @@ Files in `logos/`. Full guidance in `logos/README.md`. The short version:
 `n`, and the tile changes colour with context. The word is always one colour.
 
 - `nursia-logo.svg` is the default — teal tile, paper `n`, ink word, on any light ground.
-- `nursia-logo-reverse.svg` on the ink ground — the tile goes highlighter yellow
-  there, because teal dies on dark.
+- `nursia-logo-reverse.svg` on the ink ground — the primary highlighter tile,
+  there — the primary tile, on dark as on light.
 - `nursia-logo-photo.svg` over photography; `nursia-wordmark.svg` for the word alone.
 - `nursia-mark.svg` (the `n` tile) below ~120px wide, and for avatars and app icons.
 - Eight approved tiles: teal, yellow, ink and paper, plus results, night, plum and

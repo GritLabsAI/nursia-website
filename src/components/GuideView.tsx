@@ -22,12 +22,15 @@ export function GuideView({
   topic,
   resource,
   experiment,
+  library = "guide",
 }: {
   guide: string;
   cluster?: string;
   topic?: string;
   resource?: string;
   experiment?: Experiment | null;
+  /** Which library this page belongs to. All three carry the same offer. */
+  library?: "guide" | "review" | "nursing";
 }) {
   const sent = useRef(false);
 
@@ -43,8 +46,16 @@ export function GuideView({
       ? assign(experiment, readAnonymousId())?.key
       : undefined;
 
-    guideViewed({ guide, cluster, topic, resource, experiment: experiment?.key, variant });
-  }, [guide, cluster, topic, resource, experiment]);
+    guideViewed({
+      guide,
+      cluster,
+      topic,
+      resource,
+      experiment: experiment?.key,
+      variant,
+      library,
+    });
+  }, [guide, cluster, topic, resource, experiment, library]);
 
   return null;
 }

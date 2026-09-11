@@ -12,11 +12,11 @@ import {
 import { CLUSTERS, SITE, topicBySlug } from "@/lib/content";
 import { sanityFetch, tags } from "@/sanity/client";
 import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
-import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
+import type { GUIDES_INDEX_QUERY_RESULT } from "@/sanity.types";
 
 export const revalidate = 3600;
 
-type GuideCardData = GUIDES_INDEX_QUERYResult[number];
+type GuideCardData = GUIDES_INDEX_QUERY_RESULT[number];
 
 const TRAIL = [{ label: "Home", href: "/" }, { label: "Guides" }];
 
@@ -30,7 +30,7 @@ const TRAIL = [{ label: "Home", href: "/" }, { label: "Guides" }];
  * and nobody has to remember.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERY_RESULT>(GUIDES_INDEX_QUERY, {
     tags: [tags.guides],
   });
   return {
@@ -76,7 +76,7 @@ function GuideCard({ g, featured = false }: { g: GuideCardData; featured?: boole
 }
 
 export default async function GuidesPage() {
-  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERY_RESULT>(GUIDES_INDEX_QUERY, {
     tags: [tags.guides, tags.topics],
   });
 
@@ -160,6 +160,7 @@ export default async function GuidesPage() {
             <ul className="mt-4 grid gap-3 sm:grid-cols-3">
               {[
                 { label: "10 free questions", href: "/nclex-practice-questions", note: "no account" },
+                { label: "Review by subject", href: "/nclex-review", note: "what is tested" },
                 { label: "Everything on the site", href: "/nclex", note: "full index" },
                 { label: "Pricing", href: "/pricing", note: "one plan" },
               ].map((l) => (

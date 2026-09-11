@@ -1,4 +1,4 @@
-import { DocumentTextIcon, GiftIcon, SplitHorizontalIcon, TagIcon, UserIcon, WarningOutlineIcon } from "@sanity/icons";
+import { BookIcon, DocumentTextIcon, PackageIcon, HeartIcon, SplitHorizontalIcon, TagIcon, UserIcon, WarningOutlineIcon } from "@sanity/icons";
 import type { StructureResolver } from "sanity/structure";
 
 /**
@@ -54,6 +54,124 @@ export const structure: StructureResolver = (S) =>
                       .defaultOrdering([{ field: "title", direction: "asc" }]),
                   ),
               ),
+            ]),
+        ),
+
+      S.listItem()
+        .title("Review pages")
+        .icon(BookIcon)
+        .child(
+          S.list()
+            .title("Review pages")
+            .items([
+              S.listItem()
+                .title("Everything, newest first")
+                .icon(BookIcon)
+                .child(
+                  S.documentTypeList("seoPage")
+                    .title("All review pages")
+                    .defaultOrdering([{ field: "updatedAt", direction: "desc" }]),
+                ),
+              S.divider(),
+              /* By test plan category rather than by kind, because that is how
+                 a candidate thinks about what is left to revise — and how the
+                 gaps in the programme become visible. */
+              S.listItem()
+                .title("By test plan category")
+                .child(
+                  S.documentTypeList("seoPage")
+                    .title("By category")
+                    .defaultOrdering([
+                      { field: "examCategory", direction: "asc" },
+                      { field: "title", direction: "asc" },
+                    ]),
+                ),
+              S.listItem()
+                .title("Not converting — no free resource")
+                .child(
+                  S.documentList()
+                    .title("No free resource")
+                    .filter('_type == "seoPage" && !defined(leadMagnet)')
+                    .apiVersion("2026-02-01"),
+                ),
+              S.listItem()
+                .title("Orphaned — nothing links to it")
+                .child(
+                  S.documentList()
+                    .title("No inbound links")
+                    .filter(
+                      '_type == "seoPage" && count(*[_type in ["seoPage", "guide"] && references(^._id)]) == 0',
+                    )
+                    .apiVersion("2026-02-01"),
+                ),
+            ]),
+        ),
+
+      /*
+       * The nursing library.
+       *
+       * A thousand documents, so "everything, newest first" is the least useful
+       * entry rather than the main one — nobody scrolls a thousand rows. The
+       * lists that earn their place answer a question an editor actually has:
+       * which pages are thin, which are orphaned, which collect nothing.
+       */
+      S.listItem()
+        .title("Nursing library")
+        .icon(HeartIcon)
+        .child(
+          S.list()
+            .title("Nursing library")
+            .items([
+              S.listItem()
+                .title("By kind and title")
+                .icon(HeartIcon)
+                .child(
+                  S.documentTypeList("nursingPage")
+                    .title("By kind")
+                    .defaultOrdering([
+                      { field: "family", direction: "asc" },
+                      { field: "title", direction: "asc" },
+                    ]),
+                ),
+              S.listItem()
+                .title("Everything, newest first")
+                .child(
+                  S.documentTypeList("nursingPage")
+                    .title("All nursing pages")
+                    .defaultOrdering([{ field: "updatedAt", direction: "desc" }]),
+                ),
+              S.divider(),
+              /* Thin pages, by the only measure a query has: reading time. The
+                 pipeline's gate already holds anything under 520 words, so a
+                 published page at three minutes is one the gate passed and a
+                 person should still look at. */
+              S.listItem()
+                .title("Thinnest first")
+                .child(
+                  S.documentList()
+                    .title("Thinnest first")
+                    .filter('_type == "nursingPage" && minutes <= 4')
+                    .defaultOrdering([{ field: "minutes", direction: "asc" }])
+                    .apiVersion("2026-02-01"),
+                ),
+              S.listItem()
+                .title("Not converting — no free resource")
+                .child(
+                  S.documentList()
+                    .title("No free resource")
+                    .filter('_type == "nursingPage" && !defined(leadMagnet)')
+                    .apiVersion("2026-02-01"),
+                ),
+              S.listItem()
+                .title("Orphaned — nothing links to it")
+                .child(
+                  S.documentList()
+                    .title("No inbound links")
+                    .filter(
+                      '_type == "nursingPage" && count(*[_type in ["nursingPage", "guide", "seoPage"] && references(^._id)]) == 0',
+                    )
+                    .apiVersion("2026-02-01"),
+                ),
             ]),
         ),
 
@@ -113,7 +231,7 @@ export const structure: StructureResolver = (S) =>
 
       S.listItem()
         .title("Free resources")
-        .icon(GiftIcon)
+        .icon(PackageIcon)
         .child(S.documentTypeList("leadMagnet").title("Free resources")),
       S.listItem()
         .title("Experiments")

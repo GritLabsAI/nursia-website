@@ -166,7 +166,7 @@ itself is always one colour. Full detail in `logos/README.md`.
 
 - `nursia-logo.svg` — primary. Teal tile, paper `n`, ink word, any light ground.
 - `nursia-logo-reverse.svg` — on the ink ground. The tile goes highlighter
-  yellow, because teal dies on dark, exactly as the old full stop did.
+  yellow on every ground — it is the primary tile, light and dark alike.
 - `nursia-logo-photo.svg` — over photography: yellow tile, white word.
 - `nursia-logo-black.svg` / `-white.svg` — one colour, the `n` knocked out of the
   tile, for single-plate print, embroidery and engraving.

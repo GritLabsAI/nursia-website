@@ -104,6 +104,12 @@ export const GUIDE_BY_SLUG_QUERY = defineQuery(/* groq */ `
       "slug": slug.current,
       minutes,
       cluster
+    },
+    "relatedReviews": relatedReviews[]->{
+      title,
+      "slug": slug.current,
+      minutes,
+      kind
     }
   }
 `);
@@ -185,5 +191,124 @@ export const LEAD_MAGNET_BY_SLUG_QUERY = defineQuery(/* groq */ `
     destination,
     "file": file.asset->url,
     ${contentFragment}
+  }
+`);
+
+/* ------------------------------------------------------------ review pages */
+
+/**
+ * The review programme: one page per exam subject, published in batches by the
+ * pipeline in `pipeline/nclex/`.
+ *
+ * These queries are separate from the guide ones rather than generalised across
+ * both types, even though the two shapes rhyme. Sharing them would mean every
+ * projection carries the union of both documents' fields and every page
+ * component guards against the half it does not use — and the first time the
+ * two shapes genuinely diverge, the shared query becomes the reason neither can
+ * change. The conversion fragment *is* shared, because that part is the same
+ * offer by design.
+ */
+
+/** Slugs only, for generateStaticParams. */
+export const SEO_PAGE_SLUGS_QUERY = defineQuery(/* groq */ `
+  *[_type == "seoPage" && defined(slug.current)].slug.current
+`);
+
+/** One review page, fully expanded — the page query. */
+export const SEO_PAGE_BY_SLUG_QUERY = defineQuery(/* groq */ `
+  *[_type == "seoPage" && slug.current == $slug][0]{
+    _id,
+    title,
+    h1,
+    "slug": slug.current,
+    kind,
+    examCategory,
+    cluster,
+    minutes,
+    shortAnswer,
+    keyPoints,
+    examTip,
+    publishedAt,
+    updatedAt,
+    seo,
+    sections[]{ _key, h2, ${bodyFragment} },
+    faqs[]{ _key, q, a },
+    "topic": topic->{
+      name,
+      "slug": slug.current,
+      category,
+      share
+    },
+    "author": author->{ ${authorFragment} },
+    "reviewedBy": reviewedBy->{ name, honorific },
+    ${conversionFragment},
+    "readNext": readNext[]->{
+      title,
+      "slug": slug.current,
+      minutes,
+      kind,
+      examCategory
+    },
+    "relatedGuides": relatedGuides[]->{
+      title,
+      "slug": slug.current,
+      minutes
+    }
+  }
+`);
+
+/** Just the metadata, for generateMetadata — no body, no conversion block. */
+export const SEO_PAGE_SEO_QUERY = defineQuery(/* groq */ `
+  *[_type == "seoPage" && slug.current == $slug][0]{
+    title,
+    h1,
+    "slug": slug.current,
+    shortAnswer,
+    publishedAt,
+    updatedAt,
+    seo,
+    "authorName": author->name,
+    "authorHonorific": author->honorific
+  }
+`);
+
+/** The /nclex-review index, grouped by test plan category in the page. */
+export const SEO_PAGES_INDEX_QUERY = defineQuery(/* groq */ `
+  *[_type == "seoPage" && defined(slug.current)] | order(examCategory asc, title asc){
+    _id,
+    title,
+    "slug": slug.current,
+    kind,
+    examCategory,
+    minutes,
+    shortAnswer,
+    updatedAt,
+    "topicSlug": topic->slug.current
+  }
+`);
+
+/** Slug plus lastmod, for the sitemap. */
+export const SEO_PAGES_SITEMAP_QUERY = defineQuery(/* groq */ `
+  *[_type == "seoPage" && defined(slug.current) && seo.noIndex != true]{
+    "slug": slug.current,
+    updatedAt
+  }
+`);
+
+/**
+ * Review pages pointing at one question set, for the topic page's rail.
+ *
+ * A reverse reference, like the guide equivalent, and it is doing more work
+ * than it looks: it is the inbound link that stops a newly published review
+ * page being reachable only from the sitemap. The topic pages already rank, so
+ * a link from one is worth considerably more than a link from the new index.
+ */
+export const SEO_PAGES_FOR_TOPIC_QUERY = defineQuery(/* groq */ `
+  *[_type == "seoPage" && topic->slug.current == $topic] | order(title asc)[0...6]{
+    _id,
+    title,
+    "slug": slug.current,
+    kind,
+    minutes
   }
 `);

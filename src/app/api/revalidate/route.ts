@@ -13,9 +13,11 @@ import { parseBody } from "next-sanity/webhook";
  * Configure the webhook in Sanity Manage:
  *   URL        https://nursia.io/api/revalidate
  *   Trigger    create, update, delete
- *   Filter     _type in ["guide", "topic", "leadMagnet", "experiment", "author"]
+ *   Filter     _type in ["guide", "seoPage", "nursingPage", "topic", "leadMagnet", "experiment", "author"]
  *   Projection {"tags": [_type, _type + ":" + slug.current], "path": select(
- *                _type == "guide" => "/guides/" + slug.current, null
+ *                _type == "guide" => "/guides/" + slug.current,
+ *                _type == "seoPage" => "/nclex-review/" + slug.current,
+ *                _type == "nursingPage" => "/nursing/" + slug.current, null
  *              )}
  *   Secret     SANITY_REVALIDATE_SECRET
  *
@@ -80,9 +82,15 @@ export async function POST(req: NextRequest) {
       revalidated.push(`path:${body.path}`);
     }
 
-    /* The index and the sitemap list every guide, so any create or delete
-       changes them even when the edited page itself is untouched. */
+    /* The indexes and the sitemap list every page, so any create or delete
+       changes them even when the edited document itself is untouched. Both
+       indexes are refreshed on every hook rather than only on the matching
+       type: working out which index an edit affects means parsing the tags,
+       and getting that wrong leaves a deleted page listed on a hub — a visible
+       404 — to save one cache invalidation. */
     revalidatePath("/guides");
+    revalidatePath("/nclex-review");
+    revalidatePath("/nursing");
     revalidatePath("/sitemap.xml");
 
     if (revalidated.length === 0) {

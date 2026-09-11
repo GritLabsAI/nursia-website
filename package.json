@@ -2,6 +2,9 @@
   "name": "nursia",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "studio"
+  ],
   "engines": {
     "node": ">=20.9.0"
   },
@@ -18,18 +21,34 @@
     "seo:audit": "tsx --env-file=.env.local pipeline/04-audit.ts",
     "typegen": "npm --prefix studio run typegen",
     "seo:link": "tsx --env-file=.env.local pipeline/05-link.ts",
+    "nclex:ingest": "tsx pipeline/nclex/20-ingest.ts",
+    "nclex:plan": "tsx --env-file=.env.local pipeline/nclex/21-plan.ts",
+    "nclex:compile": "tsx pipeline/nclex/22-compile.ts",
+    "nclex:publish": "tsx --env-file=.env.local pipeline/nclex/23-publish.ts",
+    "nclex:link": "tsx --env-file=.env.local pipeline/nclex/24-link.ts",
+    "nclex:audit": "tsx --env-file=.env.local pipeline/nclex/25-audit.ts",
     "kw:signin": "tsx pipeline/keywords/signin.ts",
-    "kw:ideas": "tsx pipeline/keywords/harvest.ts"
+    "kw:ideas": "tsx pipeline/keywords/harvest.ts",
+    "nursing:ingest": "tsx pipeline/nursing/10-ingest.ts",
+    "nursing:plan": "tsx --env-file=.env.local pipeline/nursing/11-plan.ts",
+    "nursing:write": "tsx pipeline/nursing/12-write.ts",
+    "nursing:status": "tsx pipeline/nursing/status.ts",
+    "nursing:publish": "tsx --env-file=.env.local pipeline/nursing/13-publish.ts",
+    "nursing:dedupe": "tsx --env-file=.env.local pipeline/nursing/14-dedupe.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.3.3",
     "@portabletext/react": "^8.0.1",
     "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^6.13.2",
     "firebase": "^12.18.0",
     "next": "16.3.1",
     "next-sanity": "^13.3.4",
+    "posthog-js": "^1.430.2",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "sanity": "^6.13.2",
+    "styled-components": "^6.5.3"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.2",

@@ -13,7 +13,7 @@ Do not re-set the wordmark by typing it in Bricolage. Use these files.
 | File | Use |
 | --- | --- |
 | `nursia-wordmark.svg` | Primary. Ink on any light ground. |
-| `nursia-wordmark-reverse.svg` | On the ink ground. Full stop goes highlighter yellow, since teal dies on dark. |
+| `nursia-wordmark-reverse.svg` | On the ink ground. Paper word, beside the primary yellow tile. |
 | `nursia-wordmark-black.svg` | One colour. Faxes, forms, single-plate print. |
 | `nursia-wordmark-white.svg` | One colour on dark, photography, video lower-thirds. |
 | `nursia-wordmark-teal.svg` | One colour where the brand needs to carry alone — merch, stamps, embroidery. |

@@ -6,7 +6,7 @@ import { PortableBody } from "@/components/PortableBody";
 import { ResourceUnlock } from "@/components/ResourceUnlock";
 import { buildClient, sanityFetch, tags } from "@/sanity/client";
 import { LEAD_MAGNET_BY_SLUG_QUERY } from "@/sanity/queries";
-import type { LEAD_MAGNET_BY_SLUG_QUERYResult } from "@/sanity.types";
+import type { LEAD_MAGNET_BY_SLUG_QUERY_RESULT } from "@/sanity.types";
 
 /**
  * Where a free resource actually lives.
@@ -36,7 +36,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const r = await sanityFetch<LEAD_MAGNET_BY_SLUG_QUERYResult>(
+  const r = await sanityFetch<LEAD_MAGNET_BY_SLUG_QUERY_RESULT>(
     LEAD_MAGNET_BY_SLUG_QUERY,
     { params: { slug }, tags: [tags.leadMagnets] },
   );
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function ResourcePage({ params }: Params) {
   const { slug } = await params;
-  const r = await sanityFetch<LEAD_MAGNET_BY_SLUG_QUERYResult>(
+  const r = await sanityFetch<LEAD_MAGNET_BY_SLUG_QUERY_RESULT>(
     LEAD_MAGNET_BY_SLUG_QUERY,
     { params: { slug }, tags: [tags.leadMagnets] },
   );

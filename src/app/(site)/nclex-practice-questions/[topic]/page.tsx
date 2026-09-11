@@ -23,8 +23,14 @@ import {
   topicBySlug,
 } from "@/lib/content";
 import { sanityFetch, tags } from "@/sanity/client";
-import { GUIDES_FOR_TOPIC_QUERY } from "@/sanity/queries";
-import type { GUIDES_FOR_TOPIC_QUERYResult } from "@/sanity.types";
+import {
+  GUIDES_FOR_TOPIC_QUERY,
+  SEO_PAGES_FOR_TOPIC_QUERY,
+} from "@/sanity/queries";
+import type {
+  GUIDES_FOR_TOPIC_QUERY_RESULT,
+  SEO_PAGES_FOR_TOPIC_QUERY_RESULT,
+} from "@/sanity.types";
 
 type Params = { params: Promise<{ topic: string }> };
 
@@ -67,10 +73,20 @@ export default async function TopicPage({ params }: Params) {
   /* Read out of Sanity by reverse reference rather than from the curated slug
      list on the topic. The curated list cannot know about a guide published
      after it was written; this picks one up the moment it points here. */
-  const guides = await sanityFetch<GUIDES_FOR_TOPIC_QUERYResult>(
-    GUIDES_FOR_TOPIC_QUERY,
-    { params: { topic: t.slug }, tags: [tags.guides, tags.topic(t.slug)] },
-  );
+  const [guides, reviews] = await Promise.all([
+    sanityFetch<GUIDES_FOR_TOPIC_QUERY_RESULT>(GUIDES_FOR_TOPIC_QUERY, {
+      params: { topic: t.slug },
+      tags: [tags.guides, tags.topic(t.slug)],
+    }),
+    /* The review pages that point here, by the same reverse reference. This is
+       also the inbound link that stops a newly published review page being
+       reachable only from the sitemap — and it comes from a page that already
+       ranks, which is worth considerably more than one from the new index. */
+    sanityFetch<SEO_PAGES_FOR_TOPIC_QUERY_RESULT>(SEO_PAGES_FOR_TOPIC_QUERY, {
+      params: { topic: t.slug },
+      tags: [tags.seoPages, tags.topic(t.slug)],
+    }),
+  ]);
 
   return (
     <>
@@ -229,6 +245,31 @@ export default async function TopicPage({ params }: Params) {
               ))}
             </ul>
           </div>
+
+          {/* --------------------------------------------- review pages */}
+          {reviews.length > 0 && (
+            <div className="mt-12 border-t border-rule pt-5">
+              <p className="eyebrow">Revise the subject first</p>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {reviews.map((r) => (
+                  <li key={r._id}>
+                    <Link href={`/nclex-review/${r.slug}`} className="cell h-full">
+                      <p className="eyebrow">{r.minutes} min read</p>
+                      <p className="mt-2 font-display text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">
+                        {r.title}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 font-mono text-[11px] leading-relaxed text-muted">
+                ↑ what is actually tested on each, before you answer questions about it.{" "}
+                <Link href="/nclex-review" className="text-ink underline underline-offset-4">
+                  Every subject →
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
       </Section>
 

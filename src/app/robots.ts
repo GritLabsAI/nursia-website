@@ -7,7 +7,11 @@ import { SITE } from "@/lib/content";
    an account — the guide that offers one is the page meant to rank, and an
    indexed resource page would both compete with it and hand a crawler a page
    it cannot read. */
-const PRIVATE = ["/try", "/signup", "/login", "/lp/", "/resources/"];
+/* /studio is the CMS. It is behind a Sanity login and has nothing to rank, so
+   an indexed entry would only ever send a crawler — or a curious reader — to a
+   sign-in screen. The page carries a noindex tag as well; this is the cheaper
+   half of the pair, since it stops the fetch rather than the indexing. */
+const PRIVATE = ["/try", "/signup", "/login", "/lp/", "/resources/", "/studio"];
 
 /* Answer engines and their training crawlers. We allow them deliberately
    rather than by default: the whole point of writing 25 RN-reviewed guides is

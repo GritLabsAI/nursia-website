@@ -23,8 +23,8 @@ import {
   GUIDE_SLUGS_QUERY,
 } from "@/sanity/queries";
 import type {
-  GUIDE_BY_SLUG_QUERYResult,
-  GUIDE_SEO_QUERYResult,
+  GUIDE_BY_SLUG_QUERY_RESULT,
+  GUIDE_SEO_QUERY_RESULT,
 } from "@/sanity.types";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -48,7 +48,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const g = await sanityFetch<GUIDE_SEO_QUERYResult>(GUIDE_SEO_QUERY, {
+  const g = await sanityFetch<GUIDE_SEO_QUERY_RESULT>(GUIDE_SEO_QUERY, {
     params: { slug },
     tags: [tags.guide(slug), tags.authors],
   });
@@ -93,7 +93,7 @@ const monthYear = (iso: string) =>
 
 export default async function GuidePage({ params }: Params) {
   const { slug } = await params;
-  const g = await sanityFetch<GUIDE_BY_SLUG_QUERYResult>(GUIDE_BY_SLUG_QUERY, {
+  const g = await sanityFetch<GUIDE_BY_SLUG_QUERY_RESULT>(GUIDE_BY_SLUG_QUERY, {
     params: { slug },
     tags: [tags.guide(slug), ...GUIDE_PAGE_TAGS],
   });
@@ -292,8 +292,32 @@ export default async function GuidePage({ params }: Params) {
               />
             )}
 
-            {g.readNext && g.readNext.length > 0 && (
+            {/* Into the review programme. The guides rank; these links are how
+                a review page published last week gets crawled without waiting
+                for the sitemap to be believed. */}
+            {g.relatedReviews && g.relatedReviews.length > 0 && (
               <div className="mt-14 border-t border-rule pt-5">
+                <p className="eyebrow">Revise the subject</p>
+                <ul className="mt-4 flex flex-col gap-2">
+                  {g.relatedReviews.map((r) => (
+                    <li key={r.slug}>
+                      <Link
+                        href={`/nclex-review/${r.slug}`}
+                        className="font-body text-[0.9375rem] text-ink underline decoration-rule underline-offset-4 hover:text-teal"
+                      >
+                        {r.title}
+                      </Link>
+                      <span className="ml-2 font-mono text-[11px] text-muted">
+                        {r.minutes} min
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {g.readNext && g.readNext.length > 0 && (
+              <div className="mt-10 border-t border-rule pt-5">
                 <p className="eyebrow">Read next</p>
                 <ul className="mt-4 grid gap-3 sm:grid-cols-3">
                   {g.readNext.map((n) => (

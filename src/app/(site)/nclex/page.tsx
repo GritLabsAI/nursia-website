@@ -12,7 +12,7 @@ import {
 import { CLUSTERS, TOOLS, TOPICS } from "@/lib/content";
 import { sanityFetch, tags } from "@/sanity/client";
 import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
-import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
+import type { GUIDES_INDEX_QUERY_RESULT } from "@/sanity.types";
 
 export const revalidate = 3600;
 
@@ -20,7 +20,7 @@ export const revalidate = 3600;
    index, and an index that says "45 guides" while listing 50 is the one kind
    of error that undermines the page's whole reason for existing. */
 export async function generateMetadata(): Promise<Metadata> {
-  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERY_RESULT>(GUIDES_INDEX_QUERY, {
     tags: [tags.guides],
   });
   return {
@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const TRAIL = [{ label: "Home", href: "/" }, { label: "Everything for the NCLEX" }];
 
 export default async function NclexIndexPage() {
-  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERY_RESULT>(GUIDES_INDEX_QUERY, {
     tags: [tags.guides],
   });
 
