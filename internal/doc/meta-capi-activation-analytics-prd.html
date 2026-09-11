@@ -706,6 +706,86 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
   </div>
 </section>
 
+<!-- ==================================================== tag management -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Decision · Area I</p>
+      <h2>Google Tag Manager: rejected</h2>
+      <p class="lede">
+        Raised as a way to protect Core Web Vitals. It would do the opposite, and it would put two
+        of the six gates at risk.
+      </p>
+    </div>
+
+    <div class="stack">
+      <div class="callout">
+        <h3>GTM loads tags. It does not replace them.</h3>
+        <p>
+          The container is a loader: the browser fetches <code>gtm.js</code> (tens of kilobytes
+          before a single tag), parses the container, evaluates triggers, and only then injects
+          <code>gtag.js</code>, <code>fbevents.js</code> and the rest. Those tags still execute on
+          the main thread — just later, behind an extra round trip, with container and trigger
+          evaluation added on top. Adopting it means putting a new script in front of every script
+          already loading, and calling the result an optimisation.
+        </p>
+      </div>
+
+      <div class="finding sev2">
+        <p class="eyebrow">The reason it is rejected, not merely declined</p>
+        <h2>It converts partial measurement loss into total, correlated loss.</h2>
+        <p>
+          <code>googletagmanager.com</code> is among the most heavily blocked domains on the web.
+          Today a blocked GA4 request does not take down the Meta Pixel, and neither touches
+          PostHog — the failures are independent and partial. Behind one container, a single
+          blocked request removes every tag at once.
+        </p>
+        <p>
+          That failure is not random. It concentrates in privacy-conscious, mobile and paid
+          traffic — precisely the segment DOD-1 and DOD-3 exist to count. It also defeats the
+          same-origin reverse proxy in NUR-05, whose entire purpose is being unblockable.
+        </p>
+      </div>
+
+      <div class="callout">
+        <h3>Next.js already provides the scheduling GTM would remove</h3>
+        <p>
+          <code>@next/third-parties</code> ships a GA4 component built for this, and
+          <code>next/script</code> places every other tag by strategy. That control is finer than a
+          container offers, and it is visible in code review. The one thing currently misusing it
+          is <code>src/app/layout.tsx:138</code>, where Clarity loads
+          <code>beforeInteractive</code> — injected into the initial HTML and executed ahead of
+          hydration. That single line costs more than tag management would recover, and NUR-21
+          fixes it.
+        </p>
+      </div>
+
+      <div class="callout">
+        <h3>And tags are not what makes the app entry page slow</h3>
+        <p>
+          A p75 LCP of 4,461 ms is not recoverable by deferring analytics. Tags loaded
+          <code>afterInteractive</code> compete for bandwidth but do not block the largest
+          contentful paint; removing every one of them would not bring that page under 2,500 ms.
+          The cause is the hero render, an unoptimised image, or server response time. That is
+          C-12, and treating it as a tagging problem would waste the sprint.
+        </p>
+      </div>
+
+      <div class="callout">
+        <h3>When to revisit</h3>
+        <p>
+          The honest case for GTM is <em>autonomy</em>, never performance: marketing adding a pixel
+          without an engineer and a deploy. With four stable tags and engineers already in the
+          loop, that cost is not being paid yet. Revisit when the tag list grows past roughly ten,
+          or when non-engineers genuinely need to ship them. Server-side tagging — the real way to
+          move work off the browser — is already in this plan as NUR-08 and NUR-11, and needs no
+          container.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================================================ definition of done -->
 <section>
   <div class="wrap">
