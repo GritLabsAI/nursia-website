@@ -288,6 +288,31 @@ pre .c { color: var(--muted); }
   font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--muted);
 }
 
+/* ---------------------------------------------------------- contents
+   A reference opened at one section rather than read straight through, so
+   the map goes at the top and every section is addressable. */
+.toc { margin-top: 34px; border-top: 2px solid var(--rule-strong); padding-top: 16px; }
+.toc ol {
+  list-style: none; margin: 10px 0 0; padding: 0; counter-reset: toc;
+  display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+.toc li {
+  counter-increment: toc; border-bottom: 1px solid var(--rule);
+  padding: 7px 14px 8px 0; display: flex; flex-direction: column; gap: 1px;
+}
+.toc li::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--teal); line-height: 1.4;
+}
+.toc a {
+  font-family: var(--font-display); font-weight: 600; font-size: 14.5px;
+  letter-spacing: -0.01em; color: var(--ink); text-decoration: none;
+}
+.toc a:hover { color: var(--teal); text-decoration: underline; }
+.toc span { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+section[id] { scroll-margin-top: 18px; }
+
 footer { background: var(--paper-2); border-top: 2px solid var(--rule-strong); }
 footer .wrap { padding-block: 28px 40px; }
 footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
@@ -322,11 +347,35 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
       <div class="vital"><dt>Sprint size</dt><dd class="num">79 points</dd></div>
       <div class="vital"><dt>P0 items</dt><dd class="num">13 of 36</dd></div>
     </dl>
+
+    <nav class="toc" aria-label="Contents">
+      <p class="eyebrow">Contents</p>
+      <ol>
+        <li><a href="#summary">Executive summary</a><span>The situation in four numbers</span></li>
+        <li><a href="#findings">Findings</a><span>What the audit turned up</span></li>
+        <li><a href="#estate">Measurement estate</a><span>Who sees what, today</span></li>
+        <li><a href="#areas">Analytics by area</a><span>Nine areas, nine owners</span></li>
+        <li><a href="#performance">Performance budget</a><span>The constraint on every ticket</span></li>
+        <li><a href="#gtm">Tag manager</a><span>Engineering&rsquo;s call, with options</span></li>
+        <li><a href="#requirements">P0 requirements</a><span>Login, replay, the token leak</span></li>
+        <li><a href="#decisions">Engineering calls</a><span>Eight decisions before ticket one</span></li>
+        <li><a href="#done">Definition of done</a><span>Six numeric gates</span></li>
+        <li><a href="#dashboard">The dashboard</a><span>Eleven tiles &mdash; the deliverable</span></li>
+        <li><a href="#capi">Server-side events</a><span>Where CAPI comes from</span></li>
+        <li><a href="#redirect-fix">The redirect, fixed</a><span>Reference implementation</span></li>
+        <li><a href="#posthog-install">PostHog install</a><span>Spec for the marketing site</span></li>
+        <li><a href="#dependencies">Dependencies &amp; keys</a><span>What must exist first</span></li>
+        <li><a href="#revenue">Purchase &amp; value</a><span>Reaching each platform</span></li>
+        <li><a href="#ga4-events">Event vocabulary</a><span>GA4 names and onboarding steps</span></li>
+        <li><a href="#outcomes">Outcomes</a><span>What you will be able to see</span></li>
+        <li><a href="#risks">Risks</a><span>What could still mislead</span></li>
+      </ol>
+    </nav>
   </div>
 </header>
 
 <!-- ============================================== executive summary -->
-<section>
+<section id="summary">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Executive summary</p>
@@ -382,7 +431,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- ====================================================== findings -->
-<section>
+<section id="findings">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Findings</p>
@@ -489,8 +538,8 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
           Questions are being withdrawn from <code>nursia.io</code>. The measurement loss is
           small &mdash; <code>FREE_PREVIEW = 2</code> capped the public preview at two, so the
           activation threshold of five was never reachable there, and GA4 was recording a teaser
-          rather than practice. Losing it costs little and makes PostHog the single source, which
-          the rest of this document already assumes.
+          rather than practice. Losing it costs little and makes PostHog the single source for
+          practice measurement.
         </p>
         <p>
           The consequence that matters is order. If questions exist only in the app, they sit
@@ -548,7 +597,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- =================================================== the estate -->
-<section>
+<section id="estate">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Measurement estate</p>
@@ -595,7 +644,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- ================================================ area by area -->
-<section>
+<section id="areas">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Analytics by area</p>
@@ -766,7 +815,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- ================================================== performance -->
-<section>
+<section id="performance">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Constraint · Area I</p>
@@ -851,7 +900,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- ==================================================== tag management -->
-<section>
+<section id="gtm">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Decision brief &middot; Area I</p>
@@ -1015,7 +1064,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- ============================================= P0 product requirements -->
-<section>
+<section id="requirements">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">P0 product requirements</p>
@@ -1073,7 +1122,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
         <p class="eyebrow">P0 · Requirement 03</p>
         <h2>The token leak is fixed before anything else ships.</h2>
         <p>
-          Restated here because it is a requirement and not a ticket to be sequenced. 49 stored
+          A requirement rather than a ticket to be sequenced. 49 stored
           events hold a live <code>access_token</code> and <code>refresh_token</code>; 42 hold a
           Google <code>provider_token</code>. Sanitise, purge, rotate. Nothing else in this
           document should ship first, and no data export or warehouse connection should run until
@@ -1086,7 +1135,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- ============================================== engineering calls -->
-<section>
+<section id="decisions">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Before ticket one</p>
@@ -1136,7 +1185,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
             <td class="m">E-05</td>
             <td><strong>Cookie strategy across the boundary</strong></td>
             <td>Apex-scoped <code>.nursia.io</code> cookies, or forward <code>fbclid</code> and mint <code>_fbc</code> on the far side</td>
-            <td>Determines whether Meta can attribute a registration at all. The forwarding route is simpler and is what this PRD assumes; apex cookies need both hosts to agree.</td>
+            <td>Determines whether Meta can attribute a registration at all. The forwarding route is simpler and is the one specified here; apex cookies need both hosts to agree.</td>
             <td class="bad">Meta attribution stays broken</td>
           </tr>
           <tr>
@@ -1178,7 +1227,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- ================================================ definition of done -->
-<section>
+<section id="done">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Definition of done</p>
@@ -1243,7 +1292,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- =============================================== posthog dashboard -->
-<section>
+<section id="dashboard">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Deliverable</p>
@@ -1301,7 +1350,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- ==================================================== CAPI choice -->
-<section>
+<section id="capi">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Decision</p>
@@ -1333,7 +1382,7 @@ footer p { font-size: 13.5px; color: var(--muted); max-width: 48rem; }
 </section>
 
 <!-- ==================================================== the fix code -->
-<section>
+<section id="redirect-fix">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Reference implementation</p>
@@ -1383,7 +1432,7 @@ export default async function SignupPage({
 </section>
 
 <!-- ================================================ posthog install -->
-<section>
+<section id="posthog-install">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Implementation spec &middot; NUR-05, NUR-06</p>
@@ -1516,7 +1565,7 @@ export default async function SignupPage({
 </section>
 
 <!-- ============================================ technical dependencies -->
-<section>
+<section id="dependencies">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Technical dependencies</p>
@@ -1613,7 +1662,7 @@ export default async function SignupPage({
 </section>
 
 <!-- ====================================================== revenue -->
-<section>
+<section id="revenue">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Conversion events &middot; Areas C and H</p>
@@ -1662,16 +1711,10 @@ export default async function SignupPage({
     </div>
 
     <div class="finding sev2" style="margin-top:22px">
-      <p class="eyebrow">Correction to an earlier draft</p>
+      <p class="eyebrow">Route selection</p>
       <h2>The Google Ads API is not on the critical path.</h2>
       <p>
-        An earlier version of this document made the Google Ads API developer token a P0
-        dependency and called it the long pole, on the grounds that its review takes days to
-        weeks. That was wrong, and it would have put a multi-week approval in front of a problem
-        a spreadsheet solves in an afternoon.
-      </p>
-      <p>
-        Offline conversion import does not require the API. Google Ads accepts the same
+        Offline conversion import does not require the Ads API. Google Ads accepts the same
         <code>gclid</code> + timestamp + value payload from a manual upload, a scheduled Google
         Sheet, or a Zapier action &mdash; none of which need a developer token or an approval.
         There are four routes and only one of them is gated:
@@ -1688,9 +1731,9 @@ export default async function SignupPage({
         </table>
       </div>
       <p>
-        So the developer token moves from P0 to P2: apply when volume justifies automation, not
-        before. At 24 users and five days of data, building an automated upload pipeline is
-        building for a volume that does not exist yet.
+        So the developer token is P2: apply when volume justifies automation, not before. Its
+        access review takes days to weeks, and at 24 users an automated upload pipeline is built
+        for a volume that does not exist yet.
       </p>
     </div>
 
@@ -1765,7 +1808,7 @@ export default async function SignupPage({
 </section>
 
 <!-- =========================================== ga4 events + onboarding -->
-<section>
+<section id="ga4-events">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Event vocabulary</p>
@@ -1853,7 +1896,7 @@ export default async function SignupPage({
 </section>
 
 <!-- ===================================================== outcomes -->
-<section>
+<section id="outcomes">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Outcomes</p>
@@ -1965,7 +2008,7 @@ export default async function SignupPage({
 </section>
 
 <!-- ========================================================== risks -->
-<section>
+<section id="risks">
   <div class="wrap">
     <div class="sec-head">
       <p class="eyebrow">Risks</p>
