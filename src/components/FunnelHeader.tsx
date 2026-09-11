@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Wordmark } from "@/components/Wordmark";
+import { Logo } from "@/components/Logo";
 
 /**
  * The funnel pages have no nav, so they also had no way out — on a phone the
@@ -47,7 +47,7 @@ export function FunnelHeader({
         </button>
 
         <Link href="/" aria-label="Nursia — home" className="flex items-center">
-          <Wordmark />
+          <Logo />
         </Link>
 
         <Link

@@ -3,8 +3,11 @@ import { SITE } from "@/lib/content";
 
 /* /lp/* are the paid-ad landing pages: they duplicate the SEO pages on purpose
    and must never be indexed against them. /try, /signup and /login are gated
-   funnel steps with nothing to rank. */
-const PRIVATE = ["/try", "/signup", "/login", "/lp/"];
+   funnel steps with nothing to rank. /resources/* are the free things behind
+   an account — the guide that offers one is the page meant to rank, and an
+   indexed resource page would both compete with it and hand a crawler a page
+   it cannot read. */
+const PRIVATE = ["/try", "/signup", "/login", "/lp/", "/resources/"];
 
 /* Answer engines and their training crawlers. We allow them deliberately
    rather than by default: the whole point of writing 25 RN-reviewed guides is

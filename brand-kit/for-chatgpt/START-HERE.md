@@ -18,7 +18,7 @@ COLOURS — only these
 paper #FBFAF6 (default background) · second surface #F4F2EB · cards #FFFFFF
 headline ink #14161A · body ink #3A3D44 · small labels #6E6B63
 hairlines and borders #E3DFD4, always 1px
-teal #0B6B62 (buttons, ticks, the logo's full stop)
+teal #0B6B62 (buttons, ticks, the logo tile)
 highlighter yellow #F5E85C — one stroke per ad, behind one phrase only
 correct answer: #157F52 border on #F3FAF5 · wrong: #B23A2E border on #FDF5F3
 
@@ -30,10 +30,12 @@ letter-spacing, grey.
 Never set body copy in the sans. Never set a headline in the serif.
 
 LOGO
-Use the uploaded wordmark as-is: ink letters, teal full stop, on light grounds.
-On the dark ink ground use the reverse file (its full stop is yellow). Never
-stretch, rotate, recolour, outline or shadow it. Keep clear space equal to the
-height of the "n" on all sides. Place it small, bottom-left. It is never the hero.
+Use the uploaded logo as-is. It has no full stop: the word in one colour beside
+a rounded tile carrying the "n". On light grounds the tile is teal and the word
+is ink; on the dark ink ground use the on-dark file, where the tile is yellow.
+Never add a dot back, never recolour the word to match the tile, and never
+stretch, rotate, outline or shadow it. Keep clear space equal to the height of
+the "n" on all sides. Place it small, bottom-left. It is never the hero.
 
 THE SIGNATURE OBJECT — a question card
 White, 1px #E3DFD4 border, 4px radius, one very soft shadow. Inside: a grey

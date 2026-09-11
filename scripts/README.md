@@ -2,8 +2,15 @@
 
 ## build-logo.mjs
 
-Regenerates every cut of the wordmark into `public/logo/`, plus the App Router
-icon files in `src/app/`. See `public/logo/README.md` for what each cut is for.
+Regenerates every cut of the logo into `public/logo/` and `brand-kit/logos/`,
+plus the App Router icon files in `src/app/` (`icon.svg`, `apple-icon.png`,
+`opengraph-image.png`, `favicon.ico`), the three reference PNGs in
+`brand-kit/for-chatgpt/`, and `src/components/logo-paths.ts` — the outlines the
+React `<Logo>` renders, so the header can never drift from the files.
+
+v2 has no full stop: the word in one colour beside a rounded tile carrying the
+`n`, with eight approved tile colours. See `public/logo/README.md` for what each
+cut is for.
 
 ```bash
 node scripts/build-logo.mjs

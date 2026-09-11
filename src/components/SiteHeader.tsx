@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AccountMenu } from "./AccountMenu";
-import { Wordmark } from "./Wordmark";
+import { Logo } from "./Logo";
 
 const NAV = [
   { label: "Practice", href: "/nclex-practice-questions" },
@@ -28,7 +28,7 @@ export function SiteHeader() {
           plain flex row that keeps them on the right gutter. */}
       <div className="mx-auto flex h-14 max-w-[1140px] items-center justify-between gap-6 px-5 sm:h-16 sm:px-8 lg:grid lg:grid-cols-[1fr_auto_1fr]">
         <Link href="/" className="flex items-center justify-self-start" aria-label="Nursia — home">
-          <Wordmark />
+          <Logo />
         </Link>
 
         <nav aria-label="Main" className="hidden items-center gap-7 justify-self-center lg:flex">

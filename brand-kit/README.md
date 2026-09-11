@@ -29,7 +29,7 @@ guide/              The design language as eight HTML pages
   code.html           Tokens, recipes, and the shipping checklist
 
 tokens/             tokens.css · tokens.json · tokens.scss
-logos/              Every logo cut, SVG + PNG, plus logos/README.md
+logos/              Every logo cut, SVG + PNG, plus logos/README.md (v2 — no full stop)
 fonts/              Bricolage Grotesque, Source Serif 4, IBM Plex Mono (+ OFL)
 photos/             The photography shot for the site — the look to match
 for-chatgpt/        Three logo PNGs and a paste-ready prompt for ad creative
@@ -49,6 +49,11 @@ the card's. Underfilled beats packed.
 
 Everything is built around one object: the white question card with four
 bordered answer rows and a small mono key.
+
+**Logo v2 (September 2026):** the full stop is gone. The word is one colour
+beside a rounded tile carrying the `n`, and the tile colour is dynamic — teal on
+light grounds, highlighter yellow on dark, plus four context tiles. Start at
+`logos/README.md` or `guide/logo.html`; retire any file that still has a dot.
 
 ## Licences
 

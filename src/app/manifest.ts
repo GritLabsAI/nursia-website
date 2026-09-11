@@ -14,7 +14,9 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: "/logo/nursia-mark-192.png", sizes: "192x192", type: "image/png" },
       { src: "/logo/nursia-mark-512.png", sizes: "512x512", type: "image/png" },
       {
-        src: "/logo/nursia-mark-1024.png",
+        // Full-bleed square: Android applies its own mask, and the `n` sits well
+        // inside the safe circle.
+        src: "/logo/nursia-mark-square-1024.png",
         sizes: "1024x1024",
         type: "image/png",
         purpose: "maskable",

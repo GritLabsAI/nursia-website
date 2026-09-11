@@ -8,52 +8,73 @@ import {
   CtaBand,
   FaqList,
   FaqSchema,
-  InlineCta,
   OnThisPage,
   Section,
 } from "@/components/Blocks";
+import { GuideView } from "@/components/GuideView";
+import { PortableBody } from "@/components/PortableBody";
 import { QuestionSet } from "@/components/QuestionSet";
-import { StickyCta } from "@/components/StickyCta";
+import { ResourceGate } from "@/components/ResourceGate";
+import { QUESTIONS, SITE, playableCount, topicBySlug } from "@/lib/content";
+import { buildClient, sanityFetch, GUIDE_PAGE_TAGS, tags } from "@/sanity/client";
 import {
-  GUIDES,
-  QUESTIONS,
-  SITE,
-  guideBySlug,
-  guideModified,
-  playableCount,
-  topicBySlug,
-} from "@/lib/content";
+  GUIDE_BY_SLUG_QUERY,
+  GUIDE_SEO_QUERY,
+  GUIDE_SLUGS_QUERY,
+} from "@/sanity/queries";
+import type {
+  GUIDE_BY_SLUG_QUERYResult,
+  GUIDE_SEO_QUERYResult,
+} from "@/sanity.types";
 
 type Params = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return GUIDES.map((g) => ({ slug: g.slug }));
+/**
+ * Prerendered, with the webhook in /api/revalidate doing the freshness.
+ *
+ * An hour is the backstop rather than the mechanism: if the webhook is healthy
+ * an edit is live in seconds, and if somebody has broken it the page is at
+ * worst an hour stale instead of stale until the next deploy.
+ */
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  /* Straight past the CDN. This runs once at build time and a cached slug list
+     is how a guide published ninety seconds ago misses the build entirely. */
+  const slugs = await buildClient.fetch<string[]>(GUIDE_SLUGS_QUERY);
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const g = guideBySlug(slug);
+  const g = await sanityFetch<GUIDE_SEO_QUERYResult>(GUIDE_SEO_QUERY, {
+    params: { slug },
+    tags: [tags.guide(slug), tags.authors],
+  });
   if (!g) return {};
 
   /* Cut the description on a sentence, not mid-word at 155 — a truncated
      snippet reads as scraped, and assistants quote descriptions verbatim. */
-  const description =
+  const fallback =
     g.shortAnswer.length <= 158
       ? g.shortAnswer
       : `${g.shortAnswer.slice(0, 155).replace(/[\s,;:]+\S*$/, "")}…`;
+  const description = g.seo?.description || fallback;
 
   return {
-    title: { absolute: `${g.title} | Nursia` },
+    title: { absolute: `${g.seo?.title || g.title} | Nursia` },
     description,
     alternates: { canonical: `/guides/${g.slug}` },
+    ...(g.seo?.noIndex ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       type: "article",
       title: g.h1,
       description,
       url: `/guides/${g.slug}`,
-      publishedTime: "2026-08-01T00:00:00.000Z",
-      modifiedTime: `${guideModified(g)}T00:00:00.000Z`,
-      authors: ["Dana Whitfield, RN, MSN"],
+      publishedTime: `${g.publishedAt}T00:00:00.000Z`,
+      modifiedTime: `${g.updatedAt}T00:00:00.000Z`,
+      authors: [`${g.authorName}, ${g.authorHonorific}`],
     },
     twitter: { card: "summary_large_image", title: g.h1, description },
   };
@@ -62,9 +83,20 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 const anchor = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
+/** "September 2026" from an ISO date, for the visible byline. */
+const monthYear = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+
 export default async function GuidePage({ params }: Params) {
   const { slug } = await params;
-  const g = guideBySlug(slug);
+  const g = await sanityFetch<GUIDE_BY_SLUG_QUERYResult>(GUIDE_BY_SLUG_QUERY, {
+    params: { slug },
+    tags: [tags.guide(slug), ...GUIDE_PAGE_TAGS],
+  });
   if (!g) notFound();
 
   const trail = [
@@ -72,18 +104,29 @@ export default async function GuidePage({ params }: Params) {
     { label: "Guides", href: "/guides" },
     { label: g.title },
   ];
-  const topic = topicBySlug(g.topic)!;
-  /* Subject topics carry no hand-written set — they draw on the bank instead. */
-  const sample = topic.questions?.[0] ? QUESTIONS[topic.questions[0]] : null;
-  const topicCount = topic.count ?? playableCount(topic.slug);
-  const next = g.readNext.map((s) => guideBySlug(s)!).filter(Boolean);
+
+  /* The questions stay in the repo, and this is the seam. Sanity owns the
+     editorial wrapper around a topic; the items themselves are versioned,
+     reviewed in pull requests, and rendered into the static HTML — which is
+     the whole reason these pages rank. The slug is the contract between them. */
+  const localTopic = g.topic?.slug ? topicBySlug(g.topic.slug) : undefined;
+  const sample = localTopic?.questions?.[0]
+    ? QUESTIONS[localTopic.questions[0]]
+    : null;
+  const topicCount = localTopic
+    ? localTopic.count ?? playableCount(localTopic.slug)
+    : 0;
 
   const url = `${SITE.url}/guides/${g.slug}`;
-  const countWords = (text: string) => text.trim().split(/\s+/).length;
+  const sections = g.sections ?? [];
+  const faqs = (g.faqs ?? []).filter((f) => f.q && f.a) as { q: string; a: string }[];
+
+  /* Word count from the rendered text rather than a stored number, so it
+     cannot drift away from the page it describes after an edit. */
   const words =
     countWords(g.shortAnswer) +
-    g.sections.reduce((n, sec) => n + countWords(sec.body.join(" ")), 0) +
-    (g.faqs?.reduce((n, f) => n + countWords(`${f.q} ${f.a}`), 0) ?? 0);
+    sections.reduce((n, s) => n + countBlocks(s.body), 0) +
+    faqs.reduce((n, f) => n + countWords(`${f.q} ${f.a}`), 0);
 
   /* One Article node, fully described. The extra properties are not padding:
      `about`/`mentions` tie the page to entities an answer engine can resolve,
@@ -97,7 +140,7 @@ export default async function GuidePage({ params }: Params) {
     name: g.title,
     description: g.shortAnswer,
     abstract: g.shortAnswer,
-    articleSection: g.sections.map((sec) => sec.h2),
+    articleSection: sections.map((s) => s.h2),
     inLanguage: "en-US",
     isAccessibleForFree: true,
     wordCount: words,
@@ -106,27 +149,34 @@ export default async function GuidePage({ params }: Params) {
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     author: {
       "@type": "Person",
-      name: "Dana Whitfield",
-      honorificSuffix: "RN, MSN",
-      jobTitle: "Lead item writer",
-      knowsAbout: ["NCLEX-RN", "Nursing education", topic.category],
+      name: g.author?.name,
+      honorificSuffix: g.author?.honorific,
+      jobTitle: g.author?.jobTitle,
+      knowsAbout: g.author?.knowsAbout ?? [],
+      ...(g.author?.sameAs?.length ? { sameAs: g.author.sameAs } : {}),
       worksFor: { "@type": "Organization", name: SITE.name, url: SITE.url },
     },
-    reviewedBy: {
-      "@type": "Person",
-      name: "Priya Raghavan",
-      honorificSuffix: "RN, MSN, CNE",
-    },
+    ...(g.reviewedBy
+      ? {
+          reviewedBy: {
+            "@type": "Person",
+            name: g.reviewedBy.name,
+            honorificSuffix: g.reviewedBy.honorific,
+          },
+        }
+      : {}),
     publisher: {
       "@type": "Organization",
       "@id": `${SITE.url}#organization`,
       name: SITE.name,
       url: SITE.url,
     },
-    datePublished: "2026-08-01",
-    dateModified: guideModified(g),
+    datePublished: g.publishedAt,
+    dateModified: g.updatedAt,
     about: { "@type": "Thing", name: "NCLEX-RN", sameAs: "https://www.nclex.com/" },
-    mentions: [{ "@type": "Thing", name: topic.category }],
+    ...(g.topic?.category
+      ? { mentions: [{ "@type": "Thing", name: g.topic.category }] }
+      : {}),
     isPartOf: { "@type": "CollectionPage", name: "NCLEX Guides", "@id": `${SITE.url}/guides` },
   };
 
@@ -137,8 +187,15 @@ export default async function GuidePage({ params }: Params) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
-      {g.faqs && <FaqSchema items={g.faqs} />}
-      <StickyCta />
+      {faqs.length > 0 && <FaqSchema items={faqs} />}
+
+      <GuideView
+        guide={g.slug!}
+        cluster={g.cluster ?? undefined}
+        topic={g.topic?.slug ?? undefined}
+        resource={g.leadMagnet?.slug ?? undefined}
+        experiment={g.experiment}
+      />
 
       <Section className="pt-10 pb-14">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:gap-16">
@@ -148,7 +205,11 @@ export default async function GuidePage({ params }: Params) {
             <h1 className="text-[2.125rem] leading-[1.05] sm:text-[2.625rem]">{g.h1}</h1>
 
             <div className="mt-5">
-              <Byline updated={g.updated} minutes={g.minutes} />
+              <Byline
+                by={`${g.author?.name}, ${g.author?.honorific}`}
+                updated={monthYear(g.updatedAt!)}
+                minutes={g.minutes ?? undefined}
+              />
             </div>
 
             {/* Short answer — the first 60 words, written for the snippet */}
@@ -160,45 +221,48 @@ export default async function GuidePage({ params }: Params) {
             </div>
 
             <div className="prose-ns mt-10">
-              {g.sections.map((s, i) => (
-                <div key={s.h2}>
-                  <h2 id={anchor(s.h2)} className="scroll-mt-24">
+              {sections.map((s, i) => (
+                <div key={s._key}>
+                  <h2 id={anchor(s.h2!)} className="scroll-mt-24">
                     {s.h2}
                   </h2>
-                  {s.body.map((p, j) => (
-                    <p key={j}>{p}</p>
-                  ))}
+                  <PortableBody value={s.body} />
 
-                  {/* CTA slot 3 sits after section two — the highest-converting
-                      position on an editorial page, and it converts on curiosity */}
-                  {i === 1 && (
-                    <div className="not-prose">
-                      <InlineCta
-                        prompt="Reading about it will not tell you where you stand. Two questions will."
-                        action="Try 2 →"
-                      />
-                    </div>
+                  {/* The offer, mid-article. Whether it renders here, at the
+                      end, or in both places is the gate_placement experiment;
+                      the component decides and records which it showed. */}
+                  {i === 1 && g.leadMagnet && (
+                    <ResourceGate
+                      resource={g.leadMagnet}
+                      experiment={g.experiment}
+                      guideSlug={g.slug!}
+                      at="mid"
+                    />
                   )}
                 </div>
               ))}
 
-              <p>
-                Whatever you take from this, the next step is the same: answer questions and read
-                the rationales. Our{" "}
-                <Link href={`/nclex-practice-questions/${topic.slug}`}>
-                  {topic.name.toLowerCase()} practice questions
-                </Link>{" "}
-                are the closest set to what this guide covers, there are ten more on the{" "}
-                <Link href="/nclex-practice-questions">practice questions hub</Link>, and the{" "}
-                <Link href="/pricing">pricing page</Link> spells out what the free tier includes.
-              </p>
+              {localTopic && (
+                <p>
+                  Whatever you take from this, the next step is the same: answer questions and
+                  read the rationales. Our{" "}
+                  <Link href={`/nclex-practice-questions/${localTopic.slug}`}>
+                    {localTopic.name.toLowerCase()} practice questions
+                  </Link>{" "}
+                  are the closest set to what this guide covers, there are ten more on the{" "}
+                  <Link href="/nclex-practice-questions">practice questions hub</Link>, and the{" "}
+                  <Link href="/pricing">pricing page</Link> spells out what the free tier includes.
+                </p>
+              )}
             </div>
 
             {/* one question, in the article, because the argument of this whole
                 site is that a question beats a paragraph */}
-            {sample && (
+            {sample && localTopic && (
               <div className="mt-14 border-t border-rule pt-8">
-                <p className="eyebrow">One question from the {topic.name.toLowerCase()} set</p>
+                <p className="eyebrow">
+                  One question from the {localTopic.name.toLowerCase()} set
+                </p>
                 <div className="mt-5">
                   <QuestionSet questions={[sample]} />
                 </div>
@@ -208,54 +272,69 @@ export default async function GuidePage({ params }: Params) {
             {/* The long-tail phrasings the body cannot answer without turning
                 into a list. Visible copy first, schema second — never the
                 other way round. */}
-            {g.faqs && (
+            {faqs.length > 0 && (
               <div className="mt-14 border-t border-rule pt-8">
                 <h2 id="faq" className="scroll-mt-24 text-[1.5rem] sm:text-[1.75rem]">
                   Common questions
                 </h2>
                 <div className="mt-5">
-                  <FaqList items={g.faqs} />
+                  <FaqList items={faqs} />
                 </div>
               </div>
             )}
 
-            <div className="mt-14 border-t border-rule pt-5">
-              <p className="eyebrow">Read next</p>
-              <ul className="mt-4 grid gap-3 sm:grid-cols-3">
-                {next.map((n) => (
-                  <li key={n.slug}>
-                    <Link href={`/guides/${n.slug}`} className="cell h-full">
-                      <p className="eyebrow">{n.minutes} min</p>
-                      <p className="mt-2 font-display text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">
-                        {n.title}
-                      </p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {g.leadMagnet && (
+              <ResourceGate
+                resource={g.leadMagnet}
+                experiment={g.experiment}
+                guideSlug={g.slug!}
+                at="end"
+              />
+            )}
+
+            {g.readNext && g.readNext.length > 0 && (
+              <div className="mt-14 border-t border-rule pt-5">
+                <p className="eyebrow">Read next</p>
+                <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {g.readNext.map((n) => (
+                    <li key={n.slug}>
+                      <Link href={`/guides/${n.slug}`} className="cell h-full">
+                        <p className="eyebrow">{n.minutes} min</p>
+                        <p className="mt-2 font-display text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">
+                          {n.title}
+                        </p>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </article>
 
           <aside className="hidden lg:block">
             <div className="sticky top-24">
               <OnThisPage
                 items={[
-                  ...g.sections.map((s) => ({ label: s.h2, href: `#${anchor(s.h2)}` })),
-                  ...(g.faqs ? [{ label: "Common questions", href: "#faq" }] : []),
+                  ...sections.map((s) => ({ label: s.h2!, href: `#${anchor(s.h2!)}` })),
+                  ...(faqs.length > 0
+                    ? [{ label: "Common questions", href: "#faq" }]
+                    : []),
                 ]}
               />
-              <div className="mt-8 border-t border-rule pt-4">
-                <p className="eyebrow">Practise this</p>
-                <p className="mt-3 text-[0.9375rem] leading-snug text-ink-2">
-                  {topicCount} {topic.name.toLowerCase()} questions, five of them free.
-                </p>
-                <Link
-                  href={`/nclex-practice-questions/${topic.slug}`}
-                  className="btn btn-ghost mt-4 w-full !py-2.5 !text-sm"
-                >
-                  Open the set →
-                </Link>
-              </div>
+              {localTopic && (
+                <div className="mt-8 border-t border-rule pt-4">
+                  <p className="eyebrow">Practise this</p>
+                  <p className="mt-3 text-[0.9375rem] leading-snug text-ink-2">
+                    {topicCount} {localTopic.name.toLowerCase()} questions, five of them free.
+                  </p>
+                  <Link
+                    href={`/nclex-practice-questions/${localTopic.slug}`}
+                    className="btn btn-ghost mt-4 w-full !py-2.5 !text-sm"
+                  >
+                    Open the set →
+                  </Link>
+                </div>
+              )}
             </div>
           </aside>
         </div>
@@ -265,4 +344,22 @@ export default async function GuidePage({ params }: Params) {
       <div className="h-16 lg:hidden" aria-hidden />
     </>
   );
+}
+
+/* --------------------------------------------------------------- counting */
+
+function countWords(text: string | null | undefined): number {
+  return text ? text.trim().split(/\s+/).filter(Boolean).length : 0;
+}
+
+/** Words inside Portable Text, for the schema's wordCount. */
+function countBlocks(blocks: unknown): number {
+  if (!Array.isArray(blocks)) return 0;
+  let n = 0;
+  for (const block of blocks) {
+    const children = (block as { children?: { text?: string }[] }).children;
+    if (!Array.isArray(children)) continue;
+    for (const child of children) n += countWords(child.text);
+  }
+  return n;
 }

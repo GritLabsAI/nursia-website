@@ -22,7 +22,7 @@ on a surface.
 | ink-2 | `#3A3D44` | Body copy. |
 | muted | `#6E6B63` | Mono labels, captions, fine print. |
 | rule | `#E3DFD4` | Hairlines and card borders. 1px, never thicker. |
-| teal | `#0B6B62` | Buttons, links, the full stop in the logo, the tick. |
+| teal | `#0B6B62` | Buttons, links, the tick, and the primary logo tile. |
 | teal-dark | `#084F49` | Teal pressed/hover only. |
 | highlight | `#F5E85C` | The highlighter stroke. One per layout, maximum. |
 | correct | `#157F52` | Correct-answer state (border + `#F3FAF5` fill). |
@@ -52,15 +52,20 @@ Never set body copy in the display face, and never set a headline in the serif.
 
 Files in `logos/`. Full guidance in `logos/README.md`. The short version:
 
-- `nursia-wordmark.svg` is the default — ink letters, teal full stop, on any light ground.
-- `nursia-wordmark-reverse.svg` on the ink ground — the full stop goes highlighter
-  yellow there, because teal dies on dark.
-- `nursia-wordmark-white.svg` on photography.
-- `nursia-mark.svg` (the `n.` square) below ~80px wide, and for avatars and app icons.
-- Clear space = the height of the `n` on all four sides. Files already carry it.
-- Minimum wordmark width 90px on screen.
-- Never stretch, rotate, outline, shadow, re-colour the letters, or put the colour
-  wordmark on a mid-tone photo.
+**v2: there is no full stop.** Its colour moved into a rounded tile carrying the
+`n`, and the tile changes colour with context. The word is always one colour.
+
+- `nursia-logo.svg` is the default — teal tile, paper `n`, ink word, on any light ground.
+- `nursia-logo-reverse.svg` on the ink ground — the tile goes highlighter yellow
+  there, because teal dies on dark.
+- `nursia-logo-photo.svg` over photography; `nursia-wordmark.svg` for the word alone.
+- `nursia-mark.svg` (the `n` tile) below ~120px wide, and for avatars and app icons.
+- Eight approved tiles: teal, yellow, ink and paper, plus results, night, plum and
+  bronze for one context each. One per surface. The word never matches the tile.
+- Clear space = the height of the `n` on all four sides.
+- Minimum lockup width 120px on screen; the word alone 90px.
+- Never add a dot back, stretch, rotate, outline, shadow, re-colour the word, or
+  put the ink logo on a mid-tone photo.
 
 ---
 

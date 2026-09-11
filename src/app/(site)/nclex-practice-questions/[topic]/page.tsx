@@ -19,10 +19,12 @@ import {
   QUESTIONS,
   SITE,
   TOPICS,
-  guideBySlug,
   playableCount,
   topicBySlug,
 } from "@/lib/content";
+import { sanityFetch, tags } from "@/sanity/client";
+import { GUIDES_FOR_TOPIC_QUERY } from "@/sanity/queries";
+import type { GUIDES_FOR_TOPIC_QUERYResult } from "@/sanity.types";
 
 type Params = { params: Promise<{ topic: string }> };
 
@@ -62,7 +64,13 @@ export default async function TopicPage({ params }: Params) {
   const bank = BANK_LOADERS[t.slug] ? await BANK_LOADERS[t.slug]() : null;
   const count = t.count ?? bank?.length ?? 0;
   const siblings = t.siblings.map((s) => topicBySlug(s)!);
-  const guides = t.guides.map((g) => guideBySlug(g)!);
+  /* Read out of Sanity by reverse reference rather than from the curated slug
+     list on the topic. The curated list cannot know about a guide published
+     after it was written; this picks one up the moment it points here. */
+  const guides = await sanityFetch<GUIDES_FOR_TOPIC_QUERYResult>(
+    GUIDES_FOR_TOPIC_QUERY,
+    { params: { topic: t.slug }, tags: [tags.guides, tags.topic(t.slug)] },
+  );
 
   return (
     <>
@@ -210,7 +218,7 @@ export default async function TopicPage({ params }: Params) {
             <p className="eyebrow">Guides for this topic</p>
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
               {guides.map((g) => (
-                <li key={g.slug}>
+                <li key={g._id}>
                   <Link href={`/guides/${g.slug}`} className="cell h-full">
                     <p className="eyebrow">{g.minutes} min read</p>
                     <p className="mt-2 font-display text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">

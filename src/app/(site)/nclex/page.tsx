@@ -9,20 +9,34 @@ import {
   Section,
   SectionHead,
 } from "@/components/Blocks";
-import { CLUSTERS, GUIDES, TOOLS, TOPICS } from "@/lib/content";
+import { CLUSTERS, TOOLS, TOPICS } from "@/lib/content";
+import { sanityFetch, tags } from "@/sanity/client";
+import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
+import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
 
-const GUIDE_COUNT = GUIDES.length;
+export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: { absolute: "Everything for the NCLEX — the full index | Nursia" },
-  description:
-    `Every question set, guide, and tool on Nursia in one place: ${TOPICS.length} topic sets, ${GUIDE_COUNT} guides, and the free reference sheets. Nothing on the site is more than two clicks from here.`,
-  alternates: { canonical: "/nclex" },
-};
+/* The count is read rather than hard-coded: this page claims to be the full
+   index, and an index that says "45 guides" while listing 50 is the one kind
+   of error that undermines the page's whole reason for existing. */
+export async function generateMetadata(): Promise<Metadata> {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+    tags: [tags.guides],
+  });
+  return {
+    title: { absolute: "Everything for the NCLEX — the full index | Nursia" },
+    description: `Every question set, guide, and tool on Nursia in one place: ${TOPICS.length} topic sets, ${guides.length} guides, and the free reference sheets. Nothing on the site is more than two clicks from here.`,
+    alternates: { canonical: "/nclex" },
+  };
+}
 
 const TRAIL = [{ label: "Home", href: "/" }, { label: "Everything for the NCLEX" }];
 
-export default function NclexIndexPage() {
+export default async function NclexIndexPage() {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+    tags: [tags.guides],
+  });
+
   return (
     <>
       <BreadcrumbSchema trail={TRAIL} />
@@ -91,11 +105,11 @@ export default function NclexIndexPage() {
             <SectionHead
               eyebrow="2 · Guides"
               title="Written explanations"
-              note={`${GUIDE_COUNT} guides in ${CLUSTERS.length} clusters on the guides hub, grouped by where you are in your prep. Listed flat here.`}
+              note={`${guides.length} guides in ${CLUSTERS.length} clusters on the guides hub, grouped by where you are in your prep. Listed flat here.`}
             />
             <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-              {GUIDES.map((g) => (
-                <li key={g.slug}>
+              {guides.map((g) => (
+                <li key={g._id}>
                   <Link href={`/guides/${g.slug}`} className="cell flex items-center gap-4">
                     <span className="font-display text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">
                       {g.title}

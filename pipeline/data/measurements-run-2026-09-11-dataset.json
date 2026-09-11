@@ -1,0 +1,270 @@
+{
+  "runId": "run-2026-09-11",
+  "source": "dataset",
+  "observedAt": "2026-09-11",
+  "geo": "US",
+  "anchor": "nclex",
+  "note": "Interest is relative to the strongest candidate in this run, cross-calibrated through the anchor term. It is a ranking, not a search volume. A zero means Google Trends would not report on the query, which for a long-tail phrase means 'below the threshold' rather than 'nobody searches this'.",
+  "keywords": [
+    {
+      "query": "how many questions is the nclex",
+      "interest": 95,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Highest-volume query in the category. Already covered.",
+      "note": "Highest-volume query in the category. Already covered."
+    },
+    {
+      "query": "nurse licensure compact states",
+      "interest": 88,
+      "trajectory": "rising",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Consistently one of the highest-volume post-licensure queries in nursing, and it grew again as Pennsylvania (July 2025) and Connecticut (October 2025) came online. Every candidate hits it the week after they pass, which makes it an 'after' page that catches people at exactly the moment they are deciding where to work. Nobody currently covers the NCLEX-to-compact hand-off honestly — the pages that rank are staffing agencies selling travel contracts.",
+      "note": "Consistently one of the highest-volume post-licensure queries in nursing, and it grew again as Pennsylvania (July 2025) and Connecticut (October 2025) came online. Every candidate hits it the week after they pass, which makes it an 'after' page that catches people at exactly the moment they are deciding where to work. Nobody currently covers the NCLEX-to-compact hand-off honestly — the pages that rank are staffing agencies selling travel contracts."
+    },
+    {
+      "query": "nclex pass rates",
+      "interest": 84,
+      "trajectory": "seasonal",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered; refreshes annually when NCSBN publishes.",
+      "note": "Already covered; refreshes annually when NCSBN publishes."
+    },
+    {
+      "query": "pearson vue trick",
+      "interest": 81,
+      "trajectory": "seasonal",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "hesi exit exam nclex prediction",
+      "interest": 79,
+      "trajectory": "seasonal",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Peaks hard at the end of each academic term when exit exams are sat. High anxiety, high intent, and the searcher is 4-12 weeks from testing — the exact window in which they buy a question bank. The published validity figures are strong in one direction only (a high score predicts a pass; a low score predicts much less), and no ranking page says so.",
+      "note": "Peaks hard at the end of each academic term when exit exams are sat. High anxiety, high intent, and the searcher is 4-12 weeks from testing — the exact window in which they buy a question bank. The published validity figures are strong in one direction only (a high score predicts a pass; a low score predicts much less), and no ranking page says so."
+    },
+    {
+      "query": "nclex lab values to memorize",
+      "interest": 77,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered, and the strongest free-resource candidate on the site.",
+      "note": "Already covered, and the strongest free-resource candidate on the site."
+    },
+    {
+      "query": "nclex for filipino nurses",
+      "interest": 76,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "how to answer select all that apply nclex",
+      "interest": 74,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "nclex results timeline",
+      "interest": 73,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "nclex for nigerian nurses",
+      "interest": 72,
+      "trajectory": "rising",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Nigeria is now one of the largest sources of internationally educated NCLEX candidates, and search interest has climbed steadily with it. We already have guides for Filipino and Indian candidates, so this completes the set and inherits their internal linking. The live question nobody answers straight: English is the language of Nigerian nursing education and most boards still demand IELTS or TOEFL anyway.",
+      "note": "Nigeria is now one of the largest sources of internationally educated NCLEX candidates, and search interest has climbed steadily with it. We already have guides for Filipino and Indian candidates, so this completes the set and inherits their internal linking. The live question nobody answers straight: English is the language of Nigerian nursing education and most boards still demand IELTS or TOEFL anyway."
+    },
+    {
+      "query": "prioritization and delegation nclex questions",
+      "interest": 71,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "next generation nclex changes",
+      "interest": 70,
+      "trajectory": "declining",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered. Declining as NGN stops being new — worth watching, not worth a second page.",
+      "note": "Already covered. Declining as NGN stops being new — worth watching, not worth a second page."
+    },
+    {
+      "query": "nclex study plan two weeks",
+      "interest": 69,
+      "trajectory": "seasonal",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "using chatgpt to study for the nclex",
+      "interest": 68,
+      "trajectory": "rising",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "The fastest-rising study-method query in the category and the one where the ranking pages are worst — they are almost all written by tools selling an AI feature. There is a specific, checkable failure mode in the literature: a general chatbot recommends the clinically reasonable action, which on the NCLEX is frequently the physician's action and therefore the wrong answer. Saying that plainly is both true and differentiating.",
+      "note": "The fastest-rising study-method query in the category and the one where the ranking pages are worst — they are almost all written by tools selling an AI feature. There is a specific, checkable failure mode in the literature: a general chatbot recommends the clinically reasonable action, which on the NCLEX is frequently the physician's action and therefore the wrong answer. Saying that plainly is both true and differentiating."
+    },
+    {
+      "query": "nclex scoring explained",
+      "interest": 66,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "dosage calculation practice questions",
+      "interest": 65,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered by a guide and a topic set.",
+      "note": "Already covered by a guide and a topic set."
+    },
+    {
+      "query": "nclex retake rules",
+      "interest": 63,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "how to register for the nclex",
+      "interest": 62,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "infection control precautions nclex",
+      "interest": 61,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "nclex test anxiety",
+      "interest": 60,
+      "trajectory": "seasonal",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "credentials evaluation for nclex",
+      "interest": 59,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "nclex bowtie questions",
+      "interest": 58,
+      "trajectory": "rising",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "high alert medications nclex",
+      "interest": 57,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "clinical judgment measurement model",
+      "interest": 55,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered.",
+      "note": "Already covered."
+    },
+    {
+      "query": "nclex testing accommodations",
+      "interest": 54,
+      "trajectory": "steady",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Lower volume, but almost nothing written for candidates rather than for boards. The process has one sharp, expensive trap — accommodations must appear on the ATT before scheduling, so booking early voids them — and it is buried in board PDFs. A page that states the ordering plainly is durable, rarely refreshed by competitors, and reaches a group everyone else ignores.",
+      "note": "Lower volume, but almost nothing written for candidates rather than for boards. The process has one sharp, expensive trap — accommodations must appear on the ATT before scheduling, so booking early voids them — and it is buried in board PDFs. A page that states the ordering plainly is durable, rarely refreshed by competitors, and reaches a group everyone else ignores."
+    },
+    {
+      "query": "2026 nclex test plan changes",
+      "interest": 52,
+      "trajectory": "declining",
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "geo": "US",
+      "measurement": "Already covered. Declining now that April 2026 has passed, as expected.",
+      "note": "Already covered. Declining now that April 2026 has passed, as expected."
+    }
+  ]
+}

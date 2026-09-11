@@ -1,6 +1,9 @@
 import Link from "next/link";
-import { GUIDES, SITE, topicsIn } from "@/lib/content";
-import { Wordmark } from "./Wordmark";
+import { SITE, topicsIn } from "@/lib/content";
+import { sanityFetch, tags } from "@/sanity/client";
+import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
+import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
+import { Logo } from "./Logo";
 
 const LEGAL = [
   { label: "Terms", href: "/terms" },
@@ -38,7 +41,20 @@ function FootLink({ href, children }: { href: string; children: React.ReactNode 
  * topic page and guide is linked from here and nothing ends up orphaned.
  * Used everywhere except /signup and /try.
  */
-export function SiteFooter() {
+/**
+ * Async because the guide links come from Sanity.
+ *
+ * A footer is an odd place to do a fetch and it is the right call here: this
+ * runs inside a server component on a prerendered page, so the cost is paid at
+ * build and the tag-based revalidation keeps it current. The alternative —
+ * hard-coding six guide slugs — is a list that silently rots the first time
+ * somebody unpublishes one.
+ */
+export async function SiteFooter() {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+    tags: [tags.guides],
+  });
+
   return (
     <footer className="flowsheet border-t border-white/12 bg-ink text-white">
       <div className="mx-auto max-w-[1140px] px-5 py-16 sm:px-8">
@@ -46,7 +62,8 @@ export function SiteFooter() {
             smallest screen halves that; the brand block keeps the full width. */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="col-span-2 max-w-xs lg:col-span-1">
-            <Wordmark tone="paper" />
+            {/* Paper tile, not the yellow one: the footer's only highlighter is the CTA. */}
+            <Logo tone="paper" tile="paper" label="Nursia" />
             <p className="mt-3 text-[0.875rem] leading-relaxed text-white/60">{SITE.tagline}</p>
             <div className="mt-5 flex gap-4">
               {["Instagram", "TikTok", "YouTube"].map((s) => (
@@ -71,8 +88,8 @@ export function SiteFooter() {
           </Col>
 
           <Col title="Guides">
-            {GUIDES.slice(0, 6).map((g) => (
-              <FootLink key={g.slug} href={`/guides/${g.slug}`}>
+            {guides.slice(0, 6).map((g) => (
+              <FootLink key={g._id} href={`/guides/${g.slug}`}>
                 {g.title}
               </FootLink>
             ))}
@@ -134,7 +151,7 @@ export function MinimalFooter() {
       <div className="mx-auto max-w-[1140px] px-5 py-10 sm:px-8">
         <div className="grid gap-8 sm:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <Wordmark />
+            <Logo label="Nursia" />
             <a
               href={`mailto:${SITE.email}`}
               className="mt-2 block font-mono text-[0.8125rem] text-muted transition-colors hover:text-teal"

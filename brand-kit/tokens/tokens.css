@@ -72,4 +72,25 @@
   --ns-dur-state: 160ms;
   --ns-dur-reveal: 380ms;
   --ns-dur-swipe: 620ms;
+
+  /* --- logo tile (v2) --------------------------------------
+     The tile behind the `n` is the only place these colours live.
+     Each carries the `n` colour it must be paired with. */
+  --ns-tile-teal: #0b6b62;
+  --ns-tile-teal-glyph: #fbfaf6;
+  --ns-tile-yellow: #f5e85c;
+  --ns-tile-yellow-glyph: #14161a;
+  --ns-tile-ink: #14161a;
+  --ns-tile-ink-glyph: #fbfaf6;
+  --ns-tile-paper: #fbfaf6;
+  --ns-tile-paper-glyph: #14161a;
+  --ns-tile-results: #157f52;
+  --ns-tile-night: #1e3a5f;
+  --ns-tile-plum: #5b3a6e;
+  --ns-tile-bronze: #8a5a1f;
+
+  /* Inline nursia-logo-dynamic.svg and override these per context. */
+  --nursia-tile: var(--ns-tile-teal);
+  --nursia-glyph: var(--ns-tile-teal-glyph);
+  --nursia-word: var(--ns-ink);
 }

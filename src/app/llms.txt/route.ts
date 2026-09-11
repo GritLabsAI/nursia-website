@@ -1,27 +1,33 @@
-import { CLUSTERS, GUIDES, HUB_FAQ, SITE, TOPICS, playableCount } from "@/lib/content";
+import { CLUSTERS, HUB_FAQ, SITE, TOPICS, playableCount } from "@/lib/content";
+import { sanityFetch, tags } from "@/sanity/client";
+import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
+import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
 
 /**
  * /llms.txt — the llmstxt.org convention: one markdown file that tells an
  * answer engine what this site is, who wrote it, and where the substance
  * lives, without making it parse navigation chrome to find out.
  *
- * It is generated from the same content graph the pages render from, so it
- * cannot drift out of date the way a hand-written one would.
+ * It is generated from the same content graph the pages render from — the
+ * guides come out of Sanity, exactly as /guides does — so it cannot drift out
+ * of date the way a hand-written one would. That property is the entire point
+ * of the file: a stale llms.txt is worse than none, because it actively
+ * misinforms the engines that trust it.
  */
 
-export const dynamic = "force-static";
+export const revalidate = 3600;
 
-function build() {
+function build(guides: GUIDES_INDEX_QUERYResult) {
   const topicLine = (t: (typeof TOPICS)[number]) =>
     `- [${t.h1}](${SITE.url}/nclex-practice-questions/${t.slug}): ${
       t.count ?? playableCount(t.slug)
     } questions${t.share ? `, ${t.share}` : ""}. ${t.blurb}`;
 
-  const guideLine = (g: (typeof GUIDES)[number]) =>
+  const guideLine = (g: GUIDES_INDEX_QUERYResult[number]) =>
     `- [${g.title}](${SITE.url}/guides/${g.slug}): ${g.shortAnswer}`;
 
   const clusters = CLUSTERS.map((c) => {
-    const inCluster = GUIDES.filter((g) => g.cluster === c.id);
+    const inCluster = guides.filter((g) => g.cluster === c.id);
     return `### ${c.label}\n\n${c.note}\n\n${inCluster.map(guideLine).join("\n")}`;
   }).join("\n\n");
 
@@ -31,7 +37,7 @@ function build() {
 
 > ${SITE.tagline} ${SITE.totalQuestions.toLocaleString("en-US")} NCLEX-RN practice questions across ${
     TOPICS.length
-  } topics, plus ${GUIDES.length} guides. Every item is written by a practising registered nurse and reviewed by two more against the NCSBN test plan.
+  } topics, plus ${guides.length} guides. Every item is written by a practising registered nurse and reviewed by two more against the NCSBN test plan.
 
 Last updated: ${SITE.updated}.
 
@@ -78,8 +84,12 @@ ${faqs}
 `;
 }
 
-export function GET() {
-  return new Response(build(), {
+export async function GET() {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+    tags: [tags.guides],
+  });
+
+  return new Response(build(guides), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=3600, s-maxage=86400",

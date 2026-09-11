@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque, IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
+import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
 import { SITE } from "@/lib/content";
 
@@ -151,6 +152,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   function gtag(){dataLayer.push(arguments);}
                   gtag('config','${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}');`}
               </Script>
+            )}
+            {/* Meta pixel. The Facebook/Instagram counterpart to the Ads tag
+                above: its own tag, its own attribution, driving the same
+                signup conversion. */}
+            {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+              <MetaPixel pixelId={process.env.NEXT_PUBLIC_META_PIXEL_ID} />
             )}
           </>
         )}

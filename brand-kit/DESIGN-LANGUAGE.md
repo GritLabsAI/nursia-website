@@ -56,7 +56,7 @@ growth team shipped.**
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| teal | `#0B6B62` | Buttons, links, ticks, the full stop in the logo. |
+| teal | `#0B6B62` | Buttons, links, ticks, and the primary logo tile. |
 | teal-dark | `#084F49` | Hover and pressed only. A state, not a colour you design with. |
 | highlight | `#F5E85C` | The highlighter stroke. One per surface, behind one phrase. |
 | correct | `#157F52` | Correct-answer border, on `#F3FAF5`. |
@@ -160,26 +160,38 @@ scrolling.
 
 ## 5. The logo
 
-Full detail in `logos/README.md`. The short version:
+**v2, September 2026: the full stop is gone.** The colour that lived in the dot
+now fills a rounded tile carrying the `n`, and that tile is dynamic. The word
+itself is always one colour. Full detail in `logos/README.md`.
 
-- `nursia-wordmark.svg` — primary. Ink letters, teal full stop, any light ground.
-- `nursia-wordmark-reverse.svg` — on the ink ground. The full stop goes
-  highlighter yellow, because teal dies on dark.
-- `nursia-wordmark-white.svg` — on photography and video.
-- `nursia-wordmark-black.svg` / `-teal.svg` — one-colour cuts for print and merch.
-- `nursia-stacked.svg` — wordmark over `NCLEX PRACTICE QUESTIONS`, for square
+- `nursia-logo.svg` — primary. Teal tile, paper `n`, ink word, any light ground.
+- `nursia-logo-reverse.svg` — on the ink ground. The tile goes highlighter
+  yellow, because teal dies on dark, exactly as the old full stop did.
+- `nursia-logo-photo.svg` — over photography: yellow tile, white word.
+- `nursia-logo-black.svg` / `-white.svg` — one colour, the `n` knocked out of the
+  tile, for single-plate print, embroidery and engraving.
+- `nursia-wordmark.svg` — the word alone, where the brand is already clear.
+- `nursia-stacked.svg` — the lockup over `NCLEX PRACTICE QUESTIONS`, for square
   placements where the brand is unfamiliar.
-- `nursia-mark.svg` — the `n.` square, below ~80px and for avatars and app icons.
+- `nursia-mark.svg` — the `n` tile, below ~120px and for avatars and app icons.
+  With no dot beside it the letter fills 49% of the tile width.
 - `nursia-og.svg` / `.png` — the 1200×630 social card.
 
-**Clear space** = the height of the `n` on all four sides; the files carry it.
-**Minimum size** 90px wide on screen, 22mm in print.
-**The full stop is teal on light and yellow on dark** — never ink, never the
-same colour as the letters, except in the deliberate one-colour cuts.
+**The tile colour is dynamic.** Four core tiles — teal and ink on light grounds,
+highlighter yellow and paper on dark — and four context tiles: results `#157F52`,
+night `#1E3A5F`, plum `#5B3A6E`, bronze `#8A5A1F`. One colour per surface, chosen
+by context and kept there. Each tile has a fixed `n` colour, and every pair is
+4.5:1 or better. Context colours live in the tile only: never buttons, text or
+backgrounds.
 
-Never stretch, rotate, outline, shadow, re-colour the letters, tighten the
-tracking further, re-type it in Bricolage, or put the colour wordmark on a
-mid-tone photograph.
+**Clear space** = the height of the `n` on all four sides.
+**Minimum size** lockup 120px / 30mm, word 90px / 22mm, mark 16px / 5mm.
+**The word never follows the tile** — ink on light, paper on dark, white on
+photography.
+
+Never add a full stop back, stretch, rotate, outline, shadow, re-colour the
+word, tighten the tracking further, re-type it in Bricolage, use the wrong-answer
+red as a tile, or put the ink logo on a mid-tone photograph.
 
 ---
 
@@ -309,8 +321,8 @@ out loud by a tired nurse, it is not the voice.
 ### House style
 
 No exclamation marks, anywhere, including error messages. No emoji.
-**Nursia**, capital N, never all-caps, and no full stop in running text — the
-full stop belongs to the logo. **NCLEX-RN** on first mention, **NCLEX** after;
+**Nursia**, capital N, never all-caps, and never followed by a full stop — the
+logo dropped its dot in v2. **NCLEX-RN** on first mention, **NCLEX** after;
 never "the NCLEX exam". Figures, not words. Sentence case for headlines, buttons
 and nav; only mono eyebrows are uppercase. Contractions are fine and preferred.
 Spaced en dashes. US English.

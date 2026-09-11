@@ -1,0 +1,227 @@
+{
+  "runId": "run-2026-09-11",
+  "source": "dataset",
+  "generatedAt": "2026-09-11T10:33:07.424Z",
+  "coveredAt": 0.65,
+  "selected": [
+    {
+      "query": "dosage calculation practice questions",
+      "slug": "dosage-calculation-practice-questions",
+      "score": 28.407951338749097,
+      "interest": 65,
+      "trajectory": "steady",
+      "related": [],
+      "source": "dataset",
+      "observedAt": "2026-09-11",
+      "note": "Already covered by a guide and a topic set.",
+      "measurement": "Already covered by a guide and a topic set.",
+      "nearest": {
+        "slug": "dosage-calculations-without-panic",
+        "similarity": 0.5629545947884754
+      }
+    }
+  ],
+  "alsoConsidered": [],
+  "rejected": [
+    {
+      "query": "nurse licensure compact states",
+      "by": "nurse-licensure-compact-states",
+      "similarity": 1,
+      "interest": 88,
+      "trajectory": "rising",
+      "measurement": "Consistently one of the highest-volume post-licensure queries in nursing, and it grew again as Pennsylvania (July 2025) and Connecticut (October 2025) came online. Every candidate hits it the week after they pass, which makes it an 'after' page that catches people at exactly the moment they are deciding where to work. Nobody currently covers the NCLEX-to-compact hand-off honestly — the pages that rank are staffing agencies selling travel contracts."
+    },
+    {
+      "query": "hesi exit exam nclex prediction",
+      "by": "hesi-exit-exam-nclex-prediction",
+      "similarity": 1,
+      "interest": 79,
+      "trajectory": "seasonal",
+      "measurement": "Peaks hard at the end of each academic term when exit exams are sat. High anxiety, high intent, and the searcher is 4-12 weeks from testing — the exact window in which they buy a question bank. The published validity figures are strong in one direction only (a high score predicts a pass; a low score predicts much less), and no ranking page says so."
+    },
+    {
+      "query": "nclex testing accommodations",
+      "by": "nclex-testing-accommodations",
+      "similarity": 1,
+      "interest": 54,
+      "trajectory": "steady",
+      "measurement": "Lower volume, but almost nothing written for candidates rather than for boards. The process has one sharp, expensive trap — accommodations must appear on the ATT before scheduling, so booking early voids them — and it is buried in board PDFs. A page that states the ordering plainly is durable, rarely refreshed by competitors, and reaches a group everyone else ignores."
+    },
+    {
+      "query": "nclex for nigerian nurses",
+      "by": "nclex-for-nigerian-nurses",
+      "similarity": 1,
+      "interest": 72,
+      "trajectory": "rising",
+      "measurement": "Nigeria is now one of the largest sources of internationally educated NCLEX candidates, and search interest has climbed steadily with it. We already have guides for Filipino and Indian candidates, so this completes the set and inherits their internal linking. The live question nobody answers straight: English is the language of Nigerian nursing education and most boards still demand IELTS or TOEFL anyway."
+    },
+    {
+      "query": "using chatgpt to study for the nclex",
+      "by": "using-chatgpt-to-study-for-the-nclex",
+      "similarity": 1,
+      "interest": 68,
+      "trajectory": "rising",
+      "measurement": "The fastest-rising study-method query in the category and the one where the ranking pages are worst — they are almost all written by tools selling an AI feature. There is a specific, checkable failure mode in the literature: a general chatbot recommends the clinically reasonable action, which on the NCLEX is frequently the physician's action and therefore the wrong answer. Saying that plainly is both true and differentiating."
+    },
+    {
+      "query": "how many questions is the nclex",
+      "by": "how-many-questions-is-the-nclex",
+      "similarity": 1,
+      "interest": 95,
+      "trajectory": "steady",
+      "measurement": "Highest-volume query in the category. Already covered."
+    },
+    {
+      "query": "nclex pass rates",
+      "by": "nclex-pass-rates",
+      "similarity": 1,
+      "interest": 84,
+      "trajectory": "seasonal",
+      "measurement": "Already covered; refreshes annually when NCSBN publishes."
+    },
+    {
+      "query": "pearson vue trick",
+      "by": "pearson-vue-trick-explained",
+      "similarity": 1,
+      "interest": 81,
+      "trajectory": "seasonal",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "nclex lab values to memorize",
+      "by": "nclex-lab-values-to-memorize",
+      "similarity": 1,
+      "interest": 77,
+      "trajectory": "steady",
+      "measurement": "Already covered, and the strongest free-resource candidate on the site."
+    },
+    {
+      "query": "how to answer select all that apply nclex",
+      "by": "how-to-answer-sata",
+      "similarity": 0.945127994080328,
+      "interest": 74,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "nclex results timeline",
+      "by": "nclex-results-timeline",
+      "similarity": 1,
+      "interest": 73,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "prioritization and delegation nclex questions",
+      "by": "prioritization-and-delegation-questions",
+      "similarity": 0.9004875010083412,
+      "interest": 71,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "next generation nclex changes",
+      "by": "ngn-partial-credit-scoring",
+      "similarity": 0.7055907843599766,
+      "interest": 70,
+      "trajectory": "declining",
+      "measurement": "Already covered. Declining as NGN stops being new — worth watching, not worth a second page."
+    },
+    {
+      "query": "nclex study plan two weeks",
+      "by": "two-week-nclex-study-plan",
+      "similarity": 1,
+      "interest": 69,
+      "trajectory": "seasonal",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "nclex scoring explained",
+      "by": "nclex-scoring-explained",
+      "similarity": 1,
+      "interest": 66,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "nclex retake rules",
+      "by": "nclex-retake-rules",
+      "similarity": 1,
+      "interest": 63,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "how to register for the nclex",
+      "by": "how-to-register-for-the-nclex",
+      "similarity": 1,
+      "interest": 62,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "nclex test anxiety",
+      "by": "nclex-test-anxiety",
+      "similarity": 1,
+      "interest": 60,
+      "trajectory": "seasonal",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "nclex bowtie questions",
+      "by": "bowtie-questions-explained",
+      "similarity": 1,
+      "interest": 58,
+      "trajectory": "rising",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "high alert medications nclex",
+      "by": "high-alert-medications",
+      "similarity": 1,
+      "interest": 57,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "clinical judgment measurement model",
+      "by": "clinical-judgment-measurement-model",
+      "similarity": 1,
+      "interest": 55,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "nclex for filipino nurses",
+      "by": "nclex-for-filipino-nurses",
+      "similarity": 1,
+      "interest": 76,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "credentials evaluation for nclex",
+      "by": "credentials-evaluation-for-nclex",
+      "similarity": 1,
+      "interest": 59,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    },
+    {
+      "query": "2026 nclex test plan changes",
+      "by": "2026-nclex-test-plan-changes",
+      "similarity": 1,
+      "interest": 52,
+      "trajectory": "declining",
+      "measurement": "Already covered. Declining now that April 2026 has passed, as expected."
+    },
+    {
+      "query": "infection control precautions nclex",
+      "by": "infection-control-precautions",
+      "similarity": 0.910188617932572,
+      "interest": 61,
+      "trajectory": "steady",
+      "measurement": "Already covered."
+    }
+  ]
+}

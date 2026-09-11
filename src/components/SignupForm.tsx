@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
 import type { ConfirmationResult } from "firebase/auth";
 import Link from "next/link";
 import { loggedIn, signedUp } from "@/lib/analytics";
@@ -86,7 +86,33 @@ function GoogleMark() {
   );
 }
 
-export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
+/**
+ * Where this signup came from and where it is going.
+ *
+ * `next` is validated rather than trusted. It arrives in a query string, which
+ * means anybody can put anything in it, and handing it to `router.push`
+ * unchecked turns every link to /signup into an open redirect — a link that
+ * looks like ours, carries our branding through a real login, and lands on
+ * somebody else's site. So: a single leading slash and nothing else. That
+ * rejects `https://evil.example`, protocol-relative `//evil.example`, and
+ * `/\evil.example`, which some browsers still normalise into a host.
+ */
+function useFunnelParams() {
+  const params = useSearchParams();
+  const raw = params.get("next");
+  const next =
+    raw && /^\/(?![/\\])/.test(raw) ? raw : null;
+
+  return {
+    next,
+    resource: params.get("r") ?? undefined,
+    guide: params.get("g") ?? undefined,
+    experiment: params.get("x") ?? undefined,
+    variant: params.get("v") ?? undefined,
+  };
+}
+
+function SignupFormFields({ mode = "signup" }: { mode?: "signup" | "login" }) {
   const router = useRouter();
   const { session, pending } = useSession();
 
@@ -130,14 +156,33 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
      account to the wrong place. */
   const signingIn = useRef(false);
   useEffect(() => {
-    if (!pending && session && !signingIn.current) router.replace("/try");
+    if (pending || !session || signingIn.current) return;
+    /* Someone who already has an account and followed an unlock link still
+       wants the thing they clicked, not the hub. Reading `next` here is what
+       makes the second visit to a resource work at all. */
+    const already = new URLSearchParams(window.location.search).get("next");
+    router.replace(already && /^\/(?![/\\])/.test(already) ? already : "/try");
   }, [pending, session, router]);
 
   /* Signing up lands you in the exam brief rather than on a dashboard: the
      fifty questions are the thing that was promised, and a menu in between is
      a page nobody asked for. Logging back in goes to the hub instead, where a
-     finished report is waiting. */
-  const destination = mode === "signup" ? "/exam" : "/try";
+     finished report is waiting.
+
+     Unless something more specific was promised. A reader who clicked "unlock
+     the lab values" was promised the lab values, and dropping them into a
+     fifty-question exam instead is a bait and switch — the single fastest way
+     to make a free resource stop converting. `next` carries where they were
+     going; the rest carries where they came from, so the account can be
+     attributed to the guide that produced it. */
+  const funnel = useFunnelParams();
+  const destination = funnel.next ?? (mode === "signup" ? "/exam" : "/try");
+  const funnelContext = {
+    guide: funnel.guide,
+    resource: funnel.resource,
+    experiment: funnel.experiment,
+    variant: funnel.variant,
+  };
 
   /** One shape for every call: hold the buttons, translate the failure. */
   async function run(
@@ -176,7 +221,7 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
     void run("email", async () => {
       if (mode === "signup") {
         await signUpWithEmail(email.trim(), password);
-        signedUp("email");
+        signedUp("email", funnelContext);
       } else {
         await signInWithEmail(email.trim(), password);
         loggedIn("email");
@@ -190,7 +235,7 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
       const { isNew } = await signInWithGoogle();
       /* Google is one button for both, so which event it was is only known
          after the fact, from whether Firebase had seen this account before. */
-      if (isNew) signedUp("google");
+      if (isNew) signedUp("google", funnelContext);
       else loggedIn("google");
       router.push(destination);
     });
@@ -236,7 +281,7 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
     }
     void run("code", async () => {
       const { isNew } = await confirmPhoneCode(sent, code);
-      if (isNew) signedUp("phone");
+      if (isNew) signedUp("phone", funnelContext);
       else loggedIn("phone");
       router.push(destination);
     });
@@ -575,5 +620,27 @@ export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
         .
       </p>
     </div>
+  );
+}
+
+/**
+ * The Suspense boundary `useSearchParams` requires.
+ *
+ * Reading the query string makes a component dependent on the request, and
+ * Next.js will not prerender a page containing one unless the dependency is
+ * fenced off — without this the whole of /signup becomes dynamic, which costs
+ * a render on every visit to the most performance-sensitive page in the
+ * funnel. The boundary lives here rather than at the two call sites so that
+ * neither page has to know why it is needed.
+ *
+ * The fallback is a sized blank rather than a spinner: the form appears in the
+ * same paint on any real connection, and a spinner that flashes for 30ms reads
+ * as slowness that is not there. Reserving the height stops the layout jumping.
+ */
+export function SignupForm({ mode = "signup" }: { mode?: "signup" | "login" }) {
+  return (
+    <Suspense fallback={<div className="min-h-[420px]" aria-hidden />}>
+      <SignupFormFields mode={mode} />
+    </Suspense>
   );
 }

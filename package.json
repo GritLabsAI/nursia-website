@@ -11,12 +11,23 @@
     "start": "next start",
     "lint": "eslint",
     "seed:questions": "node scripts/seed-questions.mjs",
-    "test:rules": "node scripts/test-rules.mjs"
+    "test:rules": "node scripts/test-rules.mjs",
+    "seo:migrate": "tsx --env-file=.env.local pipeline/01-migrate.ts",
+    "seo:research": "tsx --env-file=.env.local pipeline/02-research.ts",
+    "seo:seed": "tsx --env-file=.env.local pipeline/03-seed.ts",
+    "seo:audit": "tsx --env-file=.env.local pipeline/04-audit.ts",
+    "typegen": "npm --prefix studio run typegen",
+    "seo:link": "tsx --env-file=.env.local pipeline/05-link.ts",
+    "kw:signin": "tsx pipeline/keywords/signin.ts",
+    "kw:ideas": "tsx pipeline/keywords/harvest.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.3.3",
+    "@portabletext/react": "^8.0.1",
+    "@sanity/image-url": "^2.1.1",
     "firebase": "^12.18.0",
     "next": "16.3.1",
+    "next-sanity": "^13.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
@@ -31,8 +42,10 @@
     "firebase-admin": "^14.3.0",
     "firebase-tools": "^15.28.1",
     "opentype.js": "^2.0.0",
+    "playwright-core": "^1.63.0",
     "sharp": "^0.35.3",
     "tailwindcss": "^4",
+    "tsx": "^4.23.13",
     "typescript": "^5"
   }
 }

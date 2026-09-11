@@ -1040,6 +1040,17 @@ const CORE_GUIDES: Guide[] = [
 ];
 
 /** The published set: the original nine, then each later wave in its own file. */
+/**
+ * FROZEN — the pre-Sanity snapshot of the guide library.
+ *
+ * Read only by pipeline/01-migrate.ts. Every page that used to render from this
+ * now queries Sanity, so adding a guide here publishes nothing. The types above
+ * are still live: `pipeline/data/drafts-*.ts` is authored against `Guide`, which
+ * is how a new guide gets type-checked before it is seeded.
+ *
+ * TOPICS and QUESTIONS below are *not* frozen. The questions deliberately stay
+ * in the repo — versioned, reviewed in pull requests, rendered into static HTML.
+ */
 export const GUIDES: Guide[] = [...CORE_GUIDES, ...EXTRA_GUIDES, ...TREND_GUIDES];
 
 export const guideBySlug = (slug: string) => GUIDES.find((g) => g.slug === slug);

@@ -1,0 +1,234 @@
+{
+  "observedAt": "2026-09-11",
+  "geo": "US",
+  "method": "Editorial research pass. Queries were assembled from NCSBN and Pearson VUE candidate-facing documentation, state board of nursing accommodation and endorsement pages, CGFNS and NLC/Nursys material, published HESI/ATI predictive-validity studies, and the peer-reviewed literature on chatbot performance against NCLEX-style items. Interest values are calibrated estimates on the Google Trends 0-100 scale, not readings taken from the Trends endpoint — the endpoint was not called for this run. Treat them as a defensible ranking, not as measurements. Re-run with TRENDS_SOURCE=google or TRENDS_SOURCE=csv to replace them with observed numbers.",
+  "sources": [
+    "https://www.nclex.com/register.page",
+    "https://www.pearsonvue.com/us/en/test-takers/accommodations.html",
+    "https://www.cgfns.org/services/certification/cgfns-certification-program/",
+    "https://nurse.org/articles/enhanced-compact-multi-state-license-eNLC/",
+    "https://www.sciencedirect.com/science/article/abs/pii/S8755722322000102",
+    "https://pubmed.ncbi.nlm.nih.gov/39692545/",
+    "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11303222/"
+  ],
+  "keywords": [
+    {
+      "query": "nurse licensure compact states",
+      "interest": 88,
+      "trajectory": "rising",
+      "related": [
+        "compact nursing license states 2026",
+        "multistate nursing license",
+        "how to get a compact nursing license",
+        "nursys license verification",
+        "nursing license by endorsement"
+      ],
+      "note": "Consistently one of the highest-volume post-licensure queries in nursing, and it grew again as Pennsylvania (July 2025) and Connecticut (October 2025) came online. Every candidate hits it the week after they pass, which makes it an 'after' page that catches people at exactly the moment they are deciding where to work. Nobody currently covers the NCLEX-to-compact hand-off honestly — the pages that rank are staffing agencies selling travel contracts.",
+      "probe": "compact nursing license"
+    },
+    {
+      "query": "hesi exit exam nclex prediction",
+      "interest": 79,
+      "trajectory": "seasonal",
+      "related": [
+        "ati comprehensive predictor score meaning",
+        "what hesi score do i need to pass nclex",
+        "is the hesi harder than the nclex",
+        "ati predictor 92 percent",
+        "failed hesi exit exam will i pass nclex"
+      ],
+      "note": "Peaks hard at the end of each academic term when exit exams are sat. High anxiety, high intent, and the searcher is 4-12 weeks from testing — the exact window in which they buy a question bank. The published validity figures are strong in one direction only (a high score predicts a pass; a low score predicts much less), and no ranking page says so.",
+      "probe": "hesi exit exam"
+    },
+    {
+      "query": "nclex testing accommodations",
+      "interest": 54,
+      "trajectory": "steady",
+      "related": [
+        "nclex ada accommodations",
+        "extra time on nclex",
+        "nclex accommodations adhd",
+        "how long does nclex accommodation approval take",
+        "nclex accommodation request form"
+      ],
+      "note": "Lower volume, but almost nothing written for candidates rather than for boards. The process has one sharp, expensive trap — accommodations must appear on the ATT before scheduling, so booking early voids them — and it is buried in board PDFs. A page that states the ordering plainly is durable, rarely refreshed by competitors, and reaches a group everyone else ignores.",
+      "probe": "nclex accommodations"
+    },
+    {
+      "query": "nclex for nigerian nurses",
+      "interest": 72,
+      "trajectory": "rising",
+      "related": [
+        "nmcn license verification for nclex",
+        "cgfns for nigerian nurses",
+        "do nigerian nurses need ielts for nclex",
+        "which us states accept nigerian nurses",
+        "nclex nigeria requirements"
+      ],
+      "note": "Nigeria is now one of the largest sources of internationally educated NCLEX candidates, and search interest has climbed steadily with it. We already have guides for Filipino and Indian candidates, so this completes the set and inherits their internal linking. The live question nobody answers straight: English is the language of Nigerian nursing education and most boards still demand IELTS or TOEFL anyway.",
+      "probe": "nclex nigerian nurses"
+    },
+    {
+      "query": "using chatgpt to study for the nclex",
+      "interest": 68,
+      "trajectory": "rising",
+      "related": [
+        "is chatgpt good for nclex questions",
+        "ai nclex practice questions",
+        "can ai write nclex rationales",
+        "best ai for nursing school",
+        "chatgpt nclex accuracy"
+      ],
+      "note": "The fastest-rising study-method query in the category and the one where the ranking pages are worst — they are almost all written by tools selling an AI feature. There is a specific, checkable failure mode in the literature: a general chatbot recommends the clinically reasonable action, which on the NCLEX is frequently the physician's action and therefore the wrong answer. Saying that plainly is both true and differentiating.",
+      "probe": "chatgpt nursing school"
+    },
+    {
+      "query": "how many questions is the nclex",
+      "interest": 95,
+      "trajectory": "steady",
+      "note": "Highest-volume query in the category. Already covered.",
+      "probe": "nclex questions"
+    },
+    {
+      "query": "nclex pass rates",
+      "interest": 84,
+      "trajectory": "seasonal",
+      "note": "Already covered; refreshes annually when NCSBN publishes.",
+      "probe": "nclex pass rate"
+    },
+    {
+      "query": "pearson vue trick",
+      "interest": 81,
+      "trajectory": "seasonal",
+      "note": "Already covered.",
+      "probe": "pearson vue trick"
+    },
+    {
+      "query": "nclex lab values to memorize",
+      "interest": 77,
+      "trajectory": "steady",
+      "note": "Already covered, and the strongest free-resource candidate on the site.",
+      "probe": "nclex lab values"
+    },
+    {
+      "query": "how to answer select all that apply nclex",
+      "interest": 74,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "select all that apply nclex"
+    },
+    {
+      "query": "nclex results timeline",
+      "interest": 73,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "nclex results"
+    },
+    {
+      "query": "prioritization and delegation nclex questions",
+      "interest": 71,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "nclex prioritization"
+    },
+    {
+      "query": "next generation nclex changes",
+      "interest": 70,
+      "trajectory": "declining",
+      "note": "Already covered. Declining as NGN stops being new — worth watching, not worth a second page.",
+      "probe": "next generation nclex"
+    },
+    {
+      "query": "nclex study plan two weeks",
+      "interest": 69,
+      "trajectory": "seasonal",
+      "note": "Already covered.",
+      "probe": "nclex study plan"
+    },
+    {
+      "query": "nclex scoring explained",
+      "interest": 66,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "nclex scoring"
+    },
+    {
+      "query": "dosage calculation practice questions",
+      "interest": 65,
+      "trajectory": "steady",
+      "note": "Already covered by a guide and a topic set.",
+      "probe": "dosage calculations"
+    },
+    {
+      "query": "nclex retake rules",
+      "interest": 63,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "nclex retake"
+    },
+    {
+      "query": "how to register for the nclex",
+      "interest": 62,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "nclex registration"
+    },
+    {
+      "query": "nclex test anxiety",
+      "interest": 60,
+      "trajectory": "seasonal",
+      "note": "Already covered.",
+      "probe": "nclex anxiety"
+    },
+    {
+      "query": "nclex bowtie questions",
+      "interest": 58,
+      "trajectory": "rising",
+      "note": "Already covered.",
+      "probe": "bowtie nclex"
+    },
+    {
+      "query": "high alert medications nclex",
+      "interest": 57,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "high alert medications"
+    },
+    {
+      "query": "clinical judgment measurement model",
+      "interest": 55,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "clinical judgment measurement model"
+    },
+    {
+      "query": "nclex for filipino nurses",
+      "interest": 76,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "nclex philippines"
+    },
+    {
+      "query": "credentials evaluation for nclex",
+      "interest": 59,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "credentials evaluation nursing"
+    },
+    {
+      "query": "2026 nclex test plan changes",
+      "interest": 52,
+      "trajectory": "declining",
+      "note": "Already covered. Declining now that April 2026 has passed, as expected.",
+      "probe": "nclex test plan"
+    },
+    {
+      "query": "infection control precautions nclex",
+      "interest": 61,
+      "trajectory": "steady",
+      "note": "Already covered.",
+      "probe": "infection control precautions"
+    }
+  ],
+  "probeNote": "Each candidate carries a `probe`: the short head term measured in its place. Google Trends will not report on multi-word long-tail phrases — it returns a flat zero for them regardless of the comparison, which means 'below the reporting threshold', not 'nobody searches this'. The probe is the shortest term that genuinely stands in for the candidate and is large enough for Trends to answer about. Where no honest proxy exists the number is unmeasurable and the editorial estimate stands."
+}

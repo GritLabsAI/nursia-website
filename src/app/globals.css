@@ -20,6 +20,14 @@
   --color-correct: #157f52;
   --color-wrong: #b23a2e;
 
+  /* Logo tiles. The tile behind the `n` is the only place these live — they are
+     never buttons, text or backgrounds, so they are deliberately not exposed as
+     Tailwind colour utilities. <Logo> and .logo-* below are the whole surface. */
+  --color-tile-results: #157f52;
+  --color-tile-night: #1e3a5f;
+  --color-tile-plum: #5b3a6e;
+  --color-tile-bronze: #8a5a1f;
+
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-ui: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-source-serif), Georgia, "Times New Roman", serif;
@@ -133,6 +141,57 @@
     width: 0.5em;
     height: 1px;
     background: var(--color-teal);
+  }
+
+  /*
+   * Buttons keep their own colours inside editorial copy.
+   *
+   * `.prose-ns a` is specificity 0-1-1 and `.btn-primary` is 0-1-0, so without
+   * this a primary button dropped into a guide renders teal text on a teal
+   * background — a button with invisible words on it, which is exactly as hard
+   * to spot in review as it sounds. Matching on `a.btn` restores the win to
+   * the button.
+   */
+  .prose-ns a.btn {
+    text-decoration: none;
+  }
+  .prose-ns a.btn-primary {
+    color: #fff;
+  }
+  .prose-ns a.btn-invert {
+    color: var(--color-ink);
+  }
+  .prose-ns a.btn-ghost {
+    color: var(--color-ink);
+  }
+  .prose-ns a.btn-ghost:hover {
+    color: var(--color-paper);
+  }
+
+  /*
+   * `not-prose` opts a self-contained block out of the editorial styles.
+   *
+   * The class was already being used in the guide templates on the assumption
+   * that it did something; it is a Tailwind Typography convention and this
+   * stylesheet is hand-written, so until now it did nothing at all. The effect
+   * was small and persistent: a conversion block placed mid-article picked up
+   * the prose list dashes and a block placed after the article did not, so the
+   * same component looked different depending on where it sat.
+   */
+  .prose-ns .not-prose ul {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+  }
+  .prose-ns .not-prose li {
+    margin: 0;
+    position: static;
+  }
+  .prose-ns .not-prose li::before {
+    content: none;
+  }
+  .prose-ns .not-prose p {
+    margin: 0;
   }
 
   /* --- the highlighter stroke: the one flourish on the site --- */

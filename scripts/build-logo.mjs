@@ -1,12 +1,17 @@
 /**
- * Generates every cut of the Nursia wordmark from one source of truth.
+ * Generates every cut of the Nursia logo from one source of truth.
  *
  *   node scripts/build-logo.mjs
  *
- * The wordmark is "nursia" in Bricolage Grotesque ExtraBold at -0.045em
- * tracking, with the full stop in scrub teal — the same setting the site header
- * renders live. Here it is converted to outlines so every cut is a real vector
- * that does not depend on the font being installed anywhere.
+ * v2 (September 2026): the full stop is gone. The word is "nursia" in Bricolage
+ * Grotesque ExtraBold at -0.045em tracking, in one colour, next to a rounded
+ * tile carrying the `n`. The colour that used to live in the full stop now
+ * lives in that tile, and the tile is dynamic: teal on light grounds,
+ * highlighter yellow on dark, plus four context colours.
+ *
+ * Everything is converted to outlines, so no cut depends on the font being
+ * installed. The React logo renders from src/components/logo-paths.ts, which
+ * this script writes too — the site and the files ship the same shapes.
  *
  * Requires scripts/.fonts/bricolage-800.ttf (see scripts/README.md).
  *
@@ -25,16 +30,32 @@ import sharp from "sharp";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const out = join(root, "public", "logo");
 const app = join(root, "src", "app");
+const kit = join(root, "brand-kit", "logos");
+const kitGpt = join(root, "brand-kit", "for-chatgpt");
+const components = join(root, "src", "components");
 
 const INK = "#14161A";
 const PAPER = "#FBFAF6";
+const WHITE = "#FFFFFF";
+const BLACK = "#000000";
 const TEAL = "#0B6B62";
 const HIGHLIGHT = "#F5E85C";
 const MUTED = "#6E6B63";
 
 const WORD = "nursia";
-const DOT = ".";
 const TRACKING = -0.045; // em, matches the header
+
+/** The approved tile colours. Each carries the `n` colour it must be paired with. */
+const TILES = {
+  teal: { hex: TEAL, glyph: PAPER, ground: "light", group: "core" },
+  yellow: { hex: HIGHLIGHT, glyph: INK, ground: "dark", group: "core" },
+  ink: { hex: INK, glyph: PAPER, ground: "light", group: "core" },
+  paper: { hex: PAPER, glyph: INK, ground: "dark", group: "core" },
+  results: { hex: "#157F52", glyph: PAPER, ground: "light", group: "context" },
+  night: { hex: "#1E3A5F", glyph: PAPER, ground: "light", group: "context" },
+  plum: { hex: "#5B3A6E", glyph: PAPER, ground: "light", group: "context" },
+  bronze: { hex: "#8A5A1F", glyph: PAPER, ground: "light", group: "context" },
+};
 
 const font = opentype.parse(
   readFileSync(join(root, "scripts", ".fonts", "bricolage-800.ttf")).buffer,
@@ -89,9 +110,9 @@ function bbox(paths) {
 /* ---------------------------------------------------------------- geometry */
 
 /**
- * Lay the glyphs out by hand so we can apply tracking and keep the full stop
- * as its own shape. Each glyph stays a separate path — merging them into one
- * risks the nonzero fill rule cancelling overlaps at this tracking.
+ * Lay the glyphs out by hand so we can apply tracking. Each glyph stays a
+ * separate path — merging them into one risks the nonzero fill rule cancelling
+ * overlaps at this tracking.
  */
 function setText(text, size) {
   const scale = size / font.unitsPerEm;
@@ -108,92 +129,148 @@ function setText(text, size) {
   return { glyphs, advance: x - track };
 }
 
-const paint = (glyphs, textFill, dotFill) =>
-  glyphs
-    .map((g) => `    <path d="${toD(g.path)}" fill="${g.ch === DOT ? dotFill : textFill}"/>`)
-    .join("\n");
+const paint = (glyphs, indent = "    ") =>
+  glyphs.map((g) => `${indent}<path d="${toD(g.path)}"/>`).join("\n");
+
+/** The word, measured once: every cut is laid out from these numbers. */
+const SIZE = 100;
+const word = setText(WORD, SIZE);
+const wordBox = bbox(word.glyphs.map((g) => g.path));
+const WORD_H = wordBox.y2 - wordBox.y1;
+
+/**
+ * The tile is a fraction taller than the word, the way a cap-height square sits
+ * beside lowercase text. Ratios, not magic numbers, so every cut scales together.
+ */
+const TILE = WORD_H * 1.145;
+const GAP = TILE * 0.273;
+const PAD_X = TILE * 0.182;
+const PAD_Y = TILE * 0.091;
+
+/** Rounded-rect path — a real path, so the one-colour cuts can knock the n out of it. */
+function tilePath(size, radius) {
+  const r = size * radius;
+  if (!r) return `M0 0H${num(size)}V${num(size)}H0Z`;
+  return (
+    `M${num(r)} 0H${num(size - r)}A${num(r)} ${num(r)} 0 0 1 ${num(size)} ${num(r)}` +
+    `V${num(size - r)}A${num(r)} ${num(r)} 0 0 1 ${num(size - r)} ${num(size)}` +
+    `H${num(r)}A${num(r)} ${num(r)} 0 0 1 0 ${num(size - r)}V${num(r)}` +
+    `A${num(r)} ${num(r)} 0 0 1 ${num(r)} 0Z`
+  );
+}
+
+/**
+ * The `n` centred on a tile, filling 49% of its width. With no full stop beside
+ * it the letter can be this big, which is what keeps it readable at 16px.
+ */
+function tileGlyph(size) {
+  const probe = font.charToGlyph("n").getPath(0, 0, SIZE);
+  const b = probe.getBoundingBox();
+  const scale = (size * 0.49) / (b.x2 - b.x1);
+  const path = font.charToGlyph("n").getPath(0, 0, SIZE * scale);
+  const g = path.getBoundingBox();
+  const dx = (size - (g.x2 - g.x1)) / 2 - g.x1;
+  const dy = (size - (g.y2 - g.y1)) / 2 - g.y1;
+  return { d: toD(path), dx, dy };
+}
 
 /* ------------------------------------------------------------------- cuts */
 
-const TONES = {
-  ink: { text: INK, dot: TEAL },
-  paper: { text: PAPER, dot: HIGHLIGHT },
-  black: { text: "#000000", dot: "#000000" },
-  white: { text: "#FFFFFF", dot: "#FFFFFF" },
-  teal: { text: TEAL, dot: TEAL },
-};
+const head = (w, h, label = "Nursia") =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${num(w)} ${num(h)}" width="${num(w)}" height="${num(h)}" role="img" aria-label="${label}">\n  <title>${label}</title>`;
 
 /**
- * Horizontal wordmark — the primary cut.
- * `duo: false` renders one colour throughout, for single-plate print,
- * embroidery, engraving, and anywhere the teal full stop would not survive.
+ * The square app mark. `knockout` cuts the letter out of the tile instead of
+ * painting it, for single-plate print, embroidery and engraving.
  */
-function wordmark({ size = 100, tone = "ink", duo = true, pad = 0.14 } = {}) {
-  const { glyphs, advance } = setText(WORD + DOT, size);
-  const box = bbox(glyphs.map((g) => g.path));
-  const colors = TONES[tone];
-  const dotFill = duo ? colors.dot : colors.text;
+function appMark({ size = 512, tile = TEAL, glyph = PAPER, radius = 0.22, knockout = false } = {}) {
+  const g = tileGlyph(size);
+  const shape = tilePath(size, radius);
 
-  // Crop to the real ink, not to font metrics, so nothing is ever clipped.
-  const padding = size * pad;
-  const w = advance + padding * 2;
-  const h = box.y2 - box.y1 + padding * 2;
-  const ox = padding;
-  const oy = padding - box.y1;
+  if (knockout) {
+    // Translate the glyph into the tile's own coordinates so tile and letter can
+    // share one path, and the letter becomes a hole under the even-odd rule.
+    const moved = translateD(g.d, g.dx, g.dy);
+    return `${head(size, size)}\n  <path fill-rule="evenodd" d="${shape}${moved}" fill="${tile}"/>\n</svg>\n`;
+  }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${num(w)} ${num(h)}" width="${num(w)}" height="${num(h)}" role="img" aria-label="Nursia">
-  <title>Nursia</title>
-  <g transform="translate(${num(ox)} ${num(oy)})">
-${paint(glyphs, colors.text, dotFill)}
+  return `${head(size, size)}
+  <path d="${shape}" fill="${tile}"/>
+  <g transform="translate(${num(g.dx)} ${num(g.dy)})" fill="${glyph}">
+    <path d="${g.d}"/>
   </g>
 </svg>
 `;
 }
 
-/**
- * The app mark: "n" plus the full stop on a square. At favicon sizes the whole
- * word is illegible, so the mark keeps the letter it starts with and the one
- * piece of colour anybody remembers.
- */
-function appMark({ size = 512, bg = INK, fg = PAPER, dot = HIGHLIGHT, radius = 0.22 } = {}) {
-  const unit = size * 0.56;
-  const { glyphs, advance } = setText("n" + DOT, unit);
-  const box = bbox(glyphs.map((g) => g.path));
+/** Shift an absolute M/L/Q/Z path. Every pair of numbers is an (x, y) point. */
+function translateD(d, dx, dy) {
+  let i = 0;
+  return d.replace(/-?\d*\.?\d+/g, (m) => {
+    const v = parseFloat(m);
+    const moved = i % 2 === 0 ? v + dx : v + dy;
+    i += 1;
+    return num(moved);
+  });
+}
 
-  const ox = (size - advance) / 2;
-  const oy = (size + (box.y2 - box.y1)) / 2 - box.y2;
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="Nursia">
-  <title>Nursia</title>
-  <rect width="${size}" height="${size}" rx="${num(size * radius)}" fill="${bg}"/>
-  <g transform="translate(${num(ox)} ${num(oy)})">
-${paint(glyphs, fg, dot)}
+/** The word on its own, one colour. */
+function wordmark({ fill = INK } = {}) {
+  const pad = SIZE * 0.14;
+  const w = word.advance + pad * 2;
+  const h = WORD_H + pad * 2;
+  return `${head(w, h)}
+  <g transform="translate(${num(pad)} ${num(pad - wordBox.y1)})" fill="${fill}">
+${paint(word.glyphs)}
   </g>
 </svg>
 `;
 }
 
-/** Stacked lockup: wordmark over the descriptor, for square-ish placements. */
-function stacked({ size = 100, tone = "ink" } = {}) {
-  const { glyphs, advance } = setText(WORD + DOT, size);
-  const box = bbox(glyphs.map((g) => g.path));
-  const colors = TONES[tone];
-  const sub = tone === "paper" ? "#FBFAF6" : MUTED;
-  const subOpacity = tone === "paper" ? "0.6" : "1";
+/** The primary lockup: tile, then the word. */
+function lockupBody({ tile, glyph, wordFill, knockout, indent = "  " }) {
+  const scale = TILE / 512;
+  const markSvg = appMark({ tile, glyph, knockout });
+  const inner = markSvg
+    .split("\n")
+    .filter((l) => l.includes("<path") || l.includes("<g ") || l.trim() === "</g>")
+    .join("\n");
+  const wordX = PAD_X + TILE + GAP - wordBox.x1;
+  const wordY = PAD_Y + TILE / 2 + WORD_H / 2 - wordBox.y2;
+  return `${indent}<g transform="translate(${num(PAD_X)} ${num(PAD_Y)}) scale(${num(scale)})">
+${inner}
+${indent}</g>
+${indent}<g transform="translate(${num(wordX)} ${num(wordY)})" fill="${wordFill}">
+${paint(word.glyphs)}
+${indent}</g>`;
+}
 
-  const pad = size * 0.14;
-  const inkHeight = box.y2 - box.y1;
-  const subSize = size * 0.185;
-  const gap = size * 0.28;
-  const w = Math.max(advance, subSize * 20) + pad * 2;
-  const h = inkHeight + gap + subSize + pad * 2;
+function lockup({ tile = TEAL, glyph = PAPER, wordFill = INK, knockout = false } = {}) {
+  const w = PAD_X * 2 + TILE + GAP + word.advance;
+  const h = TILE + PAD_Y * 2;
+  return `${head(w, h)}
+${lockupBody({ tile, glyph, wordFill, knockout })}
+</svg>
+`;
+}
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${num(w)} ${num(h)}" width="${num(w)}" height="${num(h)}" role="img" aria-label="Nursia — NCLEX practice questions">
-  <title>Nursia — NCLEX practice questions</title>
-  <g transform="translate(${num((w - advance) / 2)} ${num(pad - box.y1)})">
-${paint(glyphs, colors.text, colors.dot)}
+/** Stacked lockup: the horizontal logo over the descriptor, for square-ish placements. */
+function stacked({ tile = TEAL, glyph = PAPER, wordFill = INK, reverse = false } = {}) {
+  const lockW = PAD_X * 2 + TILE + GAP + word.advance;
+  const lockH = TILE + PAD_Y * 2;
+  const sub = reverse ? PAPER : MUTED;
+  const subOpacity = reverse ? "0.6" : "1";
+  const subSize = SIZE * 0.185;
+  const gap = SIZE * 0.2;
+  const pad = SIZE * 0.14;
+  const w = Math.max(lockW, subSize * 20) + pad * 2;
+  const h = lockH + gap + subSize + pad * 2;
+
+  return `${head(w, h, "Nursia — NCLEX practice questions")}
+  <g transform="translate(${num((w - lockW) / 2)} ${num(pad)})">
+${lockupBody({ tile, glyph, wordFill, knockout: false, indent: "    " })}
   </g>
-  <text x="${num(w / 2)}" y="${num(pad + inkHeight + gap + subSize * 0.78)}"
+  <text x="${num(w / 2)}" y="${num(pad + lockH + gap + subSize * 0.78)}"
     font-family="ui-monospace, 'IBM Plex Mono', Menlo, monospace" font-size="${num(subSize)}"
     letter-spacing="${num(subSize * 0.16)}" fill="${sub}" fill-opacity="${subOpacity}"
     text-anchor="middle">NCLEX PRACTICE QUESTIONS</text>
@@ -201,127 +278,269 @@ ${paint(glyphs, colors.text, colors.dot)}
 `;
 }
 
-/** Social / OG card: wordmark on the ink ground, under a highlighter rule. */
-function ogCard() {
+/** Social / OG card. The tile carries the colour, so there is no highlighter rule. */
+function ogCard({ dark = true } = {}) {
   const W = 1200;
   const H = 630;
-  const size = 150;
-  const { glyphs, advance } = setText(WORD + DOT, size);
-  const box = bbox(glyphs.map((g) => g.path));
-  const x = 92;
-  const baseline = 330;
-
+  const bg = dark ? INK : PAPER;
+  const tile = dark ? HIGHLIGHT : TEAL;
+  const glyph = dark ? INK : PAPER;
+  const wordFill = dark ? PAPER : INK;
+  const lockW = PAD_X * 2 + TILE + GAP + word.advance;
+  const scale = 720 / lockW;
   const grid = [
     ...Array.from(
       { length: Math.ceil(W / 40) },
-      (_, i) => `<rect x="${i * 40}" y="0" width="1" height="${H}" fill="#fff"/>`,
+      (_, i) => `<rect x="${i * 40}" y="0" width="1" height="${H}"/>`,
     ),
     ...Array.from(
       { length: Math.ceil(H / 40) },
-      (_, i) => `<rect x="0" y="${i * 40}" width="${W}" height="1" fill="#fff"/>`,
+      (_, i) => `<rect x="0" y="${i * 40}" width="${W}" height="1"/>`,
     ),
   ].join("");
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
-  <rect width="${W}" height="${H}" fill="${INK}"/>
-  <g opacity="0.055">${grid}</g>
-  <rect x="${x}" y="${num(baseline + box.y1 - 34)}" width="${num(advance)}" height="13" fill="${HIGHLIGHT}"/>
-  <g transform="translate(${x} ${baseline})">
-${paint(glyphs, PAPER, HIGHLIGHT)}
+  <rect width="${W}" height="${H}" fill="${bg}"/>
+  <g fill="${dark ? "#FFFFFF" : INK}" opacity="${dark ? "0.055" : "0.04"}">${grid}</g>
+  <g transform="translate(${num(92 - PAD_X * scale)} 196) scale(${num(scale)})">
+${lockupBody({ tile, glyph, wordFill, knockout: false, indent: "    " })}
   </g>
-  <text x="${x}" y="${baseline + 74}" font-family="ui-monospace, 'IBM Plex Mono', Menlo, monospace"
-    font-size="25" letter-spacing="3.2" fill="#FBFAF6" fill-opacity="0.6">NCLEX-RN PRACTICE QUESTIONS, WRITTEN BY NURSES</text>
-  <text x="${x}" y="${H - 66}" font-family="ui-monospace, 'IBM Plex Mono', Menlo, monospace"
-    font-size="23" letter-spacing="2" fill="#FBFAF6" fill-opacity="0.38">1,200 questions · 50 free · no card</text>
+  <text x="92" y="446" font-family="ui-monospace, 'IBM Plex Mono', Menlo, monospace"
+    font-size="25" letter-spacing="3.2" fill="${wordFill}" fill-opacity="${dark ? "0.62" : "0.7"}">NCLEX-RN PRACTICE QUESTIONS, WRITTEN BY NURSES</text>
 </svg>
 `;
 }
 
+/** The web logo, coloured at runtime through CSS variables. */
+function dynamicLockup() {
+  const svg = lockup({ tile: TEAL, glyph: PAPER, wordFill: INK });
+  return svg
+    .replace(
+      "<title>Nursia</title>",
+      `<title>Nursia</title>
+  <!--
+    Dynamic colour: inline this SVG and set these CSS variables on it or a parent.
+      nursia-tile    tile colour   (default ${TEAL} teal)
+      nursia-glyph   the n         (default ${PAPER} paper)
+      nursia-word    wordmark      (default ${INK} ink)
+    Each name is prefixed with two hyphens in CSS. Used as a plain img, the
+    defaults apply. Approved tile and n pairs are in the brand kit.
+  -->
+  <style>
+    .nursia-tile  { fill: var(--nursia-tile, ${TEAL}); }
+    .nursia-glyph { fill: var(--nursia-glyph, ${PAPER}); }
+    .nursia-word  { fill: var(--nursia-word, ${INK}); }
+  </style>`,
+    )
+    .replace(`<path d="${tilePath(512, 0.22)}" fill="${TEAL}"`, `<path class="nursia-tile" d="${tilePath(512, 0.22)}" fill="${TEAL}"`)
+    .replace(`fill="${PAPER}">`, `class="nursia-glyph" fill="${PAPER}">`)
+    .replace(`fill="${INK}">`, `class="nursia-word" fill="${INK}">`);
+}
+
 /* ------------------------------------------------------------------ write */
 
-mkdirSync(out, { recursive: true });
-
 const svgs = {
-  // primary — full colour, on light and on dark
-  "nursia-wordmark.svg": wordmark({ tone: "ink" }),
-  "nursia-wordmark-reverse.svg": wordmark({ tone: "paper" }),
-  // single colour — one-plate print, embroidery, engraving, hostile grounds
-  "nursia-wordmark-black.svg": wordmark({ tone: "black", duo: false }),
-  "nursia-wordmark-white.svg": wordmark({ tone: "white", duo: false }),
-  "nursia-wordmark-teal.svg": wordmark({ tone: "teal", duo: false }),
+  // primary lockup — tile plus word
+  "nursia-logo.svg": lockup(),
+  "nursia-logo-dynamic.svg": dynamicLockup(),
+  "nursia-logo-ink.svg": lockup({ tile: INK }),
+  "nursia-logo-reverse.svg": lockup({ tile: HIGHLIGHT, glyph: INK, wordFill: PAPER }),
+  "nursia-logo-paper-on-dark.svg": lockup({ tile: PAPER, glyph: INK, wordFill: PAPER }),
+  "nursia-logo-photo.svg": lockup({ tile: HIGHLIGHT, glyph: INK, wordFill: WHITE }),
+  "nursia-logo-black.svg": lockup({ tile: BLACK, wordFill: BLACK, knockout: true }),
+  "nursia-logo-white.svg": lockup({ tile: WHITE, wordFill: WHITE, knockout: true }),
+  // context tiles
+  ...Object.fromEntries(
+    Object.entries(TILES)
+      .filter(([, t]) => t.group === "context")
+      .map(([id, t]) => [`nursia-logo-${id}.svg`, lockup({ tile: t.hex, glyph: t.glyph })]),
+  ),
+  // word alone, always one colour
+  "nursia-wordmark.svg": wordmark({ fill: INK }),
+  "nursia-wordmark-reverse.svg": wordmark({ fill: PAPER }),
+  "nursia-wordmark-black.svg": wordmark({ fill: BLACK }),
+  "nursia-wordmark-white.svg": wordmark({ fill: WHITE }),
+  "nursia-wordmark-teal.svg": wordmark({ fill: TEAL }),
   // stacked lockup with the descriptor
-  "nursia-stacked.svg": stacked({ tone: "ink" }),
-  "nursia-stacked-reverse.svg": stacked({ tone: "paper" }),
-  // square app mark
-  "nursia-mark.svg": appMark({}),
-  "nursia-mark-light.svg": appMark({ bg: PAPER, fg: INK, dot: TEAL }),
+  "nursia-stacked.svg": stacked({}),
+  "nursia-stacked-reverse.svg": stacked({
+    tile: HIGHLIGHT,
+    glyph: INK,
+    wordFill: PAPER,
+    reverse: true,
+  }),
+  // square app mark, one per approved tile
+  ...Object.fromEntries(
+    Object.entries(TILES).map(([id, t]) => [
+      id === "teal" ? "nursia-mark.svg" : `nursia-mark-${id}.svg`,
+      appMark({ tile: t.hex, glyph: t.glyph }),
+    ]),
+  ),
   "nursia-mark-square.svg": appMark({ radius: 0 }),
+  "nursia-mark-black.svg": appMark({ tile: BLACK, knockout: true }),
+  "nursia-mark-white.svg": appMark({ tile: WHITE, knockout: true }),
   // social
-  "nursia-og.svg": ogCard(),
+  "nursia-og.svg": ogCard({ dark: true }),
+  "nursia-og-light.svg": ogCard({ dark: false }),
 };
 
 /* Nothing ships with a broken coordinate or a dropped glyph. */
-const EXPECTED_PATHS = {
-  wordmark: WORD.length + 1,
-  stacked: WORD.length + 1,
-  mark: 2,
-};
-
 for (const [name, svg] of Object.entries(svgs)) {
   if (/NaN|Infinity|undefined/.test(svg)) {
     throw new Error(`${name} contains a non-finite value`);
   }
   const paths = (svg.match(/<path /g) || []).length;
-  const expected = name.includes("wordmark")
-    ? EXPECTED_PATHS.wordmark
-    : name.includes("stacked") || name.includes("og")
-      ? EXPECTED_PATHS.stacked
-      : EXPECTED_PATHS.mark;
+  const isMark = name.includes("nursia-mark");
+  const isKnockout = name.includes("black") || name.includes("white");
+  const expected = isMark
+    ? isKnockout
+      ? 1
+      : 2
+    : name.includes("wordmark")
+      ? WORD.length
+      : isKnockout
+        ? WORD.length + 1 // knocked-out tile is one path
+        : WORD.length + 2; // tile + n + word
   if (paths !== expected) {
-    throw new Error(`${name} has ${paths} glyph paths, expected ${expected}`);
+    throw new Error(`${name} has ${paths} paths, expected ${expected}`);
   }
-  writeFileSync(join(out, name), svg);
-  console.log("svg  ", `public/logo/${name}`, `(${paths} glyphs)`);
 }
+
+mkdirSync(out, { recursive: true });
+mkdirSync(kit, { recursive: true });
+
+for (const [name, svg] of Object.entries(svgs)) {
+  writeFileSync(join(out, name), svg);
+  writeFileSync(join(kit, name), svg);
+}
+console.log(`svg   ${Object.keys(svgs).length} cuts → public/logo/ and brand-kit/logos/`);
 
 /* Rasters. Favicons and store icons must be bitmaps, and social crawlers do
    not render SVG. */
+async function raster(svg, width, { flatten } = {}) {
+  const vb = svg.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
+  const density = Math.max(1, (72 * width) / parseFloat(vb[1]));
+  let img = sharp(Buffer.from(svg), { density }).resize({ width });
+  if (flatten) img = img.flatten({ background: flatten });
+  return img.png({ compressionLevel: 9 }).toBuffer();
+}
+
 const rasters = [
-  ["nursia-mark-1024.png", svgs["nursia-mark.svg"], 1024],
-  ["nursia-mark-512.png", svgs["nursia-mark.svg"], 512],
   ["nursia-mark-192.png", svgs["nursia-mark.svg"], 192],
-  ["nursia-mark-light-512.png", svgs["nursia-mark-light.svg"], 512],
+  ["nursia-mark-512.png", svgs["nursia-mark.svg"], 512],
+  ["nursia-mark-1024.png", svgs["nursia-mark.svg"], 1024],
+  ["nursia-mark-square-1024.png", svgs["nursia-mark-square.svg"], 1024],
+  ["nursia-mark-yellow-512.png", svgs["nursia-mark-yellow.svg"], 512],
+  ["nursia-mark-paper-512.png", svgs["nursia-mark-paper.svg"], 512],
+  ["nursia-logo-1024.png", svgs["nursia-logo.svg"], 1024],
+  ["nursia-logo-2048.png", svgs["nursia-logo.svg"], 2048],
+  ["nursia-logo-reverse-1024.png", svgs["nursia-logo-reverse.svg"], 1024],
   ["nursia-wordmark-1024.png", svgs["nursia-wordmark.svg"], 1024],
   ["nursia-wordmark-reverse-1024.png", svgs["nursia-wordmark-reverse.svg"], 1024],
   ["nursia-stacked-1024.png", svgs["nursia-stacked.svg"], 1024],
   ["nursia-og.png", svgs["nursia-og.svg"], 1200],
+  ["favicon-32.png", svgs["nursia-mark.svg"], 32],
 ];
 
 for (const [name, svg, width] of rasters) {
-  await sharp(Buffer.from(svg)).resize({ width }).png().toFile(join(out, name));
-  console.log("png  ", `public/logo/${name}`);
+  const buf = await raster(svg, width);
+  writeFileSync(join(out, name), buf);
+  writeFileSync(join(kit, name), buf);
 }
+console.log(`png   ${rasters.length} rasters → public/logo/ and brand-kit/logos/`);
 
 /* App-router icon conventions — Next serves these from the routes themselves. */
 mkdirSync(app, { recursive: true });
 writeFileSync(join(app, "icon.svg"), svgs["nursia-mark-square.svg"]);
-console.log("icon ", "src/app/icon.svg");
+writeFileSync(join(app, "apple-icon.png"), await raster(svgs["nursia-mark-square.svg"], 180));
+writeFileSync(join(app, "opengraph-image.png"), await raster(svgs["nursia-og.svg"], 1200));
 
-await sharp(Buffer.from(appMark({ size: 180, radius: 0 })))
-  .resize({ width: 180 })
-  .png()
-  .toFile(join(app, "apple-icon.png"));
-console.log("icon ", "src/app/apple-icon.png");
+/* favicon.ico — 16/32/48 in one file, PNG-compressed entries. */
+function ico(entries) {
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0);
+  header.writeUInt16LE(1, 2);
+  header.writeUInt16LE(entries.length, 4);
+  let offset = 6 + 16 * entries.length;
+  const dir = entries.map(({ size, buf }) => {
+    const e = Buffer.alloc(16);
+    e.writeUInt8(size >= 256 ? 0 : size, 0);
+    e.writeUInt8(size >= 256 ? 0 : size, 1);
+    e.writeUInt16LE(1, 4);
+    e.writeUInt16LE(32, 6);
+    e.writeUInt32LE(buf.length, 8);
+    e.writeUInt32LE(offset, 12);
+    offset += buf.length;
+    return e;
+  });
+  return Buffer.concat([header, ...dir, ...entries.map((e) => e.buf)]);
+}
 
-await sharp(Buffer.from(svgs["nursia-og.svg"]))
-  .resize({ width: 1200 })
-  .png()
-  .toFile(join(app, "opengraph-image.png"));
-console.log("icon ", "src/app/opengraph-image.png");
+const icoEntries = [];
+for (const size of [16, 32, 48]) {
+  icoEntries.push({ size, buf: await raster(svgs["nursia-mark.svg"], size) });
+}
+writeFileSync(join(app, "favicon.ico"), ico(icoEntries));
+console.log("icon  src/app/icon.svg, apple-icon.png, opengraph-image.png, favicon.ico");
 
-/* 32px favicon — the one raster size that still matters */
-await sharp(Buffer.from(appMark({ size: 128, radius: 0.22 })))
-  .resize({ width: 32 })
-  .png()
-  .toFile(join(out, "favicon-32.png"));
-console.log("png  ", "public/logo/favicon-32.png");
+/* Three PNGs and a prompt live in the kit for image models, which cannot read SVG. */
+mkdirSync(kitGpt, { recursive: true });
+writeFileSync(join(kitGpt, "logo-mark.png"), await raster(svgs["nursia-mark.svg"], 512));
+writeFileSync(join(kitGpt, "logo-wordmark.png"), await raster(svgs["nursia-logo.svg"], 1024));
+writeFileSync(
+  join(kitGpt, "logo-wordmark-on-dark.png"),
+  await raster(svgs["nursia-logo-reverse.svg"], 1024, { flatten: INK }),
+);
+console.log("png   3 references → brand-kit/for-chatgpt/");
+
+/* The shapes the React logo renders, so the site and the files never drift. */
+const glyphInTile = (() => {
+  const g = tileGlyph(512);
+  return translateD(g.d, g.dx, g.dy);
+})();
+
+writeFileSync(
+  join(components, "logo-paths.ts"),
+  `/**
+ * Generated by scripts/build-logo.mjs — do not edit by hand.
+ *
+ * The Nursia logo as outlines: the wordmark's six letters, and the \`n\` centred
+ * on a 512 tile. <Logo> draws from these, so the header and the files in
+ * public/logo are the same shapes.
+ */
+
+export const WORDMARK_PATHS = [
+${word.glyphs.map((g) => `  "${toD(g.path)}",`).join("\n")}
+] as const;
+
+/** Wordmark box, with the baseline at y = ${num(-wordBox.y1)} once translated. */
+export const WORDMARK = {
+  advance: ${num(word.advance)},
+  height: ${num(WORD_H)},
+  x1: ${num(wordBox.x1)},
+  y1: ${num(wordBox.y1)},
+  y2: ${num(wordBox.y2)},
+} as const;
+
+/** Tile geometry, in the lockup's own units. */
+export const LOCKUP = {
+  tile: ${num(TILE)},
+  gap: ${num(GAP)},
+  padX: ${num(PAD_X)},
+  padY: ${num(PAD_Y)},
+  width: ${num(PAD_X * 2 + TILE + GAP + word.advance)},
+  height: ${num(TILE + PAD_Y * 2)},
+  radius: 0.22,
+} as const;
+
+/** A 512 tile and the n centred on it. */
+export const TILE_PATH = "${tilePath(512, 0.22)}";
+export const TILE_GLYPH_PATH = "${glyphInTile}";
+
+/** The approved tile colours, and the n colour each one must be paired with. */
+export const TILES = ${JSON.stringify(TILES, null, 2).replace(/"([a-z]+)":/g, "$1:")} as const;
+
+export type TileName = keyof typeof TILES;
+`,
+);
+console.log("ts    src/components/logo-paths.ts");

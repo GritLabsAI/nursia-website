@@ -15,7 +15,10 @@ import {
 } from "@/components/Blocks";
 import { QuestionSet } from "@/components/QuestionSet";
 import { StickyCta } from "@/components/StickyCta";
-import { GUIDES, HUB_FAQ, QUESTIONS, SITE, playableCount, topicsIn } from "@/lib/content";
+import { HUB_FAQ, QUESTIONS, SITE, playableCount, topicsIn } from "@/lib/content";
+import { sanityFetch, tags } from "@/sanity/client";
+import { GUIDES_BY_SLUGS_QUERY } from "@/sanity/queries";
+import type { GUIDES_BY_SLUGS_QUERYResult } from "@/sanity.types";
 
 /* Title under 60 chars, description under 155 — this is the page the whole
    site links to, so it is the one that gets finalised first. */
@@ -66,7 +69,19 @@ const TYPES = [
   },
 ];
 
-export default function HubPage() {
+/* Named rather than computed: these two are the guides somebody browsing the
+   question hub most often needs next, which is an editorial call. Only their
+   titles and reading times come from Sanity, so they cannot go stale. */
+const RELATED_GUIDES = ["how-hard-is-the-nclex", "four-week-study-plan"];
+
+export const revalidate = 3600;
+
+export default async function HubPage() {
+  const related = await sanityFetch<GUIDES_BY_SLUGS_QUERYResult>(
+    GUIDES_BY_SLUGS_QUERY,
+    { params: { slugs: RELATED_GUIDES }, tags: [tags.guides] },
+  );
+
   return (
     <>
       <BreadcrumbSchema trail={TRAIL} />
@@ -265,11 +280,10 @@ export default function HubPage() {
             <div className="mt-16 border-t border-rule pt-5">
               <p className="eyebrow">Related</p>
               <ul className="mt-4 grid gap-3 sm:grid-cols-3">
-                {["how-hard-is-the-nclex", "four-week-study-plan"].map((slug) => {
-                  const g = GUIDES.find((x) => x.slug === slug)!;
+                {related.map((g) => {
                   return (
-                    <li key={slug}>
-                      <Link href={`/guides/${slug}`} className="cell h-full">
+                    <li key={g._id}>
+                      <Link href={`/guides/${g.slug}`} className="cell h-full">
                         <p className="eyebrow">Guide · {g.minutes} min</p>
                         <p className="mt-2 font-display text-[0.9375rem] font-bold tracking-[-0.02em] text-ink">
                           {g.title}

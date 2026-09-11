@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Wordmark } from "@/components/Wordmark";
+import { Logo } from "@/components/Logo";
 import { CtaLink } from "@/components/lp/CtaLink";
 
 /**
@@ -15,7 +15,7 @@ export function LpHeader({ src }: { src: string }) {
     <header className="border-b border-rule">
       <div className="mx-auto flex h-14 max-w-[1140px] items-center px-5 sm:h-16 sm:px-8">
         <Link href="/" aria-label="Nursia — home" className="flex items-center">
-          <Wordmark />
+          <Logo />
         </Link>
         <span className="ml-auto flex items-center gap-5">
           <Link

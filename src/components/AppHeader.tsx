@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AccountMenu } from "./AccountMenu";
-import { Wordmark } from "./Wordmark";
+import { Logo } from "./Logo";
 
 /**
  * Signed-in shell: product navigation, plus how far into the exam they are.
@@ -20,7 +20,7 @@ export function AppHeader({ questionsAnswered }: { questionsAnswered: number }) 
     <header className="border-b border-rule bg-paper">
       <div className="mx-auto flex h-16 max-w-[1140px] items-center gap-7 px-5 sm:px-8">
         <Link href="/" className="flex items-center" aria-label="Nursia — home">
-          <Wordmark />
+          <Logo />
         </Link>
         <nav aria-label="Main" className="flex items-center gap-6">
           <span className="text-[0.9375rem] font-semibold text-ink">Practice</span>

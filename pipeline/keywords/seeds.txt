@@ -1,0 +1,96 @@
+# Seed keywords for Keyword Planner expansion.
+#
+# These are not the topics. They are the starting points Google expands into
+# related keywords with real volumes — one seed typically returns hundreds of
+# ideas, so breadth here matters more than precision.
+#
+# Chosen to cover the whole candidate journey and the whole test plan, because
+# a seed list weighted to one area produces a topic list weighted to the same
+# area and the gap never shows up as a gap. Twenty per request; the script
+# batches.
+
+# --- the exam itself
+nclex
+nclex rn
+nclex pn
+next generation nclex
+nclex practice questions
+nclex study guide
+nclex test plan
+nclex pass rate
+nclex scoring
+nclex results
+
+# --- logistics and eligibility
+nclex registration
+authorization to test nclex
+pearson vue nclex
+nclex retake
+nursing license by endorsement
+compact nursing license
+nursys
+cgfns
+nclex for international nurses
+nclex accommodations
+
+# --- item formats
+select all that apply nursing questions
+nclex case study
+bowtie nclex
+matrix nclex questions
+clinical judgment measurement model
+
+# --- NCSBN client need categories
+safe and effective care environment
+management of care nursing
+safety and infection control
+health promotion and maintenance
+psychosocial integrity
+basic care and comfort nursing
+pharmacological therapies
+reduction of risk potential
+physiological adaptation nursing
+
+# --- clinical subjects
+nursing pharmacology
+medical surgical nursing
+maternity nursing
+pediatric nursing
+mental health nursing
+fundamentals of nursing
+cardiac nursing
+respiratory nursing
+renal nursing
+endocrine nursing
+neurological nursing
+gastrointestinal nursing
+fluid and electrolytes nursing
+acid base balance nursing
+lab values nursing
+dosage calculations nursing
+ekg interpretation nursing
+prioritization and delegation nursing
+therapeutic communication nursing
+infection control nursing
+wound care nursing
+iv therapy nursing
+oxygenation nursing
+nursing interventions
+
+# --- study method and school
+how to study for nclex
+nclex review course
+nursing school study tips
+hesi exit exam
+ati comprehensive predictor
+nursing care plan
+nursing diagnosis
+nursing mnemonics
+clinical skills nursing
+
+# --- after the exam
+new grad nurse
+nurse residency program
+nursing job interview
+nurse salary
+travel nursing

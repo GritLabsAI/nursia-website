@@ -9,22 +9,41 @@ import {
   Section,
   SectionHead,
 } from "@/components/Blocks";
-import { CLUSTERS, GUIDES, SITE, topicBySlug } from "@/lib/content";
+import { CLUSTERS, SITE, topicBySlug } from "@/lib/content";
+import { sanityFetch, tags } from "@/sanity/client";
+import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
+import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
 
-const COUNT = GUIDES.length;
-const DEEP_DIVES = GUIDES.filter((g) => g.cluster === "content").length;
+export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: { absolute: "NCLEX Guides — study plans, scoring, content, test day | Nursia" },
-  description: `${COUNT} NCLEX-RN guides grouped by where you are in your prep: before you start, while you study, the content that decides scores, and test day and after. Written and reviewed by nurses.`,
-  alternates: { canonical: "/guides" },
-};
+type GuideCardData = GUIDES_INDEX_QUERYResult[number];
 
 const TRAIL = [{ label: "Home", href: "/" }, { label: "Guides" }];
 
-function GuideCard({ slug, featured = false }: { slug: string; featured?: boolean }) {
-  const g = GUIDES.find((x) => x.slug === slug)!;
-  const topic = topicBySlug(g.topic)!;
+/**
+ * The count is read rather than written down.
+ *
+ * It appears in the metadata, in the opening paragraph, and in the
+ * CollectionPage schema, and the one thing worse than an inaccurate count in
+ * three places is an inaccurate count in three places that disagree. Every one
+ * of them comes off the same fetch, so publishing a guide updates all of them
+ * and nobody has to remember.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+    tags: [tags.guides],
+  });
+  return {
+    title: {
+      absolute: "NCLEX Guides — study plans, scoring, content, test day | Nursia",
+    },
+    description: `${guides.length} NCLEX-RN guides grouped by where you are in your prep: before you start, while you study, the content that decides scores, and test day and after. Written and reviewed by nurses.`,
+    alternates: { canonical: "/guides" },
+  };
+}
+
+function GuideCard({ g, featured = false }: { g: GuideCardData; featured?: boolean }) {
+  const topic = g.topicSlug ? topicBySlug(g.topicSlug) : undefined;
 
   if (featured) {
     return (
@@ -35,7 +54,7 @@ function GuideCard({ slug, featured = false }: { slug: string; featured?: boolea
           {g.shortAnswer.split(". ").slice(0, 2).join(". ")}.
         </p>
         <p className="mt-4 font-mono text-[11px] text-muted">
-          RN reviewed · links to {topic.name.toLowerCase()}
+          RN reviewed{topic ? ` · links to ${topic.name.toLowerCase()}` : ""}
         </p>
       </Link>
     );
@@ -48,7 +67,7 @@ function GuideCard({ slug, featured = false }: { slug: string; featured?: boolea
           {g.title}
         </p>
         <p className="mt-1 font-mono text-[11px] text-muted">
-          {g.minutes} min · → {topic.name.toLowerCase()}
+          {g.minutes} min{topic ? ` · → ${topic.name.toLowerCase()}` : ""}
         </p>
       </div>
       <span className="ml-auto shrink-0 font-mono text-[0.8125rem] text-teal">→</span>
@@ -56,8 +75,14 @@ function GuideCard({ slug, featured = false }: { slug: string; featured?: boolea
   );
 }
 
-export default function GuidesPage() {
-  const byCluster = (id: string) => GUIDES.filter((g) => g.cluster === id);
+export default async function GuidesPage() {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+    tags: [tags.guides, tags.topics],
+  });
+
+  const count = guides.length;
+  const deepDives = guides.filter((g) => g.cluster === "content").length;
+  const byCluster = (id: string) => guides.filter((g) => g.cluster === id);
 
   return (
     <>
@@ -72,14 +97,14 @@ export default function GuidesPage() {
             "@type": "CollectionPage",
             "@id": `${SITE.url}/guides`,
             name: "NCLEX Guides",
-            description: `${COUNT} NCLEX-RN guides written and reviewed by registered nurses.`,
+            description: `${count} NCLEX-RN guides written and reviewed by registered nurses.`,
             inLanguage: "en-US",
             isPartOf: { "@id": `${SITE.url}#website` },
             about: { "@type": "Thing", name: "NCLEX-RN" },
             mainEntity: {
               "@type": "ItemList",
-              numberOfItems: COUNT,
-              itemListElement: GUIDES.map((g, i) => ({
+              numberOfItems: count,
+              itemListElement: guides.map((g, i) => ({
                 "@type": "ListItem",
                 position: i + 1,
                 name: g.title,
@@ -96,10 +121,10 @@ export default function GuidesPage() {
           <h1 className="text-[2.25rem] leading-[1.04] sm:text-[3rem]">Guides for the NCLEX</h1>
 
           <p className="mt-6 font-body text-[1.0625rem] leading-[1.68] text-ink-2 sm:text-[1.1875rem]">
-            {COUNT} guides, grouped by where you are rather than by when we published them. If you
+            {count} guides, grouped by where you are rather than by when we published them. If you
             are still deciding how seriously to take the exam, start with how hard the NCLEX
             actually is. If you have a date booked, go straight to the 4-week plan. If the gap is
-            content rather than method, the third cluster is {DEEP_DIVES} deep dives on the areas that
+            content rather than method, the third cluster is {deepDives} deep dives on the areas that
             decide most scores. And if you are here after a result you did not want, the last
             cluster is written for you and it does not open with sympathy — it opens with the
             Candidate Performance Report.
@@ -109,14 +134,10 @@ export default function GuidesPage() {
 
           {CLUSTERS.map((c, ci) => (
             <div key={c.id} className="mt-16">
-              <SectionHead
-                eyebrow={`Cluster ${ci + 1}`}
-                title={c.label}
-                note={c.note}
-              />
+              <SectionHead eyebrow={`Cluster ${ci + 1}`} title={c.label} note={c.note} />
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {byCluster(c.id).map((g, i) => (
-                  <GuideCard key={g.slug} slug={g.slug} featured={i === 0} />
+                  <GuideCard key={g._id} g={g} featured={i === 0} />
                 ))}
               </div>
               {c.id === "during" && (

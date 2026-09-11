@@ -18,7 +18,7 @@ COLOURS — use these and nothing else
 Paper background #FBFAF6. Second surface #F4F2EB. Cards pure white #FFFFFF.
 Headline ink #14161A. Body ink #3A3D44. Small labels #6E6B63.
 Hairlines and borders #E3DFD4, always 1px.
-Teal accent #0B6B62 — buttons, ticks, the full stop in the logo.
+Teal accent #0B6B62 — buttons, ticks, the primary logo tile.
 Highlighter yellow #F5E85C — one stroke per layout, maximum, behind one phrase.
 Correct answer green #157F52 on fill #F3FAF5. Wrong answer red #B23A2E on #FDF5F3.
 
@@ -30,10 +30,13 @@ all caps, wide letter-spacing, grey.
 Never set body copy in the sans. Never set a headline in the serif.
 
 LOGO
-Use the supplied wordmark file as-is. Ink letters with a teal full stop on
-light grounds; on the dark ink ground the full stop is highlighter yellow, and
-on photography use the white cut. Never stretch, rotate, recolour, outline or
-shadow it. Keep clear space equal to the height of the "n" on all sides.
+Use the supplied logo file as-is. It has no full stop: the word in one colour,
+next to a rounded tile carrying the "n". On light grounds the tile is teal with
+a paper "n" and the word is ink; on the dark ink ground use the reverse file,
+where the tile is highlighter yellow with an ink "n"; over photography the word
+is white. Never add a dot back, never recolour the word to match the tile, and
+never stretch, rotate, outline or shadow it. Keep clear space equal to the
+height of the "n" on all sides.
 Place it small, bottom-left or top-left. It is never the hero.
 
 THE SIGNATURE OBJECT

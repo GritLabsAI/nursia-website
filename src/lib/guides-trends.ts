@@ -1,3 +1,16 @@
+/*
+ * FROZEN — the pre-Sanity snapshot.
+ *
+ * The live guide library is in Sanity (project z92ivzd6). Nothing the site
+ * renders reads this file any more; its only consumer is
+ * pipeline/01-migrate.ts, which transcribed it into the content lake.
+ *
+ * Editing a guide here will not change the page. Edit it in the Studio
+ * (cd studio && npm run dev), or through the pipeline. This file is kept so the
+ * migration remains reproducible and so the original hand-written copy stays in
+ * version control next to the code that moved it.
+ */
+
 /**
  * The third wave of guides — written against what people are actually
  * searching for in late 2026.

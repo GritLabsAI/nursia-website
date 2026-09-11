@@ -49,3 +49,10 @@ scripts/.fonts/
 *-debug.log
 firebase-debug.*.log
 .firebase/
+
+# local content store for the batch pipeline (regenerable, can be large)
+pipeline/data/content.db*
+
+# live Google session for the ads browser automation — treat as a credential
+pipeline/.browser-profile/
+pipeline/data/downloads/
