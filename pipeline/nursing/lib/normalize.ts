@@ -50,6 +50,32 @@ const EXCLUDE = [
   "uworld", "uwsa", "u world", "you world", "archer", "nurseachieve",
   "simplenursing", "picmonic", "bootcamp", "hurst", "saunders", "ati ",
   "mark klimek", "nursing.com", "lecturio", "osmosis",
+  /*
+   * Off-funnel intents — added September 2026, when the second harvest was
+   * seeded broadly enough to pull in the whole "nurse salary" and "travel
+   * nursing" market. Those queries have real volume and no path to the
+   * practice product: a reader comparing CRNA pay is not three days from an
+   * exam. Left in, they outscored every clinical subject on volume alone and
+   * took 900 of the 1,700 slots in the first dry run. Navigational queries
+   * for other organisations' logins go the same way — the page cannot answer
+   * them.
+   */
+  "salary", "salaries", "pay", "paid", "income", "wage", "wages", "earn",
+  "earnings", "hourly", "per hour", "job", "jobs", "hiring", "career",
+  "careers", "agency", "agencies", "staffing", "travel", "traveling",
+  "travelling", "per diem", "contract", "contracts", "assignment",
+  "assignments", "recruiter", "recruiting", "resume", "cover letter",
+  "interview", "certification", "certified", "certificate", "wocn", "cwocn",
+  "ccrn", "cen", "cnor", "pccn", "conference", "association", "magazine",
+  "journal", "login", "log in", "sign in", "nursys", "pearson", "cgfns",
+  "indeed", "ziprecruiter", "glassdoor", "vivian", "aya", "amn", "fastaff",
+  "gypsy", "lancesoft", "trustaff", "prolink", "tnaa", "onestaff",
+  "practitioner", "np", "crna", "anesthetist", "midwife", "dnp", "msn", "bsn",
+  "adn", "cna", "phlebotomy", "medical assistant", "lab tech", "ekg tech",
+  "scrubs", "shoes", "stethoscope", "watch", "gift", "gifts", "week",
+  "quotes", "memes", "meme", "funny", "salary", "become a", "how to become",
+  "school", "schools", "program", "programs", "degree", "prerequisites",
+  "tuition", "accredited", "university", "college",
 ];
 
 /**
