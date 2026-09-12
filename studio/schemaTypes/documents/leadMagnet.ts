@@ -1,4 +1,4 @@
-import { GiftIcon } from "@sanity/icons";
+import { PackageIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
 /**
@@ -20,7 +20,7 @@ export const leadMagnet = defineType({
   name: "leadMagnet",
   title: "Free resource",
   type: "document",
-  icon: GiftIcon,
+  icon: PackageIcon,
   groups: [
     { name: "what", title: "The resource", default: true },
     { name: "gate", title: "The ask" },

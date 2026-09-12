@@ -44,6 +44,10 @@ export const buildClient = client.withConfig({ useCdn: false });
 export const tags = {
   guide: (slug: string) => `guide:${slug}`,
   guides: "guide",
+  seoPage: (slug: string) => `seoPage:${slug}`,
+  seoPages: "seoPage",
+  nursingPage: (slug: string) => `nursingPage:${slug}`,
+  nursingPages: "nursingPage",
   topic: (slug: string) => `topic:${slug}`,
   topics: "topic",
   leadMagnets: "leadMagnet",
@@ -53,6 +57,41 @@ export const tags = {
 
 /** Everything a guide page depends on, in one list. */
 export const GUIDE_PAGE_TAGS = [
+  tags.guides,
+  tags.topics,
+  tags.leadMagnets,
+  tags.experiments,
+  tags.authors,
+];
+
+/**
+ * The same list for a review page, plus the guides it links out to.
+ *
+ * `tags.guides` is in here because a review page renders the titles of the
+ * guides in its related-reading rail. Retitle a guide and, without this, the
+ * old title keeps appearing on a hundred review pages until something else
+ * happens to rebuild them.
+ */
+export const SEO_PAGE_TAGS = [
+  tags.seoPages,
+  tags.guides,
+  tags.topics,
+  tags.leadMagnets,
+  tags.experiments,
+  tags.authors,
+];
+
+/**
+ * The same again for a nursing library page.
+ *
+ * `tags.nursingPages` as well as the per-slug tag, because these pages render
+ * each other: every page carries a rail of four siblings by title, so editing
+ * one page's title changes the text on four others. Without the type tag those
+ * four keep the old title until something unrelated rebuilds them, and at a
+ * thousand pages "something unrelated" may not happen for weeks.
+ */
+export const NURSING_PAGE_TAGS = [
+  tags.nursingPages,
   tags.guides,
   tags.topics,
   tags.leadMagnets,

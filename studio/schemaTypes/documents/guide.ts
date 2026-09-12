@@ -171,6 +171,17 @@ export const guide = defineType({
     }),
 
     defineField({
+      name: "relatedReviews",
+      title: "Revise the subject",
+      type: "array",
+      group: "connect",
+      of: [defineArrayMember({ type: "reference", to: [{ type: "seoPage" }] })],
+      description:
+        "Review pages on the subject this guide touches. These are outbound links from a page that already ranks into a newer one, which is the only reason a newly published review page gets crawled promptly — the sitemap alone is not enough. Two is plenty; this rail is not the point of the guide.",
+      validation: (rule) => rule.max(3).unique(),
+    }),
+
+    defineField({
       name: "author",
       type: "reference",
       group: "meta",

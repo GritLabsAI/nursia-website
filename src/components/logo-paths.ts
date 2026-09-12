@@ -50,7 +50,7 @@ export const TILES = {
   yellow: {
     hex: "#F5E85C",
     glyph: "#14161A",
-    ground: "dark",
+    ground: "any",
     group: "core"
   },
   ink: {

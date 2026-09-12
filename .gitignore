@@ -56,3 +56,11 @@ pipeline/data/content.db*
 # live Google session for the ads browser automation — treat as a credential
 pipeline/.browser-profile/
 pipeline/data/downloads/
+
+# pipeline working state: SQLite databases, run logs and lock files. The
+# pipelines are reproducible from the code and the keyword CSVs; the databases
+# are large, binary and per-machine, and a lock file is meaningless off the
+# machine that took it.
+pipeline/*/data/
+.tmp/
+*.zip

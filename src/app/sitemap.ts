@@ -1,8 +1,13 @@
 import type { MetadataRoute } from "next";
 import { SITE, TOPICS } from "@/lib/content";
 import { sanityFetch, tags } from "@/sanity/client";
-import { GUIDES_SITEMAP_QUERY } from "@/sanity/queries";
-import type { GUIDES_SITEMAP_QUERYResult } from "@/sanity.types";
+import { GUIDES_SITEMAP_QUERY, SEO_PAGES_SITEMAP_QUERY } from "@/sanity/queries";
+import { NURSING_SITEMAP_QUERY } from "@/sanity/nursing-queries";
+import type {
+  GUIDES_SITEMAP_QUERY_RESULT,
+  NURSING_SITEMAP_QUERY_RESULT,
+  SEO_PAGES_SITEMAP_QUERY_RESULT,
+} from "@/sanity.types";
 
 /**
  * Every public page. The gated ones (/signup, /login, /try) stay out, and so
@@ -27,10 +32,17 @@ const BANK_UPDATED = new Date("2026-08-01");
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const guides = await sanityFetch<GUIDES_SITEMAP_QUERYResult>(
-    GUIDES_SITEMAP_QUERY,
-    { tags: [tags.guides] },
-  );
+  const [guides, reviews, nursing] = await Promise.all([
+    sanityFetch<GUIDES_SITEMAP_QUERY_RESULT>(GUIDES_SITEMAP_QUERY, {
+      tags: [tags.guides],
+    }),
+    sanityFetch<SEO_PAGES_SITEMAP_QUERY_RESULT>(SEO_PAGES_SITEMAP_QUERY, {
+      tags: [tags.seoPages],
+    }),
+    sanityFetch<NURSING_SITEMAP_QUERY_RESULT>(NURSING_SITEMAP_QUERY, {
+      tags: [tags.nursingPages],
+    }),
+  ]);
 
   const at = (
     path: string,
@@ -52,6 +64,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...guides.map((g) =>
       at(`/guides/${g.slug}`, 0.7, new Date(`${g.updatedAt}T00:00:00Z`), "monthly"),
     ),
+    /* The review programme. Lower priority than the guides deliberately: these
+       are a wider, shallower net, and telling a crawler that a hundred new
+       pages matter as much as the hand-written library is how the library's
+       own priority stops meaning anything. */
+    at("/nclex-review", 0.8, SITE_UPDATED, "weekly"),
+    ...reviews.map((p) =>
+      at(`/nclex-review/${p.slug}`, 0.6, new Date(`${p.updatedAt}T00:00:00Z`), "monthly"),
+    ),
+
+    /*
+     * The nursing library — the long tail, and the largest thing in here.
+     *
+     * The hub is 0.8 because it is the page every one of these is reachable
+     * from, and a crawler that reads one URL from this section should read
+     * that one. The pages themselves sit at 0.5, below the review programme,
+     * which is below the guides. That ordering is the honest one: priority is
+     * relative within a sitemap and means nothing in absolute terms, so the
+     * only useful thing it can say is which of our own pages we would rather
+     * have crawled first. Telling a crawler a thousand programmatic pages
+     * matter as much as fifty hand-written ones does not raise the thousand,
+     * it flattens the signal for all of them.
+     *
+     * `noIndex` pages are already excluded by the query rather than filtered
+     * here, because a URL that is in the sitemap and carries a noindex tag is
+     * a contradiction a crawler resolves by trusting neither.
+     */
+    at("/nursing", 0.8, SITE_UPDATED, "weekly"),
+    ...nursing.map((p) =>
+      at(`/nursing/${p.slug}`, 0.5, new Date(`${p.updatedAt}T00:00:00Z`), "monthly"),
+    ),
+
     at("/nclex", 0.6),
 
     /* Commercial and trust */

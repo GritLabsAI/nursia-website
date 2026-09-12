@@ -2,24 +2,24 @@
   <title>Nursia</title>
   <!--
     Dynamic colour: inline this SVG and set these CSS variables on it or a parent.
-      nursia-tile    tile colour   (default #0B6B62 teal)
-      nursia-glyph   the n         (default #FBFAF6 paper)
+      nursia-tile    tile colour   (default #F5E85C highlighter)
+      nursia-glyph   the n         (default #14161A ink)
       nursia-word    wordmark      (default #14161A ink)
     Each name is prefixed with two hyphens in CSS. Used as a plain img, the
     defaults apply. Approved tile and n pairs are in the brand kit.
   -->
   <style>
-    .nursia-tile  { fill: var(--nursia-tile, #0B6B62); }
-    .nursia-glyph { fill: var(--nursia-glyph, #FBFAF6); }
+    .nursia-tile  { fill: var(--nursia-tile, #F5E85C); }
+    .nursia-glyph { fill: var(--nursia-glyph, #14161A); }
     .nursia-word  { fill: var(--nursia-word, #14161A); }
   </style>
   <g transform="translate(16.004 8.002) scale(0.172)">
-  <path class="nursia-tile" d="M112.64 0H399.36A112.64 112.64 0 0 1 512 112.64V399.36A112.64 112.64 0 0 1 399.36 512H112.64A112.64 112.64 0 0 1 0 399.36V112.64A112.64 112.64 0 0 1 112.64 0Z" fill="#0B6B62"/>
-  <g transform="translate(101.045 385.01)" class="nursia-glyph" fill="#FBFAF6">
+  <path class="nursia-tile" d="M112.64 0H399.36A112.64 112.64 0 0 1 512 112.64V399.36A112.64 112.64 0 0 1 399.36 512H112.64A112.64 112.64 0 0 1 0 399.36V112.64A112.64 112.64 0 0 1 112.64 0Z" fill="#F5E85C"/>
+  <g class="nursia-glyph" transform="translate(101.045 385.01)" class="nursia-word" fill="#14161A">
     <path d="M106.16 0L29.515 0L29.515 -151.385L29.515 -251.356L91.402 -251.356L92.354 -177.568L101.875 -177.568Q108.064 -204.227 119.489 -222.317Q130.915 -240.407 148.529 -249.214Q166.143 -258.021 189.945 -258.021L189.945 -258.021Q234.218 -258.021 257.307 -227.077Q280.395 -196.134 280.395 -128.534L280.395 -128.534L280.395 0L203.275 0L203.275 -119.965Q203.275 -159.002 192.087 -176.854Q180.9 -194.706 159.002 -194.706L159.002 -194.706Q140.912 -194.706 129.248 -183.757Q117.585 -172.807 111.872 -154.717Q106.16 -136.627 106.16 -114.253L106.16 -114.253L106.16 0"/>
   </g>
   </g>
-  <g transform="translate(121.747 88.97)" class="nursia-word" fill="#14161A">
+  <g transform="translate(121.747 88.97)" fill="#14161A">
     <path d="M22.3 0L6.2 0L6.2 -31.8L6.2 -52.8L19.2 -52.8L19.4 -37.3L21.4 -37.3Q22.7 -42.9 25.1 -46.7Q27.5 -50.5 31.2 -52.35Q34.9 -54.2 39.9 -54.2L39.9 -54.2Q49.2 -54.2 54.05 -47.7Q58.9 -41.2 58.9 -27L58.9 -27L58.9 0L42.7 0L42.7 -25.2Q42.7 -33.4 40.35 -37.15Q38 -40.9 33.4 -40.9L33.4 -40.9Q29.6 -40.9 27.15 -38.6Q24.7 -36.3 23.5 -32.5Q22.3 -28.7 22.3 -24L22.3 -24L22.3 0"/>
     <path d="M84.1 1.4L84.1 1.4Q74.7 1.4 69.95 -4.95Q65.2 -11.3 65.2 -24.3L65.2 -24.3L65.2 -52.8L81.4 -52.8L81.4 -26.4Q81.4 -19 83.6 -15.35Q85.8 -11.7 90.3 -11.7L90.3 -11.7Q93 -11.7 94.95 -13.05Q96.9 -14.4 98.25 -16.85Q99.6 -19.3 100.25 -22.5Q100.9 -25.7 100.9 -29.5L100.9 -29.5L100.9 -52.8L117 -52.8L117 -21.4L117 0L104.2 0L103.9 -16.3L101.9 -16.3Q100.4 -10.1 98.15 -6.15Q95.9 -2.2 92.5 -0.4Q89.1 1.4 84.1 1.4"/>
     <path d="M141.1 0L124.9 0L124.9 -24.5L124.9 -52.8L138.1 -52.8L138.4 -34.9L140.4 -34.9Q141.1 -41.9 143.05 -46.05Q145 -50.2 148.65 -52.1Q152.3 -54 157.7 -54L157.7 -54Q158.5 -54 159.5 -53.95Q160.5 -53.9 161.8 -53.7L161.8 -53.7L161.2 -36.5Q159.6 -37.3 157.75 -37.55Q155.9 -37.8 154.5 -37.8L154.5 -37.8Q150.6 -37.8 147.75 -36.3Q144.9 -34.8 143.25 -31.7Q141.6 -28.6 141.1 -23.9L141.1 -23.9L141.1 0"/>

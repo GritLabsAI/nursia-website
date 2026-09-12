@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SITE, SOCIAL, topicsIn } from "@/lib/content";
 import { sanityFetch, tags } from "@/sanity/client";
 import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
-import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
+import type { GUIDES_INDEX_QUERY_RESULT } from "@/sanity.types";
 import { Logo } from "./Logo";
 
 const LEGAL = [
@@ -51,7 +51,7 @@ function FootLink({ href, children }: { href: string; children: React.ReactNode 
  * somebody unpublishes one.
  */
 export async function SiteFooter() {
-  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERY_RESULT>(GUIDES_INDEX_QUERY, {
     tags: [tags.guides],
   });
 
@@ -62,8 +62,8 @@ export async function SiteFooter() {
             smallest screen halves that; the brand block keeps the full width. */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="col-span-2 max-w-xs lg:col-span-1">
-            {/* Paper tile, not the yellow one: the footer's only highlighter is the CTA. */}
-            <Logo tone="paper" tile="paper" label="Nursia" />
+            {/* The primary yellow tile, with the paper word the ink ground needs. */}
+            <Logo tone="paper" label="Nursia" />
             <p className="mt-3 text-[0.875rem] leading-relaxed text-white/60">{SITE.tagline}</p>
             <div className="mt-5 flex gap-4">
               {SOCIAL.map((s) => (
@@ -96,6 +96,13 @@ export async function SiteFooter() {
               </FootLink>
             ))}
             <FootLink href="/guides">All guides →</FootLink>
+            {/* Site-wide, so the review hub is one hop from every page rather
+                than only from the topic pages that happen to link into it. */}
+            <FootLink href="/nclex-review">NCLEX review by subject →</FootLink>
+            {/* And the nursing library, for the same reason and more urgently:
+                a thousand pages hang off that one hub, so if it is reachable
+                only from itself the entire library is two hops from nowhere. */}
+            <FootLink href="/nursing">The nursing library →</FootLink>
           </Col>
 
           <Col title="Company">
@@ -167,6 +174,7 @@ export function MinimalFooter() {
               links: [
                 { label: "Practice", href: "/nclex-practice-questions" },
                 { label: "Guides", href: "/guides" },
+                { label: "Review by subject", href: "/nclex-review" },
                 { label: "Pricing", href: "/pricing" },
               ],
             },

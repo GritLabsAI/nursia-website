@@ -5,10 +5,12 @@ import type { TileName } from "./logo-paths";
  * The logo, drawn from the same outlines as the files in public/logo — the word
  * is never re-set as live text, so the header cannot drift from the artwork.
  *
- * v2 has no full stop. The colour lives in the tile behind the `n`, and the tile
- * is dynamic: teal on light grounds, highlighter yellow on dark, plus the four
- * context tiles. Every fill reads a CSS variable first, so a section can retheme
- * the mark with `--nursia-tile` without touching this component.
+ * v2 has no full stop. The colour lives in the tile behind the `n`, and the
+ * primary tile is highlighter yellow with an ink `n` — it carries every ground,
+ * light and dark alike. Teal, ink, paper and the four context tiles remain for
+ * surfaces that need a quieter mark. Every fill reads a CSS variable first, so a
+ * section can retheme the mark with `--nursia-tile` without touching this
+ * component.
  */
 type Props = {
   /** Word colour. The word is always one colour, and never matches the tile. */
@@ -25,7 +27,7 @@ const WORD_FILL = { ink: "#14161A", paper: "#FBFAF6", white: "#FFFFFF" } as cons
 
 export function Logo({
   tone = "ink",
-  tile = "teal",
+  tile = "yellow",
   variant = "lockup",
   label,
   className,

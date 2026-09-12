@@ -1,7 +1,7 @@
 import { CLUSTERS, HUB_FAQ, SITE, TOPICS, playableCount } from "@/lib/content";
 import { sanityFetch, tags } from "@/sanity/client";
 import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
-import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
+import type { GUIDES_INDEX_QUERY_RESULT } from "@/sanity.types";
 
 /**
  * /llms.txt — the llmstxt.org convention: one markdown file that tells an
@@ -17,13 +17,13 @@ import type { GUIDES_INDEX_QUERYResult } from "@/sanity.types";
 
 export const revalidate = 3600;
 
-function build(guides: GUIDES_INDEX_QUERYResult) {
+function build(guides: GUIDES_INDEX_QUERY_RESULT) {
   const topicLine = (t: (typeof TOPICS)[number]) =>
     `- [${t.h1}](${SITE.url}/nclex-practice-questions/${t.slug}): ${
       t.count ?? playableCount(t.slug)
     } questions${t.share ? `, ${t.share}` : ""}. ${t.blurb}`;
 
-  const guideLine = (g: GUIDES_INDEX_QUERYResult[number]) =>
+  const guideLine = (g: GUIDES_INDEX_QUERY_RESULT[number]) =>
     `- [${g.title}](${SITE.url}/guides/${g.slug}): ${g.shortAnswer}`;
 
   const clusters = CLUSTERS.map((c) => {
@@ -85,7 +85,7 @@ ${faqs}
 }
 
 export async function GET() {
-  const guides = await sanityFetch<GUIDES_INDEX_QUERYResult>(GUIDES_INDEX_QUERY, {
+  const guides = await sanityFetch<GUIDES_INDEX_QUERY_RESULT>(GUIDES_INDEX_QUERY, {
     tags: [tags.guides],
   });
 

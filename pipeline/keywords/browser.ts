@@ -46,7 +46,11 @@ export async function openAdsBrowser(
         channel,
         headless,
         acceptDownloads: true,
-        downloadsPath: DOWNLOAD_DIR,
+        /* No downloadsPath: letting Chrome write straight into our own folder
+           leaves half-finished .crdownload files there when a navigation
+           interrupts the transfer, and Playwright's `path()` then never
+           resolves. Playwright's own managed temp directory is the thing that
+           knows when a download is actually complete. */
         viewport: { width: 1440, height: 900 },
         locale: "en-US",
         args: [
@@ -66,6 +70,46 @@ export async function openAdsBrowser(
       `Close any window already using the profile at ${PROFILE_DIR}. ` +
       `Last error: ${(lastError as Error)?.message}`,
   );
+}
+
+/**
+ * Get past the account chooser.
+ *
+ * A Google login that can reach several ad accounts lands on
+ * /nav/selectaccount instead of wherever it was sent, and everything
+ * downstream then silently operates on nothing. Matching on the customer id
+ * rather than the account name because names are edited and duplicated
+ * ("nursia" also appears as a campaign, a label and a conversion action) while
+ * the CID is unique and stable.
+ *
+ * Returns true if it had to choose, false if it was already in an account.
+ */
+export async function selectAccount(
+  context: BrowserContext,
+  customerId: string,
+): Promise<boolean> {
+  const page = context.pages()[0] ?? (await context.newPage());
+  if (!page.url().includes("/nav/selectaccount")) return false;
+
+  /* The chooser renders the id as 633-182-5613. */
+  const dashed = customerId.replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3");
+
+  /* The row is an Angular Material `material-list-item[role=menuitem]`. The
+     CID itself sits in a leaf span inside it that handles no events, so a
+     plain text match finds something visible, clicks it, and nothing happens —
+     the page simply stays on the chooser, which looks like a failed
+     navigation rather than a missed target. */
+  const row = page
+    .locator('material-list-item[role="menuitem"]', { hasText: dashed })
+    .first();
+  await row.waitFor({ state: "visible", timeout: 30_000 });
+  await row.click();
+
+  await page.waitForURL((url) => !url.toString().includes("/nav/selectaccount"), {
+    timeout: 60_000,
+  });
+  await page.waitForTimeout(5000);
+  return true;
 }
 
 /**

@@ -18,7 +18,7 @@ import { StickyCta } from "@/components/StickyCta";
 import { HUB_FAQ, QUESTIONS, SITE, playableCount, topicsIn } from "@/lib/content";
 import { sanityFetch, tags } from "@/sanity/client";
 import { GUIDES_BY_SLUGS_QUERY } from "@/sanity/queries";
-import type { GUIDES_BY_SLUGS_QUERYResult } from "@/sanity.types";
+import type { GUIDES_BY_SLUGS_QUERY_RESULT } from "@/sanity.types";
 
 /* Title under 60 chars, description under 155 — this is the page the whole
    site links to, so it is the one that gets finalised first. */
@@ -77,7 +77,7 @@ const RELATED_GUIDES = ["how-hard-is-the-nclex", "four-week-study-plan"];
 export const revalidate = 3600;
 
 export default async function HubPage() {
-  const related = await sanityFetch<GUIDES_BY_SLUGS_QUERYResult>(
+  const related = await sanityFetch<GUIDES_BY_SLUGS_QUERY_RESULT>(
     GUIDES_BY_SLUGS_QUERY,
     { params: { slugs: RELATED_GUIDES }, tags: [tags.guides] },
   );

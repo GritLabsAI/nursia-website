@@ -48,7 +48,7 @@ const TRACKING = -0.045; // em, matches the header
 /** The approved tile colours. Each carries the `n` colour it must be paired with. */
 const TILES = {
   teal: { hex: TEAL, glyph: PAPER, ground: "light", group: "core" },
-  yellow: { hex: HIGHLIGHT, glyph: INK, ground: "dark", group: "core" },
+  yellow: { hex: HIGHLIGHT, glyph: INK, ground: "any", group: "core" },
   ink: { hex: INK, glyph: PAPER, ground: "light", group: "core" },
   paper: { hex: PAPER, glyph: INK, ground: "dark", group: "core" },
   results: { hex: "#157F52", glyph: PAPER, ground: "light", group: "context" },
@@ -183,7 +183,7 @@ const head = (w, h, label = "Nursia") =>
  * The square app mark. `knockout` cuts the letter out of the tile instead of
  * painting it, for single-plate print, embroidery and engraving.
  */
-function appMark({ size = 512, tile = TEAL, glyph = PAPER, radius = 0.22, knockout = false } = {}) {
+function appMark({ size = 512, tile = HIGHLIGHT, glyph = INK, radius = 0.22, knockout = false } = {}) {
   const g = tileGlyph(size);
   const shape = tilePath(size, radius);
 
@@ -245,7 +245,7 @@ ${paint(word.glyphs)}
 ${indent}</g>`;
 }
 
-function lockup({ tile = TEAL, glyph = PAPER, wordFill = INK, knockout = false } = {}) {
+function lockup({ tile = HIGHLIGHT, glyph = INK, wordFill = INK, knockout = false } = {}) {
   const w = PAD_X * 2 + TILE + GAP + word.advance;
   const h = TILE + PAD_Y * 2;
   return `${head(w, h)}
@@ -255,7 +255,7 @@ ${lockupBody({ tile, glyph, wordFill, knockout })}
 }
 
 /** Stacked lockup: the horizontal logo over the descriptor, for square-ish placements. */
-function stacked({ tile = TEAL, glyph = PAPER, wordFill = INK, reverse = false } = {}) {
+function stacked({ tile = HIGHLIGHT, glyph = INK, wordFill = INK, reverse = false } = {}) {
   const lockW = PAD_X * 2 + TILE + GAP + word.advance;
   const lockH = TILE + PAD_Y * 2;
   const sub = reverse ? PAPER : MUTED;
@@ -313,27 +313,28 @@ ${lockupBody({ tile, glyph, wordFill, knockout: false, indent: "    " })}
 
 /** The web logo, coloured at runtime through CSS variables. */
 function dynamicLockup() {
-  const svg = lockup({ tile: TEAL, glyph: PAPER, wordFill: INK });
+  const gb = tileGlyph(512);
+  const svg = lockup({ tile: HIGHLIGHT, glyph: INK, wordFill: INK });
   return svg
     .replace(
       "<title>Nursia</title>",
       `<title>Nursia</title>
   <!--
     Dynamic colour: inline this SVG and set these CSS variables on it or a parent.
-      nursia-tile    tile colour   (default ${TEAL} teal)
-      nursia-glyph   the n         (default ${PAPER} paper)
+      nursia-tile    tile colour   (default ${HIGHLIGHT} highlighter)
+      nursia-glyph   the n         (default ${INK} ink)
       nursia-word    wordmark      (default ${INK} ink)
     Each name is prefixed with two hyphens in CSS. Used as a plain img, the
     defaults apply. Approved tile and n pairs are in the brand kit.
   -->
   <style>
-    .nursia-tile  { fill: var(--nursia-tile, ${TEAL}); }
-    .nursia-glyph { fill: var(--nursia-glyph, ${PAPER}); }
+    .nursia-tile  { fill: var(--nursia-tile, ${HIGHLIGHT}); }
+    .nursia-glyph { fill: var(--nursia-glyph, ${INK}); }
     .nursia-word  { fill: var(--nursia-word, ${INK}); }
   </style>`,
     )
-    .replace(`<path d="${tilePath(512, 0.22)}" fill="${TEAL}"`, `<path class="nursia-tile" d="${tilePath(512, 0.22)}" fill="${TEAL}"`)
-    .replace(`fill="${PAPER}">`, `class="nursia-glyph" fill="${PAPER}">`)
+    .replace(`<path d="${tilePath(512, 0.22)}" fill="${HIGHLIGHT}"`, `<path class="nursia-tile" d="${tilePath(512, 0.22)}" fill="${HIGHLIGHT}"`)
+    .replace(`<g transform="translate(${num(gb.dx)} ${num(gb.dy)})" fill="${INK}">`, `<g class="nursia-glyph" transform="translate(${num(gb.dx)} ${num(gb.dy)})" fill="${INK}">`)
     .replace(`fill="${INK}">`, `class="nursia-word" fill="${INK}">`);
 }
 
@@ -343,7 +344,8 @@ const svgs = {
   // primary lockup — tile plus word
   "nursia-logo.svg": lockup(),
   "nursia-logo-dynamic.svg": dynamicLockup(),
-  "nursia-logo-ink.svg": lockup({ tile: INK }),
+  "nursia-logo-teal.svg": lockup({ tile: TEAL, glyph: PAPER }),
+  "nursia-logo-ink.svg": lockup({ tile: INK, glyph: PAPER }),
   "nursia-logo-reverse.svg": lockup({ tile: HIGHLIGHT, glyph: INK, wordFill: PAPER }),
   "nursia-logo-paper-on-dark.svg": lockup({ tile: PAPER, glyph: INK, wordFill: PAPER }),
   "nursia-logo-photo.svg": lockup({ tile: HIGHLIGHT, glyph: INK, wordFill: WHITE }),
@@ -372,7 +374,7 @@ const svgs = {
   // square app mark, one per approved tile
   ...Object.fromEntries(
     Object.entries(TILES).map(([id, t]) => [
-      id === "teal" ? "nursia-mark.svg" : `nursia-mark-${id}.svg`,
+      id === "yellow" ? "nursia-mark.svg" : `nursia-mark-${id}.svg`,
       appMark({ tile: t.hex, glyph: t.glyph }),
     ]),
   ),
@@ -430,7 +432,7 @@ const rasters = [
   ["nursia-mark-512.png", svgs["nursia-mark.svg"], 512],
   ["nursia-mark-1024.png", svgs["nursia-mark.svg"], 1024],
   ["nursia-mark-square-1024.png", svgs["nursia-mark-square.svg"], 1024],
-  ["nursia-mark-yellow-512.png", svgs["nursia-mark-yellow.svg"], 512],
+  ["nursia-mark-teal-512.png", svgs["nursia-mark-teal.svg"], 512],
   ["nursia-mark-paper-512.png", svgs["nursia-mark-paper.svg"], 512],
   ["nursia-logo-1024.png", svgs["nursia-logo.svg"], 1024],
   ["nursia-logo-2048.png", svgs["nursia-logo.svg"], 2048],

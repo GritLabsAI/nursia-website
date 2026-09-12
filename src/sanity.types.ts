@@ -12,6 +12,8 @@
  * ---------------------------------------------------------------------------------
  */
 
+export declare const internalGroqTypeReferenceTo: unique symbol;
+
 // Source: schema.json
 export type ExperimentVariant = {
   _type: "experimentVariant";
@@ -34,6 +36,20 @@ export type Research = {
   runId?: string;
 };
 
+export type GuideReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "guide";
+};
+
+export type TopicReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "topic";
+};
+
 export type RichText = Array<{
   children?: Array<{
     marks?: Array<string>;
@@ -43,26 +59,19 @@ export type RichText = Array<{
   }>;
   style?: "normal" | "h3" | "blockquote";
   listItem?: "bullet" | "number";
-  markDefs?: Array<{
-    reference: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "guide";
-    } | {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "topic";
-    };
-    _type: "internalLink";
-    _key: string;
-  } | {
-    href: string;
-    rel?: boolean;
-    _type: "link";
-    _key: string;
-  }>;
+  markDefs?: Array<
+    | {
+        reference: GuideReference | TopicReference;
+        _type: "internalLink";
+        _key: string;
+      }
+    | {
+        href: string;
+        rel?: boolean;
+        _type: "link";
+        _key: string;
+      }
+  >;
   level?: number;
   _type: "block";
   _key: string;
@@ -80,6 +89,147 @@ export type GuideSection = {
   body: RichText;
 };
 
+export type LeadMagnetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "leadMagnet";
+};
+
+export type ExperimentReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "experiment";
+};
+
+export type NursingPageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "nursingPage";
+};
+
+export type AuthorReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "author";
+};
+
+export type NursingPage = {
+  _id: string;
+  _type: "nursingPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  slug: Slug;
+  h1: string;
+  family: "clinical" | "practice" | "faq" | "exam" | "career";
+  entity?: string;
+  shortAnswer: string;
+  sections: Array<
+    {
+      _key: string;
+    } & GuideSection
+  >;
+  faqs?: Array<
+    {
+      _key: string;
+    } & Faq
+  >;
+  minutes: number;
+  leadMagnet?: LeadMagnetReference;
+  experiment?: ExperimentReference;
+  topic: TopicReference;
+  readNext?: Array<
+    {
+      _key: string;
+    } & NursingPageReference
+  >;
+  relatedGuides?: Array<
+    {
+      _key: string;
+    } & GuideReference
+  >;
+  author: AuthorReference;
+  reviewedBy?: AuthorReference;
+  publishedAt: string;
+  updatedAt: string;
+  research?: Research;
+  quality?: string;
+  seo?: {
+    title?: string;
+    description?: string;
+    noIndex?: boolean;
+  };
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
+export type SeoPageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "seoPage";
+};
+
+export type SeoPage = {
+  _id: string;
+  _type: "seoPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  slug: Slug;
+  h1: string;
+  kind: "practice" | "review" | "clinical" | "medication" | "strategy";
+  examCategory: string;
+  cluster: "before" | "during" | "content" | "after";
+  shortAnswer: string;
+  keyPoints: Array<string>;
+  sections: Array<
+    {
+      _key: string;
+    } & GuideSection
+  >;
+  examTip?: string;
+  faqs?: Array<
+    {
+      _key: string;
+    } & Faq
+  >;
+  minutes: number;
+  leadMagnet?: LeadMagnetReference;
+  experiment?: ExperimentReference;
+  topic: TopicReference;
+  readNext?: Array<
+    {
+      _key: string;
+    } & SeoPageReference
+  >;
+  relatedGuides?: Array<
+    {
+      _key: string;
+    } & GuideReference
+  >;
+  author: AuthorReference;
+  reviewedBy?: AuthorReference;
+  publishedAt: string;
+  updatedAt: string;
+  research?: Research;
+  seo?: {
+    title?: string;
+    description?: string;
+    noIndex?: boolean;
+  };
+};
+
 export type Guide = {
   _id: string;
   _type: "guide";
@@ -91,50 +241,32 @@ export type Guide = {
   h1: string;
   cluster: "before" | "during" | "content" | "after";
   shortAnswer: string;
-  sections: Array<{
-    _key: string;
-  } & GuideSection>;
-  faqs?: Array<{
-    _key: string;
-  } & Faq>;
+  sections: Array<
+    {
+      _key: string;
+    } & GuideSection
+  >;
+  faqs?: Array<
+    {
+      _key: string;
+    } & Faq
+  >;
   minutes: number;
-  leadMagnet?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "leadMagnet";
-  };
-  experiment?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "experiment";
-  };
-  topic: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "topic";
-  };
-  readNext?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "guide";
-  }>;
-  author: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "author";
-  };
-  reviewedBy?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "author";
-  };
+  leadMagnet?: LeadMagnetReference;
+  experiment?: ExperimentReference;
+  topic: TopicReference;
+  readNext?: Array<
+    {
+      _key: string;
+    } & GuideReference
+  >;
+  relatedReviews?: Array<
+    {
+      _key: string;
+    } & SeoPageReference
+  >;
+  author: AuthorReference;
+  reviewedBy?: AuthorReference;
   publishedAt: string;
   updatedAt: string;
   research?: Research;
@@ -171,16 +303,19 @@ export type Experiment = {
   hypothesis: string;
   metric: "signup_rate" | "gate_click_rate" | "unlock_rate" | "activated_rate";
   minimumSample?: number;
-  variants: Array<{
-    _key: string;
-  } & ExperimentVariant>;
+  variants: Array<
+    {
+      _key: string;
+    } & ExperimentVariant
+  >;
   notes?: string;
 };
 
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
 };
 
 export type LeadMagnet = {
@@ -191,7 +326,13 @@ export type LeadMagnet = {
   _rev: string;
   title: string;
   slug: Slug;
-  kind: "checklist" | "plan" | "cheatsheet" | "questionPack" | "worked" | "template";
+  kind:
+    | "checklist"
+    | "plan"
+    | "cheatsheet"
+    | "questionPack"
+    | "worked"
+    | "template";
   promise: string;
   contains?: Array<string>;
   headline?: string;
@@ -199,12 +340,7 @@ export type LeadMagnet = {
   ctaLabel: string;
   delivery: "page" | "file" | "practice";
   file?: {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
-    };
+    asset?: SanityFileAssetReference;
     media?: unknown;
     _type: "file";
   };
@@ -261,6 +397,7 @@ export type SanityImageMetadata = {
   palette?: SanityImagePalette;
   lqip?: string;
   blurHash?: string;
+  thumbHash?: string;
   hasAlpha?: boolean;
   isOpaque?: boolean;
 };
@@ -292,14 +429,14 @@ export type SanityFileAsset = {
   title?: string;
   description?: string;
   altText?: string;
-  sha1hash?: string;
-  extension?: string;
-  mimeType?: string;
-  size?: number;
-  assetId?: string;
+  sha1hash: string;
+  extension: string;
+  mimeType: string;
+  size: number;
+  assetId: string;
   uploadId?: string;
-  path?: string;
-  url?: string;
+  path: string;
+  url: string;
   source?: SanityAssetSourceData;
 };
 
@@ -321,14 +458,14 @@ export type SanityImageAsset = {
   title?: string;
   description?: string;
   altText?: string;
-  sha1hash?: string;
-  extension?: string;
-  mimeType?: string;
-  size?: number;
-  assetId?: string;
+  sha1hash: string;
+  extension: string;
+  mimeType: string;
+  size: number;
+  assetId: string;
   uploadId?: string;
-  path?: string;
-  url?: string;
+  path: string;
+  url: string;
   metadata?: SanityImageMetadata;
   source?: SanityAssetSourceData;
 };
@@ -340,15 +477,213 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = ExperimentVariant | Research | RichText | Faq | GuideSection | Guide | Author | Experiment | Slug | LeadMagnet | Topic | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
-export declare const internalGroqTypeReferenceTo: unique symbol;
+export type AllSanitySchemaTypes =
+  | ExperimentVariant
+  | Research
+  | GuideReference
+  | TopicReference
+  | RichText
+  | Faq
+  | GuideSection
+  | LeadMagnetReference
+  | ExperimentReference
+  | NursingPageReference
+  | AuthorReference
+  | NursingPage
+  | Slug
+  | SeoPageReference
+  | SeoPage
+  | Guide
+  | Author
+  | Experiment
+  | SanityFileAssetReference
+  | LeadMagnet
+  | Topic
+  | SanityImagePaletteSwatch
+  | SanityImagePalette
+  | SanityImageDimensions
+  | SanityImageMetadata
+  | SanityImageHotspot
+  | SanityImageCrop
+  | SanityFileAsset
+  | SanityAssetSourceData
+  | SanityImageAsset
+  | Geopoint;
+
+// Source: ../src/sanity/nursing-queries.ts
+// Variable: NURSING_SLUGS_QUERY
+// Query: *[_type == "nursingPage" && defined(slug.current)].slug.current
+export type NURSING_SLUGS_QUERY_RESULT = Array<string>;
+
+// Source: ../src/sanity/nursing-queries.ts
+// Variable: NURSING_PAGE_BY_SLUG_QUERY
+// Query: *[_type == "nursingPage" && slug.current == $slug][0]{    "slug": slug.current,    title,    h1,    family,    entity,    shortAnswer,    minutes,    publishedAt,    updatedAt,    seo,    sections[]{ _key, h2, body[]{   ...,  _type == "block" => {    ...,    markDefs[]{      ...,      _type == "internalLink" => {        "docType": reference->_type,        "slug": reference->slug.current      }    }  } } },    faqs[]{ q, a },    "topic": topic->{ "slug": slug.current, "title": name },    "author": author->{   name,  honorific,  jobTitle,  knowsAbout,  sameAs },    "reviewedBy": reviewedBy->{ name, honorific },    "leadMagnet": leadMagnet->{      title,      "slug": slug.current,      kind,      promise,      contains,      headline,      body,      ctaLabel,      delivery,      destination,      "file": file.asset->url    },    "experiment": experiment->{      "key": key.current,      status,      metric,      variants[]{ _key, key, weight, headline, body, ctaLabel, placement }    },    "readNext": readNext[]->{ "slug": slug.current, title, entity, family, minutes },    "relatedGuides": relatedGuides[]->{ "slug": slug.current, title, shortAnswer }  }
+export type NURSING_PAGE_BY_SLUG_QUERY_RESULT = {
+  slug: string;
+  title: string;
+  h1: string;
+  family: "career" | "clinical" | "exam" | "faq" | "practice";
+  entity: string | null;
+  shortAnswer: string;
+  minutes: number;
+  publishedAt: string;
+  updatedAt: string;
+  seo: {
+    title?: string;
+    description?: string;
+    noIndex?: boolean;
+  } | null;
+  sections: Array<{
+    _key: string;
+    h2: string;
+    body: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h3" | "normal";
+      listItem?: "bullet" | "number";
+      markDefs: Array<
+        | {
+            reference: GuideReference | TopicReference;
+            _type: "internalLink";
+            _key: string;
+            docType: "guide" | "topic";
+            slug: string;
+          }
+        | {
+            href: string;
+            rel?: boolean;
+            _type: "link";
+            _key: string;
+          }
+      > | null;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }>;
+  }>;
+  faqs: Array<{
+    q: string;
+    a: string;
+  }> | null;
+  topic: {
+    slug: string;
+    title: string;
+  };
+  author: {
+    name: string;
+    honorific: string;
+    jobTitle: string | null;
+    knowsAbout: Array<string> | null;
+    sameAs: Array<string> | null;
+  };
+  reviewedBy: {
+    name: string;
+    honorific: string;
+  } | null;
+  leadMagnet: {
+    title: string;
+    slug: string;
+    kind:
+      | "cheatsheet"
+      | "checklist"
+      | "plan"
+      | "questionPack"
+      | "template"
+      | "worked";
+    promise: string;
+    contains: Array<string> | null;
+    headline: string | null;
+    body: string | null;
+    ctaLabel: string;
+    delivery: "file" | "page" | "practice";
+    destination: string | null;
+    file: string | null;
+  } | null;
+  experiment: {
+    key: string;
+    status: "draft" | "finished" | "running";
+    metric:
+      "activated_rate" | "gate_click_rate" | "signup_rate" | "unlock_rate";
+    variants: Array<{
+      _key: string;
+      key: string;
+      weight: number;
+      headline: string | null;
+      body: string | null;
+      ctaLabel: string | null;
+      placement: "both" | "end" | "mid" | null;
+    }>;
+  } | null;
+  readNext: Array<{
+    slug: string;
+    title: string;
+    entity: string | null;
+    family: "career" | "clinical" | "exam" | "faq" | "practice";
+    minutes: number;
+  }> | null;
+  relatedGuides: Array<{
+    slug: string;
+    title: string;
+    shortAnswer: string;
+  }> | null;
+} | null;
+
+// Source: ../src/sanity/nursing-queries.ts
+// Variable: NURSING_PAGE_SEO_QUERY
+// Query: *[_type == "nursingPage" && slug.current == $slug][0]{    "slug": slug.current,    title,    h1,    shortAnswer,    publishedAt,    updatedAt,    seo,    "authorName": author->name,    "authorHonorific": author->honorific  }
+export type NURSING_PAGE_SEO_QUERY_RESULT = {
+  slug: string;
+  title: string;
+  h1: string;
+  shortAnswer: string;
+  publishedAt: string;
+  updatedAt: string;
+  seo: {
+    title?: string;
+    description?: string;
+    noIndex?: boolean;
+  } | null;
+  authorName: string;
+  authorHonorific: string;
+} | null;
+
+// Source: ../src/sanity/nursing-queries.ts
+// Variable: NURSING_INDEX_QUERY
+// Query: *[_type == "nursingPage" && defined(slug.current)]    | order(topic->name asc, title asc){      "slug": slug.current,      title,      entity,      family,      minutes,      shortAnswer,      "topic": topic->{ "slug": slug.current, "title": name }    }
+export type NURSING_INDEX_QUERY_RESULT = Array<{
+  slug: string;
+  title: string;
+  entity: string | null;
+  family: "career" | "clinical" | "exam" | "faq" | "practice";
+  minutes: number;
+  shortAnswer: string;
+  topic: {
+    slug: string;
+    title: string;
+  };
+}>;
+
+// Source: ../src/sanity/nursing-queries.ts
+// Variable: NURSING_SITEMAP_QUERY
+// Query: *[_type == "nursingPage" && defined(slug.current) && seo.noIndex != true]{    "slug": slug.current,    updatedAt  }
+export type NURSING_SITEMAP_QUERY_RESULT = Array<{
+  slug: string;
+  updatedAt: string;
+}>;
+
 // Source: ../src/sanity/queries.ts
 // Variable: GUIDE_SLUGS_QUERY
 // Query: *[_type == "guide" && defined(slug.current)].slug.current
-export type GUIDE_SLUGS_QUERYResult = Array<string>;
+export type GUIDE_SLUGS_QUERY_RESULT = Array<string>;
+
+// Source: ../src/sanity/queries.ts
 // Variable: GUIDE_BY_SLUG_QUERY
-// Query: *[_type == "guide" && slug.current == $slug][0]{    _id,    title,    h1,    "slug": slug.current,    cluster,    minutes,    shortAnswer,    publishedAt,    updatedAt,    seo,    sections[]{ _key, h2, body[]{   ...,  _type == "block" => {    ...,    markDefs[]{      ...,      _type == "internalLink" => {        "docType": reference->_type,        "slug": reference->slug.current      }    }  } } },    faqs[]{ _key, q, a },    "topic": topic->{      name,      "slug": slug.current,      category,      share    },    "author": author->{   name,  honorific,  jobTitle,  knowsAbout,  sameAs },    "reviewedBy": reviewedBy->{ name, honorific },      "leadMagnet": leadMagnet->{    title,    "slug": slug.current,    kind,    promise,    contains,    headline,    body,    ctaLabel,    delivery,    destination,    "file": file.asset->url  },  "experiment": experiment->{    "key": key.current,    status,    metric,    variants[]{ _key, key, weight, headline, body, ctaLabel, placement }  },    "readNext": readNext[]->{      title,      "slug": slug.current,      minutes,      cluster    }  }
-export type GUIDE_BY_SLUG_QUERYResult = {
+// Query: *[_type == "guide" && slug.current == $slug][0]{    _id,    title,    h1,    "slug": slug.current,    cluster,    minutes,    shortAnswer,    publishedAt,    updatedAt,    seo,    sections[]{ _key, h2, body[]{   ...,  _type == "block" => {    ...,    markDefs[]{      ...,      _type == "internalLink" => {        "docType": reference->_type,        "slug": reference->slug.current      }    }  } } },    faqs[]{ _key, q, a },    "topic": topic->{      name,      "slug": slug.current,      category,      share    },    "author": author->{   name,  honorific,  jobTitle,  knowsAbout,  sameAs },    "reviewedBy": reviewedBy->{ name, honorific },      "leadMagnet": leadMagnet->{    title,    "slug": slug.current,    kind,    promise,    contains,    headline,    body,    ctaLabel,    delivery,    destination,    "file": file.asset->url  },  "experiment": experiment->{    "key": key.current,    status,    metric,    variants[]{ _key, key, weight, headline, body, ctaLabel, placement }  },    "readNext": readNext[]->{      title,      "slug": slug.current,      minutes,      cluster    },    "relatedReviews": relatedReviews[]->{      title,      "slug": slug.current,      minutes,      kind    }  }
+export type GUIDE_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string;
   h1: string;
@@ -375,28 +710,21 @@ export type GUIDE_BY_SLUG_QUERYResult = {
       }>;
       style?: "blockquote" | "h3" | "normal";
       listItem?: "bullet" | "number";
-      markDefs: Array<{
-        reference: {
-          _ref: string;
-          _type: "reference";
-          _weak?: boolean;
-          [internalGroqTypeReferenceTo]?: "guide";
-        } | {
-          _ref: string;
-          _type: "reference";
-          _weak?: boolean;
-          [internalGroqTypeReferenceTo]?: "topic";
-        };
-        _type: "internalLink";
-        _key: string;
-        docType: "guide" | "topic";
-        slug: string;
-      } | {
-        href: string;
-        rel?: boolean;
-        _type: "link";
-        _key: string;
-      }> | null;
+      markDefs: Array<
+        | {
+            reference: GuideReference | TopicReference;
+            _type: "internalLink";
+            _key: string;
+            docType: "guide" | "topic";
+            slug: string;
+          }
+        | {
+            href: string;
+            rel?: boolean;
+            _type: "link";
+            _key: string;
+          }
+      > | null;
       level?: number;
       _type: "block";
       _key: string;
@@ -427,7 +755,13 @@ export type GUIDE_BY_SLUG_QUERYResult = {
   leadMagnet: {
     title: string;
     slug: string;
-    kind: "cheatsheet" | "checklist" | "plan" | "questionPack" | "template" | "worked";
+    kind:
+      | "cheatsheet"
+      | "checklist"
+      | "plan"
+      | "questionPack"
+      | "template"
+      | "worked";
     promise: string;
     contains: Array<string> | null;
     headline: string | null;
@@ -440,7 +774,8 @@ export type GUIDE_BY_SLUG_QUERYResult = {
   experiment: {
     key: string;
     status: "draft" | "finished" | "running";
-    metric: "activated_rate" | "gate_click_rate" | "signup_rate" | "unlock_rate";
+    metric:
+      "activated_rate" | "gate_click_rate" | "signup_rate" | "unlock_rate";
     variants: Array<{
       _key: string;
       key: string;
@@ -457,10 +792,18 @@ export type GUIDE_BY_SLUG_QUERYResult = {
     minutes: number;
     cluster: "after" | "before" | "content" | "during";
   }> | null;
+  relatedReviews: Array<{
+    title: string;
+    slug: string;
+    minutes: number;
+    kind: "clinical" | "medication" | "practice" | "review" | "strategy";
+  }> | null;
 } | null;
+
+// Source: ../src/sanity/queries.ts
 // Variable: GUIDE_SEO_QUERY
 // Query: *[_type == "guide" && slug.current == $slug][0]{    title,    h1,    "slug": slug.current,    shortAnswer,    publishedAt,    updatedAt,    seo,    "authorName": author->name,    "authorHonorific": author->honorific  }
-export type GUIDE_SEO_QUERYResult = {
+export type GUIDE_SEO_QUERY_RESULT = {
   title: string;
   h1: string;
   slug: string;
@@ -475,9 +818,11 @@ export type GUIDE_SEO_QUERYResult = {
   authorName: string;
   authorHonorific: string;
 } | null;
+
+// Source: ../src/sanity/queries.ts
 // Variable: GUIDES_INDEX_QUERY
 // Query: *[_type == "guide" && defined(slug.current)] | order(cluster asc, title asc){    _id,    title,    "slug": slug.current,    cluster,    minutes,    shortAnswer,    updatedAt,    "topicSlug": topic->slug.current,    "hasResource": defined(leadMagnet)  }
-export type GUIDES_INDEX_QUERYResult = Array<{
+export type GUIDES_INDEX_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   slug: string;
@@ -488,34 +833,48 @@ export type GUIDES_INDEX_QUERYResult = Array<{
   topicSlug: string;
   hasResource: false | true;
 }>;
+
+// Source: ../src/sanity/queries.ts
 // Variable: GUIDES_SITEMAP_QUERY
 // Query: *[_type == "guide" && defined(slug.current) && seo.noIndex != true]{    "slug": slug.current,    updatedAt  }
-export type GUIDES_SITEMAP_QUERYResult = Array<{
+export type GUIDES_SITEMAP_QUERY_RESULT = Array<{
   slug: string;
   updatedAt: string;
 }>;
+
+// Source: ../src/sanity/queries.ts
 // Variable: GUIDES_FOR_TOPIC_QUERY
 // Query: *[_type == "guide" && topic->slug.current == $topic] | order(title asc)[0...6]{    _id,    title,    "slug": slug.current,    minutes  }
-export type GUIDES_FOR_TOPIC_QUERYResult = Array<{
+export type GUIDES_FOR_TOPIC_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   slug: string;
   minutes: number;
 }>;
+
+// Source: ../src/sanity/queries.ts
 // Variable: GUIDES_BY_SLUGS_QUERY
 // Query: *[_type == "guide" && slug.current in $slugs]{    _id,    title,    "slug": slug.current,    minutes  }
-export type GUIDES_BY_SLUGS_QUERYResult = Array<{
+export type GUIDES_BY_SLUGS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   slug: string;
   minutes: number;
 }>;
+
+// Source: ../src/sanity/queries.ts
 // Variable: LEAD_MAGNET_BY_SLUG_QUERY
 // Query: *[_type == "leadMagnet" && slug.current == $slug][0]{    title,    "slug": slug.current,    kind,    promise,    contains,    delivery,    destination,    "file": file.asset->url,    content[]{   ...,  _type == "block" => {    ...,    markDefs[]{      ...,      _type == "internalLink" => {        "docType": reference->_type,        "slug": reference->slug.current      }    }  } }  }
-export type LEAD_MAGNET_BY_SLUG_QUERYResult = {
+export type LEAD_MAGNET_BY_SLUG_QUERY_RESULT = {
   title: string;
   slug: string;
-  kind: "cheatsheet" | "checklist" | "plan" | "questionPack" | "template" | "worked";
+  kind:
+    | "cheatsheet"
+    | "checklist"
+    | "plan"
+    | "questionPack"
+    | "template"
+    | "worked";
   promise: string;
   contains: Array<string> | null;
   delivery: "file" | "page" | "practice";
@@ -530,45 +889,234 @@ export type LEAD_MAGNET_BY_SLUG_QUERYResult = {
     }>;
     style?: "blockquote" | "h3" | "normal";
     listItem?: "bullet" | "number";
-    markDefs: Array<{
-      reference: {
-        _ref: string;
-        _type: "reference";
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "guide";
-      } | {
-        _ref: string;
-        _type: "reference";
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "topic";
-      };
-      _type: "internalLink";
-      _key: string;
-      docType: "guide" | "topic";
-      slug: string;
-    } | {
-      href: string;
-      rel?: boolean;
-      _type: "link";
-      _key: string;
-    }> | null;
+    markDefs: Array<
+      | {
+          reference: GuideReference | TopicReference;
+          _type: "internalLink";
+          _key: string;
+          docType: "guide" | "topic";
+          slug: string;
+        }
+      | {
+          href: string;
+          rel?: boolean;
+          _type: "link";
+          _key: string;
+        }
+    > | null;
     level?: number;
     _type: "block";
     _key: string;
   }> | null;
 } | null;
 
+// Source: ../src/sanity/queries.ts
+// Variable: SEO_PAGE_SLUGS_QUERY
+// Query: *[_type == "seoPage" && defined(slug.current)].slug.current
+export type SEO_PAGE_SLUGS_QUERY_RESULT = Array<string>;
+
+// Source: ../src/sanity/queries.ts
+// Variable: SEO_PAGE_BY_SLUG_QUERY
+// Query: *[_type == "seoPage" && slug.current == $slug][0]{    _id,    title,    h1,    "slug": slug.current,    kind,    examCategory,    cluster,    minutes,    shortAnswer,    keyPoints,    examTip,    publishedAt,    updatedAt,    seo,    sections[]{ _key, h2, body[]{   ...,  _type == "block" => {    ...,    markDefs[]{      ...,      _type == "internalLink" => {        "docType": reference->_type,        "slug": reference->slug.current      }    }  } } },    faqs[]{ _key, q, a },    "topic": topic->{      name,      "slug": slug.current,      category,      share    },    "author": author->{   name,  honorific,  jobTitle,  knowsAbout,  sameAs },    "reviewedBy": reviewedBy->{ name, honorific },      "leadMagnet": leadMagnet->{    title,    "slug": slug.current,    kind,    promise,    contains,    headline,    body,    ctaLabel,    delivery,    destination,    "file": file.asset->url  },  "experiment": experiment->{    "key": key.current,    status,    metric,    variants[]{ _key, key, weight, headline, body, ctaLabel, placement }  },    "readNext": readNext[]->{      title,      "slug": slug.current,      minutes,      kind,      examCategory    },    "relatedGuides": relatedGuides[]->{      title,      "slug": slug.current,      minutes    }  }
+export type SEO_PAGE_BY_SLUG_QUERY_RESULT = {
+  _id: string;
+  title: string;
+  h1: string;
+  slug: string;
+  kind: "clinical" | "medication" | "practice" | "review" | "strategy";
+  examCategory: string;
+  cluster: "after" | "before" | "content" | "during";
+  minutes: number;
+  shortAnswer: string;
+  keyPoints: Array<string>;
+  examTip: string | null;
+  publishedAt: string;
+  updatedAt: string;
+  seo: {
+    title?: string;
+    description?: string;
+    noIndex?: boolean;
+  } | null;
+  sections: Array<{
+    _key: string;
+    h2: string;
+    body: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h3" | "normal";
+      listItem?: "bullet" | "number";
+      markDefs: Array<
+        | {
+            reference: GuideReference | TopicReference;
+            _type: "internalLink";
+            _key: string;
+            docType: "guide" | "topic";
+            slug: string;
+          }
+        | {
+            href: string;
+            rel?: boolean;
+            _type: "link";
+            _key: string;
+          }
+      > | null;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }>;
+  }>;
+  faqs: Array<{
+    _key: string;
+    q: string;
+    a: string;
+  }> | null;
+  topic: {
+    name: string;
+    slug: string;
+    category: string;
+    share: string | null;
+  };
+  author: {
+    name: string;
+    honorific: string;
+    jobTitle: string | null;
+    knowsAbout: Array<string> | null;
+    sameAs: Array<string> | null;
+  };
+  reviewedBy: {
+    name: string;
+    honorific: string;
+  } | null;
+  leadMagnet: {
+    title: string;
+    slug: string;
+    kind:
+      | "cheatsheet"
+      | "checklist"
+      | "plan"
+      | "questionPack"
+      | "template"
+      | "worked";
+    promise: string;
+    contains: Array<string> | null;
+    headline: string | null;
+    body: string | null;
+    ctaLabel: string;
+    delivery: "file" | "page" | "practice";
+    destination: string | null;
+    file: string | null;
+  } | null;
+  experiment: {
+    key: string;
+    status: "draft" | "finished" | "running";
+    metric:
+      "activated_rate" | "gate_click_rate" | "signup_rate" | "unlock_rate";
+    variants: Array<{
+      _key: string;
+      key: string;
+      weight: number;
+      headline: string | null;
+      body: string | null;
+      ctaLabel: string | null;
+      placement: "both" | "end" | "mid" | null;
+    }>;
+  } | null;
+  readNext: Array<{
+    title: string;
+    slug: string;
+    minutes: number;
+    kind: "clinical" | "medication" | "practice" | "review" | "strategy";
+    examCategory: string;
+  }> | null;
+  relatedGuides: Array<{
+    title: string;
+    slug: string;
+    minutes: number;
+  }> | null;
+} | null;
+
+// Source: ../src/sanity/queries.ts
+// Variable: SEO_PAGE_SEO_QUERY
+// Query: *[_type == "seoPage" && slug.current == $slug][0]{    title,    h1,    "slug": slug.current,    shortAnswer,    publishedAt,    updatedAt,    seo,    "authorName": author->name,    "authorHonorific": author->honorific  }
+export type SEO_PAGE_SEO_QUERY_RESULT = {
+  title: string;
+  h1: string;
+  slug: string;
+  shortAnswer: string;
+  publishedAt: string;
+  updatedAt: string;
+  seo: {
+    title?: string;
+    description?: string;
+    noIndex?: boolean;
+  } | null;
+  authorName: string;
+  authorHonorific: string;
+} | null;
+
+// Source: ../src/sanity/queries.ts
+// Variable: SEO_PAGES_INDEX_QUERY
+// Query: *[_type == "seoPage" && defined(slug.current)] | order(examCategory asc, title asc){    _id,    title,    "slug": slug.current,    kind,    examCategory,    minutes,    shortAnswer,    updatedAt,    "topicSlug": topic->slug.current  }
+export type SEO_PAGES_INDEX_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  slug: string;
+  kind: "clinical" | "medication" | "practice" | "review" | "strategy";
+  examCategory: string;
+  minutes: number;
+  shortAnswer: string;
+  updatedAt: string;
+  topicSlug: string;
+}>;
+
+// Source: ../src/sanity/queries.ts
+// Variable: SEO_PAGES_SITEMAP_QUERY
+// Query: *[_type == "seoPage" && defined(slug.current) && seo.noIndex != true]{    "slug": slug.current,    updatedAt  }
+export type SEO_PAGES_SITEMAP_QUERY_RESULT = Array<{
+  slug: string;
+  updatedAt: string;
+}>;
+
+// Source: ../src/sanity/queries.ts
+// Variable: SEO_PAGES_FOR_TOPIC_QUERY
+// Query: *[_type == "seoPage" && topic->slug.current == $topic] | order(title asc)[0...6]{    _id,    title,    "slug": slug.current,    kind,    minutes  }
+export type SEO_PAGES_FOR_TOPIC_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  slug: string;
+  kind: "clinical" | "medication" | "practice" | "review" | "strategy";
+  minutes: number;
+}>;
+
 // Query TypeMap
-import "@sanity/client";
-declare module "@sanity/client" {
+declare global {
   interface SanityQueries {
-    "\n  *[_type == \"guide\" && defined(slug.current)].slug.current\n": GUIDE_SLUGS_QUERYResult;
-    "\n  *[_type == \"guide\" && slug.current == $slug][0]{\n    _id,\n    title,\n    h1,\n    \"slug\": slug.current,\n    cluster,\n    minutes,\n    shortAnswer,\n    publishedAt,\n    updatedAt,\n    seo,\n    sections[]{ _key, h2, body[]{ \n  ...,\n  _type == \"block\" => {\n    ...,\n    markDefs[]{\n      ...,\n      _type == \"internalLink\" => {\n        \"docType\": reference->_type,\n        \"slug\": reference->slug.current\n      }\n    }\n  }\n } },\n    faqs[]{ _key, q, a },\n    \"topic\": topic->{\n      name,\n      \"slug\": slug.current,\n      category,\n      share\n    },\n    \"author\": author->{ \n  name,\n  honorific,\n  jobTitle,\n  knowsAbout,\n  sameAs\n },\n    \"reviewedBy\": reviewedBy->{ name, honorific },\n    \n  \"leadMagnet\": leadMagnet->{\n    title,\n    \"slug\": slug.current,\n    kind,\n    promise,\n    contains,\n    headline,\n    body,\n    ctaLabel,\n    delivery,\n    destination,\n    \"file\": file.asset->url\n  },\n  \"experiment\": experiment->{\n    \"key\": key.current,\n    status,\n    metric,\n    variants[]{ _key, key, weight, headline, body, ctaLabel, placement }\n  }\n,\n    \"readNext\": readNext[]->{\n      title,\n      \"slug\": slug.current,\n      minutes,\n      cluster\n    }\n  }\n": GUIDE_BY_SLUG_QUERYResult;
-    "\n  *[_type == \"guide\" && slug.current == $slug][0]{\n    title,\n    h1,\n    \"slug\": slug.current,\n    shortAnswer,\n    publishedAt,\n    updatedAt,\n    seo,\n    \"authorName\": author->name,\n    \"authorHonorific\": author->honorific\n  }\n": GUIDE_SEO_QUERYResult;
-    "\n  *[_type == \"guide\" && defined(slug.current)] | order(cluster asc, title asc){\n    _id,\n    title,\n    \"slug\": slug.current,\n    cluster,\n    minutes,\n    shortAnswer,\n    updatedAt,\n    \"topicSlug\": topic->slug.current,\n    \"hasResource\": defined(leadMagnet)\n  }\n": GUIDES_INDEX_QUERYResult;
-    "\n  *[_type == \"guide\" && defined(slug.current) && seo.noIndex != true]{\n    \"slug\": slug.current,\n    updatedAt\n  }\n": GUIDES_SITEMAP_QUERYResult;
-    "\n  *[_type == \"guide\" && topic->slug.current == $topic] | order(title asc)[0...6]{\n    _id,\n    title,\n    \"slug\": slug.current,\n    minutes\n  }\n": GUIDES_FOR_TOPIC_QUERYResult;
-    "\n  *[_type == \"guide\" && slug.current in $slugs]{\n    _id,\n    title,\n    \"slug\": slug.current,\n    minutes\n  }\n": GUIDES_BY_SLUGS_QUERYResult;
-    "\n  *[_type == \"leadMagnet\" && slug.current == $slug][0]{\n    title,\n    \"slug\": slug.current,\n    kind,\n    promise,\n    contains,\n    delivery,\n    destination,\n    \"file\": file.asset->url,\n    content[]{ \n  ...,\n  _type == \"block\" => {\n    ...,\n    markDefs[]{\n      ...,\n      _type == \"internalLink\" => {\n        \"docType\": reference->_type,\n        \"slug\": reference->slug.current\n      }\n    }\n  }\n }\n  }\n": LEAD_MAGNET_BY_SLUG_QUERYResult;
+    '\n  *[_type == "nursingPage" && defined(slug.current)].slug.current\n': NURSING_SLUGS_QUERY_RESULT;
+    '\n  *[_type == "nursingPage" && slug.current == $slug][0]{\n    "slug": slug.current,\n    title,\n    h1,\n    family,\n    entity,\n    shortAnswer,\n    minutes,\n    publishedAt,\n    updatedAt,\n    seo,\n    sections[]{ _key, h2, body[]{ \n  ...,\n  _type == "block" => {\n    ...,\n    markDefs[]{\n      ...,\n      _type == "internalLink" => {\n        "docType": reference->_type,\n        "slug": reference->slug.current\n      }\n    }\n  }\n } },\n    faqs[]{ q, a },\n    "topic": topic->{ "slug": slug.current, "title": name },\n    "author": author->{ \n  name,\n  honorific,\n  jobTitle,\n  knowsAbout,\n  sameAs\n },\n    "reviewedBy": reviewedBy->{ name, honorific },\n    "leadMagnet": leadMagnet->{\n      title,\n      "slug": slug.current,\n      kind,\n      promise,\n      contains,\n      headline,\n      body,\n      ctaLabel,\n      delivery,\n      destination,\n      "file": file.asset->url\n    },\n    "experiment": experiment->{\n      "key": key.current,\n      status,\n      metric,\n      variants[]{ _key, key, weight, headline, body, ctaLabel, placement }\n    },\n    "readNext": readNext[]->{ "slug": slug.current, title, entity, family, minutes },\n    "relatedGuides": relatedGuides[]->{ "slug": slug.current, title, shortAnswer }\n  }\n': NURSING_PAGE_BY_SLUG_QUERY_RESULT;
+    '\n  *[_type == "nursingPage" && slug.current == $slug][0]{\n    "slug": slug.current,\n    title,\n    h1,\n    shortAnswer,\n    publishedAt,\n    updatedAt,\n    seo,\n    "authorName": author->name,\n    "authorHonorific": author->honorific\n  }\n': NURSING_PAGE_SEO_QUERY_RESULT;
+    '\n  *[_type == "nursingPage" && defined(slug.current)]\n    | order(topic->name asc, title asc){\n      "slug": slug.current,\n      title,\n      entity,\n      family,\n      minutes,\n      shortAnswer,\n      "topic": topic->{ "slug": slug.current, "title": name }\n    }\n': NURSING_INDEX_QUERY_RESULT;
+    '\n  *[_type == "nursingPage" && defined(slug.current) && seo.noIndex != true]{\n    "slug": slug.current,\n    updatedAt\n  }\n': NURSING_SITEMAP_QUERY_RESULT;
+    '\n  *[_type == "guide" && defined(slug.current)].slug.current\n': GUIDE_SLUGS_QUERY_RESULT;
+    '\n  *[_type == "guide" && slug.current == $slug][0]{\n    _id,\n    title,\n    h1,\n    "slug": slug.current,\n    cluster,\n    minutes,\n    shortAnswer,\n    publishedAt,\n    updatedAt,\n    seo,\n    sections[]{ _key, h2, body[]{ \n  ...,\n  _type == "block" => {\n    ...,\n    markDefs[]{\n      ...,\n      _type == "internalLink" => {\n        "docType": reference->_type,\n        "slug": reference->slug.current\n      }\n    }\n  }\n } },\n    faqs[]{ _key, q, a },\n    "topic": topic->{\n      name,\n      "slug": slug.current,\n      category,\n      share\n    },\n    "author": author->{ \n  name,\n  honorific,\n  jobTitle,\n  knowsAbout,\n  sameAs\n },\n    "reviewedBy": reviewedBy->{ name, honorific },\n    \n  "leadMagnet": leadMagnet->{\n    title,\n    "slug": slug.current,\n    kind,\n    promise,\n    contains,\n    headline,\n    body,\n    ctaLabel,\n    delivery,\n    destination,\n    "file": file.asset->url\n  },\n  "experiment": experiment->{\n    "key": key.current,\n    status,\n    metric,\n    variants[]{ _key, key, weight, headline, body, ctaLabel, placement }\n  }\n,\n    "readNext": readNext[]->{\n      title,\n      "slug": slug.current,\n      minutes,\n      cluster\n    },\n    "relatedReviews": relatedReviews[]->{\n      title,\n      "slug": slug.current,\n      minutes,\n      kind\n    }\n  }\n': GUIDE_BY_SLUG_QUERY_RESULT;
+    '\n  *[_type == "guide" && slug.current == $slug][0]{\n    title,\n    h1,\n    "slug": slug.current,\n    shortAnswer,\n    publishedAt,\n    updatedAt,\n    seo,\n    "authorName": author->name,\n    "authorHonorific": author->honorific\n  }\n': GUIDE_SEO_QUERY_RESULT;
+    '\n  *[_type == "guide" && defined(slug.current)] | order(cluster asc, title asc){\n    _id,\n    title,\n    "slug": slug.current,\n    cluster,\n    minutes,\n    shortAnswer,\n    updatedAt,\n    "topicSlug": topic->slug.current,\n    "hasResource": defined(leadMagnet)\n  }\n': GUIDES_INDEX_QUERY_RESULT;
+    '\n  *[_type == "guide" && defined(slug.current) && seo.noIndex != true]{\n    "slug": slug.current,\n    updatedAt\n  }\n': GUIDES_SITEMAP_QUERY_RESULT;
+    '\n  *[_type == "guide" && topic->slug.current == $topic] | order(title asc)[0...6]{\n    _id,\n    title,\n    "slug": slug.current,\n    minutes\n  }\n': GUIDES_FOR_TOPIC_QUERY_RESULT;
+    '\n  *[_type == "guide" && slug.current in $slugs]{\n    _id,\n    title,\n    "slug": slug.current,\n    minutes\n  }\n': GUIDES_BY_SLUGS_QUERY_RESULT;
+    '\n  *[_type == "leadMagnet" && slug.current == $slug][0]{\n    title,\n    "slug": slug.current,\n    kind,\n    promise,\n    contains,\n    delivery,\n    destination,\n    "file": file.asset->url,\n    content[]{ \n  ...,\n  _type == "block" => {\n    ...,\n    markDefs[]{\n      ...,\n      _type == "internalLink" => {\n        "docType": reference->_type,\n        "slug": reference->slug.current\n      }\n    }\n  }\n }\n  }\n': LEAD_MAGNET_BY_SLUG_QUERY_RESULT;
+    '\n  *[_type == "seoPage" && defined(slug.current)].slug.current\n': SEO_PAGE_SLUGS_QUERY_RESULT;
+    '\n  *[_type == "seoPage" && slug.current == $slug][0]{\n    _id,\n    title,\n    h1,\n    "slug": slug.current,\n    kind,\n    examCategory,\n    cluster,\n    minutes,\n    shortAnswer,\n    keyPoints,\n    examTip,\n    publishedAt,\n    updatedAt,\n    seo,\n    sections[]{ _key, h2, body[]{ \n  ...,\n  _type == "block" => {\n    ...,\n    markDefs[]{\n      ...,\n      _type == "internalLink" => {\n        "docType": reference->_type,\n        "slug": reference->slug.current\n      }\n    }\n  }\n } },\n    faqs[]{ _key, q, a },\n    "topic": topic->{\n      name,\n      "slug": slug.current,\n      category,\n      share\n    },\n    "author": author->{ \n  name,\n  honorific,\n  jobTitle,\n  knowsAbout,\n  sameAs\n },\n    "reviewedBy": reviewedBy->{ name, honorific },\n    \n  "leadMagnet": leadMagnet->{\n    title,\n    "slug": slug.current,\n    kind,\n    promise,\n    contains,\n    headline,\n    body,\n    ctaLabel,\n    delivery,\n    destination,\n    "file": file.asset->url\n  },\n  "experiment": experiment->{\n    "key": key.current,\n    status,\n    metric,\n    variants[]{ _key, key, weight, headline, body, ctaLabel, placement }\n  }\n,\n    "readNext": readNext[]->{\n      title,\n      "slug": slug.current,\n      minutes,\n      kind,\n      examCategory\n    },\n    "relatedGuides": relatedGuides[]->{\n      title,\n      "slug": slug.current,\n      minutes\n    }\n  }\n': SEO_PAGE_BY_SLUG_QUERY_RESULT;
+    '\n  *[_type == "seoPage" && slug.current == $slug][0]{\n    title,\n    h1,\n    "slug": slug.current,\n    shortAnswer,\n    publishedAt,\n    updatedAt,\n    seo,\n    "authorName": author->name,\n    "authorHonorific": author->honorific\n  }\n': SEO_PAGE_SEO_QUERY_RESULT;
+    '\n  *[_type == "seoPage" && defined(slug.current)] | order(examCategory asc, title asc){\n    _id,\n    title,\n    "slug": slug.current,\n    kind,\n    examCategory,\n    minutes,\n    shortAnswer,\n    updatedAt,\n    "topicSlug": topic->slug.current\n  }\n': SEO_PAGES_INDEX_QUERY_RESULT;
+    '\n  *[_type == "seoPage" && defined(slug.current) && seo.noIndex != true]{\n    "slug": slug.current,\n    updatedAt\n  }\n': SEO_PAGES_SITEMAP_QUERY_RESULT;
+    '\n  *[_type == "seoPage" && topic->slug.current == $topic] | order(title asc)[0...6]{\n    _id,\n    title,\n    "slug": slug.current,\n    kind,\n    minutes\n  }\n': SEO_PAGES_FOR_TOPIC_QUERY_RESULT;
   }
+}
+// Lets @sanity/client releases that predate the global registry read it too
+declare module "@sanity/client" {
+  interface SanityQueries extends globalThis.SanityQueries {}
 }

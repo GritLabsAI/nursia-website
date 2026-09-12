@@ -194,6 +194,21 @@ export type FunnelContext = {
   experiment?: string;
   /** which arm this browser is in */
   variant?: string;
+  /**
+   * Which library the reader is in — a hand-written guide, a review page from
+   * the keyword programme, or a nursing library page from the clinical index.
+   *
+   * Both carry the same offer, so without this the two are indistinguishable in
+   * the funnel and "do the review pages convert as well as the guides" cannot
+   * be asked at all. `guide_slug` alone cannot answer it: the slugs come from
+   * different namespaces and nothing in GA4 knows which is which.
+   *
+   * Sent as `page_type` rather than `surface`, because `surface` is already a
+   * parameter on the question events with an unrelated set of values, and two
+   * meanings of one parameter name is how a report quietly stops meaning
+   * anything.
+   */
+  library?: "guide" | "review" | "nursing";
 };
 
 function funnelParams(c: FunnelContext): Params {
@@ -202,6 +217,7 @@ function funnelParams(c: FunnelContext): Params {
     resource_slug: c.resource,
     experiment: c.experiment,
     variant: c.variant,
+    page_type: c.library ?? "guide",
   };
 }
 
