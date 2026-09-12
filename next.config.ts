@@ -32,6 +32,29 @@ const nextConfig: NextConfig = {
   /* PostHog's API is strict about the trailing slash and Next would otherwise
      redirect /ingest/decide/ to /ingest/decide, losing the POST body with it. */
   skipTrailingSlashRedirect: true,
+
+  experimental: {
+    /*
+     * Retry a page that fails to prerender, rather than ending the build.
+     *
+     * Defaults to undefined, which is one attempt: the first page whose data
+     * fetch fails takes the whole export down with it. With 1,700 pages read
+     * from a rate-limited API that is a single unlucky request away from a red
+     * deploy, which is exactly how 2026-09-12 failed — three pages 429'd and
+     * "exiting the build" followed immediately.
+     *
+     * This is the backstop, not the fix; the fix is the token in
+     * src/sanity/client.ts. Kept because the two protect against different
+     * things: the token lowers the odds of being throttled, this stops one
+     * page that still is from costing a deploy.
+     *
+     * If a build is still throttled, the next lever is volume rather than
+     * retries — `staticGenerationMaxConcurrency` (pages exported per worker)
+     * and `cpus` (worker count) both cut requests per second, at the cost of a
+     * longer build.
+     */
+    staticGenerationRetryCount: 3,
+  },
 };
 
 export default nextConfig;

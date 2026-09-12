@@ -27,6 +27,34 @@ export const client = createClient({
   apiVersion,
   useCdn: true,
   perspective: "published",
+  /*
+   * Authenticate the reads, even though the dataset is public and none of this
+   * needs permission to read.
+   *
+   * A production build prerenders ~1,700 pages across as many workers as the
+   * builder has cores, and each page costs two queries — one in
+   * generateMetadata, one in the page body. That is several thousand requests
+   * in a few minutes from a SINGLE build IP, and it is what killed the deploy
+   * on 2026-09-12: HTTP 429 with `sanity-ratelimit-applied: ip`. Anonymous
+   * reads share a per-IP bucket; authenticated ones are counted against the
+   * project's own, much larger allowance.
+   *
+   * Retrying was NOT the missing piece and is not what this fixes.
+   * @sanity/client already retries a 429 five times with exponential backoff
+   * by default, and the build failed anyway — the throttling is sustained for
+   * the length of the export, not a momentary burst.
+   *
+   * Safe alongside `useCdn` and a public dataset because `perspective` is
+   * "published": a token cannot widen what these queries return, so a cached
+   * CDN response still cannot contain a draft. And it cannot reach a browser —
+   * every importer of this module is a server component, and the variable is
+   * deliberately not NEXT_PUBLIC_.
+   *
+   * Optional by design: unset, this is `undefined` and the client behaves
+   * exactly as it did before, so a missing token degrades to the old rate
+   * limit rather than breaking the build.
+   */
+  token: process.env.SANITY_API_READ_TOKEN,
 });
 
 /** Bypasses the CDN. For build-time reads, where fresh beats fast. */
