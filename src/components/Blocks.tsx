@@ -231,9 +231,14 @@ export function OnThisPage({ items }: { items: { label: string; href: string }[]
   );
 }
 
-/** Reviewed-by byline. Links to /about, and carries a visible update date. */
+/**
+ * Update-date byline. Carries a visible update date and, once we have a real
+ * named author to credit, the `by` prop to reintroduce a "written and
+ * reviewed by" credit — deliberately not defaulted to a placeholder, so an
+ * unset author renders as nothing rather than as an invented name.
+ */
 export function Byline({
-  by = "Dana Whitfield, RN, MSN",
+  by,
   updated,
   minutes,
 }: {
@@ -243,11 +248,16 @@ export function Byline({
 }) {
   return (
     <p className="font-mono text-[11px] leading-relaxed text-muted">
-      Written and reviewed by{" "}
-      <Link href="/about#reviewers" className="text-ink underline underline-offset-4 hover:text-teal">
-        {by}
-      </Link>
-      {minutes ? ` · ${minutes} min read` : ""} · Updated {updated}
+      {by ? (
+        <>
+          Written and reviewed by{" "}
+          <Link href="/about" className="text-ink underline underline-offset-4 hover:text-teal">
+            {by}
+          </Link>{" "}
+          ·{" "}
+        </>
+      ) : null}
+      {minutes ? `${minutes} min read · ` : ""}Updated {updated}
     </p>
   );
 }

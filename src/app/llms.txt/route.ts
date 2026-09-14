@@ -51,7 +51,7 @@ ${SITE.totalQuestions.toLocaleString("en-US")} come with the $${SITE.price}/mont
 
 Editorial standard: every question and guide is written by a registered nurse
 and reviewed by two more, one of whom maps it to a client-need category in the
-NCSBN test plan. Named authors and credentials are at ${SITE.url}/about.
+NCSBN test plan.
 
 ## Guides
 
