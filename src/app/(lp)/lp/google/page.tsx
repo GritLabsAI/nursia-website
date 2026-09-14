@@ -4,7 +4,7 @@ import { QuestionSet } from "@/components/QuestionSet";
 import { CtaLink, LP_CTA_HREF } from "@/components/lp/CtaLink";
 import { LpCheck, LpClose, LpCross, LpFacts, LpHeader, LpSection } from "@/components/lp/LpKit";
 import { LpSticky } from "@/components/lp/LpSticky";
-import { PRICING_FAQ, QUESTIONS, REVIEWERS, SITE } from "@/lib/content";
+import { PRICING_FAQ, QUESTIONS, SITE } from "@/lib/content";
 
 /**
  * Google Ads landing page — "free nclex practice questions", "nclex practice
@@ -177,27 +177,13 @@ export default function GoogleLandingPage() {
         </div>
       </LpSection>
 
-      {/* -------------------------------------------------------- who wrote */}
-      <LpSection className="pt-16">
-        <div className="border-t border-rule pt-5">
-          <p className="eyebrow">Who writes the items</p>
-          <h2 className="mt-3 max-w-2xl text-[1.75rem] sm:text-[2.125rem]">
-            Every question is signed off by a nurse, not a content mill
-          </h2>
-        </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          {REVIEWERS.map((r) => (
-            <div key={r.name} className="rounded-sm border border-rule bg-white p-6">
-              <p className="font-display text-[1.0625rem] font-bold tracking-[-0.02em] text-ink">
-                {r.name}
-              </p>
-              <p className="mt-1 font-mono text-[11px] text-teal">{r.credentials}</p>
-              <p className="mt-3 text-[0.875rem] font-semibold text-ink-2">{r.role}</p>
-              <p className="mt-2 font-body text-[0.9375rem] leading-relaxed text-muted">{r.note}</p>
-            </div>
-          ))}
-        </div>
-      </LpSection>
+      {/*
+        The "who wrote the items" reviewer-cards section used to sit here.
+        Down for the time being: the three bios were placeholder copy, not
+        real people, and a paid landing page is exactly the wrong place to
+        leave that live. Bring it back once there are actual named reviewers
+        to credit.
+      */}
 
       {/* --------------------------------------------------------- the FAQ */}
       <LpSection className="pt-16">

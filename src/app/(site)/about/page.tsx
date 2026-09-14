@@ -6,7 +6,6 @@ import {
   Section,
   SectionHead,
 } from "@/components/Blocks";
-import { REVIEWERS } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: { absolute: "About Nursia — who writes the questions" },
@@ -58,9 +57,7 @@ export default function AboutPage() {
               Nursia is the version of that product I wanted. Every question is written by a
               registered nurse, reviewed by two more, and mapped to a category on the NCSBN test
               plan before it goes anywhere near the site. Every rationale explains the distractors,
-              not just the key. The names of the people who write and review them are on this page,
-              with their credentials, because if we are asking you to trust an unknown brand with
-              six weeks of your life, the least we can do is tell you who we are.
+              not just the key.
             </p>
             <p>
               We are early. There are 1,200 questions where there should eventually be three
@@ -70,41 +67,14 @@ export default function AboutPage() {
               the product, ungated, on almost every page — answer a few questions and decide for
               yourself.
             </p>
-            <p>
-              <strong>— Dana Whitfield, RN, MSN</strong>
-              <br />
-              Founder
-            </p>
           </div>
 
-          <div id="reviewers" className="mt-16 scroll-mt-24">
-            <SectionHead
-              eyebrow="The team"
-              title="Who writes the questions"
-              note="Three people. All practising or recently practising, all named, all reachable."
-            />
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {REVIEWERS.map((r) => (
-                <div key={r.name} className="cell">
-                  <div
-                    className="mb-4 grid h-24 place-items-center rounded-sm border border-rule bg-paper-2 font-mono text-[1.25rem] text-muted"
-                    aria-hidden
-                  >
-                    {r.name
-                      .split(" ")
-                      .map((w) => w[0])
-                      .join("")}
-                  </div>
-                  <p className="font-display text-[1rem] font-bold tracking-[-0.02em] text-ink">
-                    {r.name}
-                  </p>
-                  <p className="mt-1 font-mono text-[11px] text-teal">{r.credentials}</p>
-                  <p className="mt-0.5 font-mono text-[11px] text-muted">{r.role}</p>
-                  <p className="mt-3 text-[0.8125rem] leading-snug text-ink-2">{r.note}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/*
+            The named-reviewer section that used to sit here is down for the
+            time being: the three bios were placeholder copy, not real people,
+            and this page is exactly the wrong place to leave that live. Bring
+            it back once there are actual named reviewers to credit.
+          */}
 
           <div className="mt-16">
             <SectionHead
