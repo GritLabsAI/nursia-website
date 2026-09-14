@@ -1,7 +1,19 @@
 import { redirect } from "next/navigation";
+import { APP_URL, type SearchParams, withCarried, LOGIN_ON_SITE } from "@/lib/app-handoff";
 
-export default function SignupPage() {
-  redirect("https://app.nursia.io");
+/*
+ * A redirect that keeps its job and stops discarding the reason people arrived
+ * (NUR-01). A bare redirect() drops the query string, which is how a campaign
+ * ends up bidding toward a conversion it cannot attribute. The app has no
+ * per-page route for this, so the visitor lands on its root with everything
+ * carried.
+ */
+export default async function SignupPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const from = await searchParams;
+  /* With login on this site (NUR-28) signup is the same form in its other mode —
+     no cross-domain hop left to lose anything on. */
+  if (LOGIN_ON_SITE) redirect(withCarried("/login?mode=signup", from));
+  redirect(withCarried(APP_URL, from));
 }
 
 // import Link from "next/link";
