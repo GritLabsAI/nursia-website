@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { QuestionSet } from "@/components/QuestionSet";
 import { CtaLink, LP_CTA_HREF } from "@/components/lp/CtaLink";
+import { LpViewed } from "@/components/lp/LpViewed";
 import { LpClose, LpHeader, LpSection } from "@/components/lp/LpKit";
 import { QUESTIONS, SITE } from "@/lib/content";
 
@@ -50,6 +51,7 @@ const NOT = [
 export default function RedditLandingPage() {
   return (
     <>
+      <LpViewed src={SRC} />
       <LpHeader src={SRC} />
 
       {/* ------------------------------------------------------------- lede */}

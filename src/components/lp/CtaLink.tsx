@@ -19,6 +19,9 @@ const CARRY = [
   "utm_content",
   "utm_term",
   "gclid",
+  /* iOS app-campaign clicks arrive with these instead of gclid; without them an iOS purchase is unattributable. */
+  "gbraid",
+  "wbraid",
   "fbclid",
 ] as const;
 

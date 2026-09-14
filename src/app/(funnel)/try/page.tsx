@@ -1,7 +1,15 @@
 import { redirect } from "next/navigation";
+import { APP_URL, type SearchParams, withCarried } from "@/lib/app-handoff";
 
-export default function TryPage() {
-  redirect("https://app.nursia.io");
+/*
+ * A redirect that keeps its job and stops discarding the reason people arrived
+ * (NUR-01). A bare redirect() drops the query string, which is how a campaign
+ * ends up bidding toward a conversion it cannot attribute. The app has no
+ * per-page route for this, so the visitor lands on its root with everything
+ * carried.
+ */
+export default async function TryPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  redirect(withCarried(APP_URL, await searchParams));
 }
 
 // import type { Metadata } from "next";

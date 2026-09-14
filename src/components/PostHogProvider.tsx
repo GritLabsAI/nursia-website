@@ -2,6 +2,8 @@
 
 import posthog from "posthog-js";
 import { useEffect } from "react";
+import { flushQueuedEvents } from "@/lib/analytics";
+import { redactCapture } from "@/lib/redact-auth";
 
 /**
  * PostHog on the marketing site.
@@ -12,7 +14,7 @@ import { useEffect } from "react";
  * which guide earns an account — spans the two, so both halves have to land in
  * one project against one person.
  *
- * Three decisions worth keeping:
+ * Decisions worth keeping:
  *
  * **Same-origin.** `api_host` points at our own `/ingest`, which `next.config.ts`
  * rewrites onward. A third-party analytics host is blocked far more often on
@@ -30,25 +32,48 @@ import { useEffect } from "react";
  * guide costs money and buys nothing. The profile is created when the app
  * identifies them, and `initialAttribution` below makes sure the channel that
  * brought them is still attached when that happens.
+ *
+ * **One person across the boundary** (engineering call E-01). The cookie is
+ * scoped to `.nursia.io`, and app.nursia.io sets the same, so the visitor who
+ * clicked an ad here and the account created there share a distinct id before
+ * anyone calls identify.
+ *
+ * **Replay, sampled** (NUR-29). The funnel says Meta traffic drops at the gate;
+ * a replay says whether they scrolled past it, tapped and bounced, or never saw
+ * it. Clarity cannot be filtered by channel or joined to a person, which is the
+ * whole question. Sampled rather than 100%, and behind the same token sanitiser
+ * the app runs (NUR-00).
  */
+
+const REPLAY_SAMPLE_RATE = (() => {
+  const n = Number(process.env.NEXT_PUBLIC_POSTHOG_REPLAY_SAMPLE_RATE);
+  return Number.isFinite(n) && n > 0 && n <= 1 ? n : 0.25;
+})();
+
 export default function PostHogProvider({ token }: { token: string }) {
   useEffect(() => {
-    posthog.init(token, {
-      api_host: "/ingest",
-      /* Where "open in PostHog" links point. Without it the toolbar and replay
-         links resolve against the proxy path and 404. */
-      ui_host: "https://us.posthog.com",
-      defaults: "2026-08-30",
-      capture_pageview: "history_change",
-      capture_pageleave: true,
-      person_profiles: "identified_only",
-      /* Core Web Vitals from real sessions. The performance budget in the PRD
-         is enforced against this rather than against a Lighthouse run, because
-         a lab number cannot tell you what a nurse on hospital wifi sees. */
-      capture_performance: { web_vitals: true },
-    });
-
-    initialAttribution();
+    if (!posthog.__loaded) {
+      posthog.init(token, {
+        api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "/ingest",
+        /* Where "open in PostHog" links point. Without it the toolbar and replay
+           links resolve against the proxy path and 404. */
+        ui_host: "https://us.posthog.com",
+        defaults: "2026-08-30",
+        capture_pageview: "history_change",
+        capture_pageleave: true,
+        person_profiles: "identified_only",
+        /* Core Web Vitals from real sessions. The performance budget in the PRD
+           is enforced against this rather than against a Lighthouse run, because
+           a lab number cannot tell you what a nurse on hospital wifi sees. */
+        capture_performance: { web_vitals: true },
+        cross_subdomain_cookie: true,
+        disable_session_recording: false,
+        session_recording: { sampleRate: REPLAY_SAMPLE_RATE },
+        before_send: redactCapture,
+      });
+      initialAttribution();
+    }
+    flushQueuedEvents();
   }, [token]);
 
   return null;
@@ -103,7 +128,7 @@ function initialAttribution() {
     if (Object.keys(initial).length === 0) return;
 
     initial.initial_landing_path = window.location.pathname;
-    posthog.register_once(initial);
+    posthog.register_once(initial, undefined);
   } catch {
     /* analytics must never take a page down with it */
   }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { QuestionSet } from "@/components/QuestionSet";
 import { CtaLink, LP_CTA_HREF } from "@/components/lp/CtaLink";
+import { LpViewed } from "@/components/lp/LpViewed";
 import { LpCheck, LpClose, LpHeader, LpSection } from "@/components/lp/LpKit";
 import { LpSticky } from "@/components/lp/LpSticky";
 import { QUESTIONS, SITE } from "@/lib/content";
@@ -60,6 +61,7 @@ const GET = [
 export default function MetaPrioritisationLandingPage() {
   return (
     <>
+      <LpViewed src={SRC} />
       <LpHeader src={SRC} />
 
       {/* -------------------------------------------------------------- hook */}

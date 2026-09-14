@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { FaqList } from "@/components/Blocks";
 import { QuestionSet } from "@/components/QuestionSet";
 import { CtaLink, LP_CTA_HREF } from "@/components/lp/CtaLink";
+import { LpViewed } from "@/components/lp/LpViewed";
 import { LpCheck, LpClose, LpCross, LpFacts, LpHeader, LpSection } from "@/components/lp/LpKit";
 import { LpSticky } from "@/components/lp/LpSticky";
 import { PRICING_FAQ, QUESTIONS, REVIEWERS, SITE } from "@/lib/content";
@@ -59,6 +60,7 @@ const PAID_IN = [
 export default function GoogleLandingPage() {
   return (
     <>
+      <LpViewed src={SRC} />
       <LpHeader src={SRC} />
 
       {/* ------------------------------------------------------------- hero */}

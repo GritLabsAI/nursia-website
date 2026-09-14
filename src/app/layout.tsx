@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, IBM_Plex_Mono, Source_Serif_4 } from "next/font/go
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
 import MetaPixel from "@/components/MetaPixel";
+import PostHogProvider from "@/components/PostHogProvider";
 import "./globals.css";
 import { SITE, SOCIAL } from "@/lib/content";
 
@@ -131,11 +132,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
+        {/* PostHog is the system of record, so it is gated on its key alone — not on
+            NODE_ENV like the tags below. An event nobody can see in development is
+            how instrumentation ships broken (PH-13). Rendered before the page so its
+            init effect runs ahead of the page's own mount events. */}
+        {process.env.NEXT_PUBLIC_POSTHOG_KEY && (
+          <PostHogProvider token={process.env.NEXT_PUBLIC_POSTHOG_KEY} />
+        )}
         {children}
         {process.env.NODE_ENV === "production" && (
           <>
+            {/* afterInteractive, not beforeInteractive: it used to execute ahead of
+                hydration on every marketing page — a straight LCP cost, and the
+                headroom the performance budget needs before PostHog is added (NUR-21). */}
             {process.env.NEXT_PUBLIC_CLARITY_ID && (
-              <Script id="ms-clarity-init" strategy="beforeInteractive">
+              <Script id="ms-clarity-init" strategy="afterInteractive">
                 {`(function(c,l,a,r,i,t,y){
                     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
                     t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;

@@ -13,6 +13,8 @@
  * make a round trip through Google to be read.
  */
 
+import posthog from "posthog-js";
+
 type Params = Record<string, string | number | boolean | undefined>;
 
 declare global {
@@ -36,6 +38,41 @@ function track(event: string, params: Params = {}) {
     }
   } catch {
     /* analytics must never take a page down with it */
+  }
+  toPostHog(event, clean);
+}
+
+/* ------------------------------------------------------------- posthog */
+
+/**
+ * Every event also goes to PostHog, the system of record (PostHog install spec
+ * PH-11). Because every call on this site funnels through `track`, this one
+ * edit sends all of them without touching a call site.
+ *
+ * PostHog initialises in an effect, and a page's own mount effects (a
+ * `guide_viewed`) can run first. Those few are held here rather than lost; the
+ * provider flushes them once init has run. Without a PostHog key the provider
+ * never mounts and the queue simply stays small and unsent.
+ */
+const queued: Array<[string, Params]> = [];
+
+function toPostHog(event: string, params: Params) {
+  try {
+    if (posthog.__loaded) posthog.capture(event, params);
+    else if (queued.length < 50) queued.push([event, params]);
+  } catch {
+    /* analytics must never take a page down with it */
+  }
+}
+
+export function flushQueuedEvents() {
+  if (!posthog.__loaded) return;
+  for (const [event, params] of queued.splice(0)) {
+    try {
+      posthog.capture(event, params);
+    } catch {
+      /* analytics must never take a page down with it */
+    }
   }
 }
 
@@ -148,11 +185,56 @@ function adsConversion(sendTo: string | undefined) {
  * NOT done here; it would mean shipping user data to Meta from the browser,
  * and it belongs in the Conversions API on the server if it is ever wanted.
  */
-function meta(event: string, params: Params = {}) {
+function meta(event: string, params: Params = {}, eventId?: string) {
   if (typeof window === "undefined") return;
   const clean = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined));
   try {
-    window.fbq?.("track", event, clean);
+    window.fbq?.("track", event, clean, eventId ? { eventID: eventId } : undefined);
+  } catch {
+    /* analytics must never take a page down with it */
+  }
+}
+
+/**
+ * One id per conversion, shared by the Pixel call, the server call and the
+ * PostHog event (NUR-07). It is what lets Meta collapse the browser and server
+ * copies into one conversion — the test DOD-4 runs.
+ */
+function newEventId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function readCookie(name: string): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : undefined;
+}
+
+/**
+ * The server half of a Meta conversion (NUR-08, NUR-10). Browser-only events
+ * lose what blockers and iOS strip — disproportionately the paid, mobile
+ * traffic being bought — and the route recovers it under the same event id.
+ * `keepalive` so a click that navigates away still arrives.
+ */
+function metaServer(event: string, eventId: string, customData: Params = {}) {
+  if (typeof window === "undefined" || !process.env.NEXT_PUBLIC_META_PIXEL_ID) return;
+  const clean = Object.fromEntries(Object.entries(customData).filter(([, v]) => v !== undefined));
+  try {
+    void fetch("/api/meta/capi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        event_name: event,
+        event_id: eventId,
+        event_source_url: window.location.href,
+        fbp: readCookie("_fbp"),
+        fbc: readCookie("_fbc"),
+        fbclid: new URLSearchParams(window.location.search).get("fbclid") ?? undefined,
+        custom_data: clean,
+      }),
+    }).catch(() => {});
   } catch {
     /* analytics must never take a page down with it */
   }
@@ -255,11 +337,14 @@ export function resourceOffered(p: FunnelContext & { placement?: string }) {
 }
 
 export function resourceClicked(p: FunnelContext & { placement?: string }) {
-  track("resource_clicked", { ...funnelParams(p), placement: p.placement });
+  const eventId = newEventId();
+  track("resource_clicked", { ...funnelParams(p), placement: p.placement, event_id: eventId });
   /* Meta's mid-funnel signal. Not the conversion the campaign bids toward,
      but enough volume to give delivery something to learn from long before
-     signups alone would. */
-  meta("Lead", { content_name: p.resource, content_category: p.guide });
+     signups alone would. Sent by the Pixel and the server under one id (Area B). */
+  const lead = { content_name: p.resource, content_category: p.guide };
+  meta("Lead", lead, eventId);
+  metaServer("Lead", eventId, lead);
 }
 
 /**
@@ -287,17 +372,54 @@ export type AuthMethod = "email" | "google" | "phone";
  * which pages produce accounts — has no data behind it.
  */
 export function signedUp(method: AuthMethod, context: FunnelContext = {}) {
-  track("sign_up", { method, ...funnelParams(context) });
+  const eventId = newEventId();
+  track("sign_up", { method, ...funnelParams(context), event_id: eventId });
   /* The campaign's PRIMARY conversion — this is what Google Ads bids toward. */
   adsConversion(process.env.NEXT_PUBLIC_ADS_SIGNUP_LABEL);
   /* Same conversion, told to Meta. CompleteRegistration is the standard event
      Ads Manager offers as an optimisation goal for exactly this. */
-  meta("CompleteRegistration", {
-    registration_method: method,
-    content_name: context.guide,
-  });
+  const registration = { registration_method: method, content_name: context.guide };
+  meta("CompleteRegistration", registration, eventId);
+  metaServer("CompleteRegistration", eventId, registration);
 }
 
 export function loggedIn(method: AuthMethod) {
   track("login", { method });
+}
+
+/* ----------------------------------------------------------------- login */
+
+/**
+ * Login on nursia.io (NUR-28). The completion is recorded by the app, on the
+ * callback that receives the session — the one place that knows whether the
+ * account is new — so this side records the steps before it: the form was
+ * seen, an attempt was made, an attempt failed and why. Same names the app
+ * uses, so dashboard tile 6 reads one funnel across both hosts.
+ */
+export type LoginMode = "login" | "signup";
+
+export function loginViewed(mode: LoginMode) {
+  track("login_viewed", { screen_name: "nursia_login", mode });
+}
+
+export function loginStarted(method: AuthMethod, mode: LoginMode) {
+  track("login_started", { screen_name: "nursia_login", method, mode });
+}
+
+export function loginFailed(method: AuthMethod, mode: LoginMode, reason: string) {
+  track("login_failed", { screen_name: "nursia_login", method, mode, reason });
+}
+
+/** Hand-off to the app with a session: tie this browser's history to the account (identify on the domain holding first touch). */
+export function identifyPerson(userId: string) {
+  try {
+    if (posthog.__loaded) posthog.identify(userId);
+  } catch {
+    /* analytics must never take a page down with it */
+  }
+}
+
+/** Area A: which landing page, by its slug. */
+export function lpViewed(src: string) {
+  track("lp_viewed", { src });
 }
