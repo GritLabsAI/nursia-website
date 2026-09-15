@@ -1,7 +1,12 @@
 import { redirect } from "next/navigation";
+import { APP_ORIGIN, withForwardedAttribution } from "@/lib/app-handoff";
+import { readAttribution, toSearchParams, type SearchParamsRecord } from "@/lib/attribution/allowlist";
 
-export default function TryPage() {
-  redirect("https://app.nursia.io");
+/* Same destination as before; the allowlisted attribution now survives the hop
+   instead of being thrown away with the rest of the query string. */
+export default async function TryPage({ searchParams }: { searchParams: Promise<SearchParamsRecord> }) {
+  const { forwarded } = readAttribution(toSearchParams(await searchParams));
+  redirect(withForwardedAttribution(APP_ORIGIN, forwarded));
 }
 
 // import type { Metadata } from "next";
