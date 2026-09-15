@@ -109,6 +109,10 @@ export function decodeAttributionCookie(value: string | undefined, now: number):
   if (l) out.l = l;
   // Keep the invariant the database enforces: first never after last.
   if (out.f && out.l && out.f.t > out.l.t) out.f = out.l;
+  // The first touch expired but a later one is still valid: that surviving touch
+  // is now the earliest valid touch, so it must stay first rather than let the
+  // next visit take the slot.
+  if (!out.f && out.l) out.f = out.l;
   return out;
 }
 

@@ -105,6 +105,23 @@ describe("decodeAttributionCookie", () => {
     expect(out.f?.utm_source).toBe("meta");
     expect(out.l?.utm_source).toBe("google");
   });
+
+  it("promotes a surviving last touch to first when the first touch has expired, before the next visit merges", () => {
+    const cookie = raw({
+      v: 1,
+      f: { t: NOW - 100 * DAY, surface: "nursia_web", utm_source: "old-campaign" },
+      l: { t: NOW - 20 * DAY, surface: "nursia_web", utm_source: "meta", fbclid: "L20" },
+    });
+    const decoded = decodeAttributionCookie(cookie, NOW);
+    expect(decoded.f?.fbclid).toBe("L20");
+    expect(decoded.l?.fbclid).toBe("L20");
+
+    const visit = makeTouch({ utm_source: "google", gclid: "NOW" }, "/lp/google", NOW);
+    const merged = mergeTouch(decoded, visit);
+    expect(merged.f).toEqual({ t: NOW - 20 * DAY, surface: "nursia_web", utm_source: "meta", fbclid: "L20" });
+    expect(merged.l).toEqual(visit);
+    expect(JSON.stringify(merged)).not.toContain("old-campaign");
+  });
 });
 
 describe("encodeAttributionCookie", () => {
