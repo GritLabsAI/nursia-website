@@ -11,7 +11,8 @@ import { SITE } from "@/lib/content";
    an indexed entry would only ever send a crawler — or a curious reader — to a
    sign-in screen. The page carries a noindex tag as well; this is the cheaper
    half of the pair, since it stops the fetch rather than the indexing. */
-const PRIVATE = ["/try", "/signup", "/login", "/lp/", "/resources/", "/studio"];
+/* /meta is the Meta-ads handoff: a redirect to the app with nothing to index. */
+const PRIVATE = ["/try", "/signup", "/login", "/meta", "/lp/", "/resources/", "/studio"];
 
 /* Answer engines and their training crawlers. We allow them deliberately
    rather than by default: the whole point of writing 25 RN-reviewed guides is
