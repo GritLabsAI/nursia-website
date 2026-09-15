@@ -6,6 +6,7 @@ import { TopicIcon } from "@/components/TopicIcon";
 import { Cross, LETTERS, Tick, WhyBlock } from "@/components/practice/Rationale";
 import { drillCompleted, questionAnswered } from "@/lib/analytics";
 import { recordAttempt } from "@/lib/attempts";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 import { FREE_PREVIEW, useMaybeSignedIn } from "@/lib/gate";
 import type { BankQuestion } from "@/lib/bank/types";
 import type { IconKey } from "@/lib/icons";
@@ -257,7 +258,7 @@ function Results({
             {closeLabel}
           </button>
         ) : (
-          <Link href="https://app.nursia.io" className="btn btn-ghost">
+          <Link href={APP_LOGIN_URL} className="btn btn-ghost">
             Unlock 50 more, free →
           </Link>
         )}
@@ -361,7 +362,7 @@ export function TopicDrill({
             category is costing you the most marks.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <Link href="https://app.nursia.io" className="btn btn-primary">
+            <Link href={APP_LOGIN_URL} className="btn btn-primary">
               Start free →
             </Link>
             <Link

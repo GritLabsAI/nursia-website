@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { CtaLink } from "@/components/lp/CtaLink";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 
 /**
  * The furniture the three ad landing pages share.
@@ -19,7 +20,7 @@ export function LpHeader({ src }: { src: string }) {
         </Link>
         <span className="ml-auto flex items-center gap-5">
           <Link
-            href="https://app.nursia.io"
+            href={APP_LOGIN_URL}
             className="text-[0.9375rem] font-medium text-ink-2 transition-colors hover:text-teal"
           >
             Log in

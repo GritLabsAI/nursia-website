@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 import {
   BreadcrumbSchema,
   Breadcrumbs,
@@ -142,7 +143,7 @@ export default async function TopicPage({ params }: Params) {
                       eyebrow: "End of the free set",
                       headline: "Keep going",
                       body: `A free account opens 50 questions across every category, including more ${t.name.toLowerCase()}.`,
-                      cta: { label: "Start free →", href: "https://app.nursia.io" },
+                      cta: { label: "Start free →", href: APP_LOGIN_URL },
                       exits: [
                         { label: "Practise any topic", href: "/practice" },
                         { label: "See pricing", href: "/pricing" },

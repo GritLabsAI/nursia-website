@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 import {
   BreadcrumbSchema,
   Breadcrumbs,
@@ -70,7 +71,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="https://app.nursia.io" className="btn btn-ghost mt-8 w-full">
+              <Link href={APP_LOGIN_URL} className="btn btn-ghost mt-8 w-full">
                 Start free
               </Link>
             </div>
@@ -95,7 +96,7 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="https://app.nursia.io" className="btn btn-primary mt-8 w-full">
+              <Link href={APP_LOGIN_URL} className="btn btn-primary mt-8 w-full">
                 Try 10 questions first →
               </Link>
               <p className="mt-3 text-center font-mono text-[11px] text-muted">

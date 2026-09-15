@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 import {
   BreadcrumbSchema,
   Breadcrumbs,
@@ -127,7 +128,7 @@ export default async function HubPage() {
                     eyebrow: "End of the free set",
                     headline: "Keep going",
                     body: "A free account adds 50 more questions and tells you which category is costing you the most marks. Email and password, no card.",
-                    cta: { label: "Start free →", href: "https://app.nursia.io" },
+                    cta: { label: "Start free →", href: APP_LOGIN_URL },
                     exits: [
                       { label: "See pricing", href: "/pricing" },
                       { label: "Practise a single topic", href: "#by-topic" },
@@ -322,7 +323,7 @@ export default async function HubPage() {
                 <p className="mt-2 text-[0.8125rem] leading-snug text-ink-2">
                   more questions with a free account.
                 </p>
-                <Link href="https://app.nursia.io" className="btn btn-primary mt-4 w-full !py-2.5 !text-sm">
+                <Link href={APP_LOGIN_URL} className="btn btn-primary mt-4 w-full !py-2.5 !text-sm">
                   Start free →
                 </Link>
               </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 import { SITE, SOCIAL, topicsIn } from "@/lib/content";
 import { sanityFetch, tags } from "@/sanity/client";
 import { GUIDES_INDEX_QUERY } from "@/sanity/queries";
@@ -123,7 +124,7 @@ export async function SiteFooter() {
             </p>
             <p className="text-[0.875rem] text-white/55">No card. Cancel anytime.</p>
           </div>
-          <Link href="https://app.nursia.io" className="btn btn-invert sm:ml-auto">
+          <Link href={APP_LOGIN_URL} className="btn btn-invert sm:ml-auto">
             Start free →
           </Link>
         </div>

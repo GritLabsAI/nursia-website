@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
-import { APP_ORIGIN, withForwardedAttribution } from "@/lib/app-handoff";
+import { APP_LOGIN_URL, withForwardedAttribution } from "@/lib/app-handoff";
 import { readAttribution, toSearchParams, type SearchParamsRecord } from "@/lib/attribution/allowlist";
 
-/* Same destination as before; the allowlisted attribution now survives the hop
-   instead of being thrown away with the rest of the query string. */
+/* Straight to the app's login screen now, not the app root: this route is
+   named /login, so it should not make a visitor sit through the root's
+   splash-then-redirect on the way there. The allowlisted attribution still
+   survives the hop. */
 export default async function LoginPage({ searchParams }: { searchParams: Promise<SearchParamsRecord> }) {
   const { forwarded } = readAttribution(toSearchParams(await searchParams));
-  redirect(withForwardedAttribution(APP_ORIGIN, forwarded));
+  redirect(withForwardedAttribution(APP_LOGIN_URL, forwarded));
 }
 
 // import type { Metadata } from "next";

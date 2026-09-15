@@ -7,6 +7,7 @@
  */
 
 import type { IconKey } from "@/lib/icons";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 import { BANK_COUNTS } from "@/lib/bank/counts";
 import { EXTRA_GUIDES } from "@/lib/guides-content";
 import { TREND_GUIDES } from "@/lib/guides-trends";
@@ -1212,5 +1213,5 @@ export const TOOLS = [
   { name: "Dosage calculator", note: "Check your setup, not just your answer", href: "/nclex" },
   { name: "Lab values sheet", note: "The 24 values the exam repeats", href: "/nclex" },
   { name: "Test plan breakdown", note: "All eight categories with weights", href: "/guides/whats-on-the-test-plan" },
-  { name: "Readiness quiz", note: "2 questions, instant estimate", href: "https://app.nursia.io" },
+  { name: "Readiness quiz", note: "2 questions, instant estimate", href: APP_LOGIN_URL },
 ];

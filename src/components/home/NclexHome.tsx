@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 import { HOME_FAQ } from "@/lib/content";
 import { CYCLE_STAGES } from "./cycleData";
 import { QTYPE_DATA } from "./qtypeData";
@@ -230,7 +231,7 @@ export function NclexHome() {
               reviewed by practising nurses — and a readiness score that moves after every session.
             </p>
             <div className="hero-actions">
-              <Link href="https://app.nursia.io" className="btn-pill">
+              <Link href={APP_LOGIN_URL} className="btn-pill">
                 Start free →
               </Link>
               <span className="hero-note">50 free questions · No card needed</span>
@@ -617,7 +618,7 @@ export function NclexHome() {
           </div>
           <h2 className="cta-strip-heading">50 free questions. No card.</h2>
           <div className="cta-strip-action">
-            <Link href="https://app.nursia.io" className="btn-pill">
+            <Link href={APP_LOGIN_URL} className="btn-pill">
               Start free →
             </Link>
             <span className="cta-strip-note">Cancel anytime</span>

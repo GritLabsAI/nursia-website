@@ -3,15 +3,19 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { APP_ORIGIN } from "@/lib/app-handoff";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 import { readAttribution } from "@/lib/attribution/allowlist";
 
 /**
  * Where every paid-traffic CTA lands. Kept in one place so the three landing
  * pages can be pointed somewhere else in a single edit — signup is the whole
  * reason these pages exist, so it is also the thing most likely to move.
+ *
+ * Points straight at the app's login screen, not the app root: the root is a
+ * client-side redirector that splashes for ~0.6-1.4s before sending a signed-out
+ * visitor to /login anyway, and paid traffic is signed-out by definition.
  */
-export const LP_CTA_HREF = APP_ORIGIN;
+export const LP_CTA_HREF = APP_LOGIN_URL;
 
 type Props = {
   /** landing-page slug, used when the visit carried no src of its own */

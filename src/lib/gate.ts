@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { APP_LOGIN_URL } from "@/lib/app-handoff";
 import { hasAuthHint } from "@/lib/auth-hint";
 
 /**
@@ -58,6 +59,6 @@ export const PREVIEW_GATE: GateConfig = {
   eyebrow: `That is ${FREE_PREVIEW} of 1,200`,
   headline: "Make an account to keep going",
   body: "An account is an email and a password — no card. It opens the rest of the set, keeps every answer, and names the category costing you the most marks.",
-  cta: { label: "Start free →", href: "https://app.nursia.io" },
+  cta: { label: "Start free →", href: APP_LOGIN_URL },
   exits: [{ label: "See what an account gets you", href: "/pricing" }],
 };
