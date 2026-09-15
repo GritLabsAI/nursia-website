@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, IBM_Plex_Mono, Source_Serif_4 } from "next/font/go
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
 import MetaPixel from "@/components/MetaPixel";
+import PostHogProvider from "@/components/PostHogProvider";
 import "./globals.css";
 import { SITE, SOCIAL } from "@/lib/content";
 
@@ -132,10 +133,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         {children}
+        {/* PostHog is gated on its key alone, not on NODE_ENV like the tags
+            below: it is the system of record, and not seeing events outside a
+            production build is how instrumentation ships broken (PH-13). A
+            staging or local build simply leaves the key unset — or sets a test
+            project's. */}
+        {process.env.NEXT_PUBLIC_POSTHOG_KEY && (
+          <PostHogProvider token={process.env.NEXT_PUBLIC_POSTHOG_KEY} />
+        )}
         {process.env.NODE_ENV === "production" && (
           <>
             {process.env.NEXT_PUBLIC_CLARITY_ID && (
-              <Script id="ms-clarity-init" strategy="beforeInteractive">
+              /* afterInteractive, not beforeInteractive: Clarity is a session
+                 recorder, not something the page needs before hydration, and
+                 running it first delayed hydration on every page (NUR-21). */
+              <Script id="ms-clarity-init" strategy="afterInteractive">
                 {`(function(c,l,a,r,i,t,y){
                     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
                     t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;

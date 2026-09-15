@@ -140,16 +140,17 @@ export function ResourceGate({ resource, experiment, guideSlug, at }: Props) {
   const label = variant?.ctaLabel || resource.ctaLabel || "Unlock it free →";
 
   /* Everything the funnel needs to attribute the signup, carried in the query
-     string. /signup reads `next` to know where to send them afterwards and the
-     rest to know where they came from — otherwise every account looks like it
-     arrived from nowhere and the content programme cannot be evaluated. */
+     string under the names /signup forwards to the app (the Phase 2 allowlist's
+     guide / resource / experiment / variant) — otherwise every account looks
+     like it arrived from nowhere and the content programme cannot be evaluated.
+     `next` is kept for the on-site form. */
   const href = signedIn
     ? destination
     : `/signup?next=${encodeURIComponent(destination)}` +
-      `&r=${encodeURIComponent(resource.slug)}` +
-      `&g=${encodeURIComponent(guideSlug)}` +
-      (experiment?.key ? `&x=${encodeURIComponent(experiment.key)}` : "") +
-      (variant?.key ? `&v=${encodeURIComponent(variant.key)}` : "");
+      `&resource=${encodeURIComponent(resource.slug)}` +
+      `&guide=${encodeURIComponent(guideSlug)}` +
+      (experiment?.key ? `&experiment=${encodeURIComponent(experiment.key)}` : "") +
+      (variant?.key ? `&variant=${encodeURIComponent(variant.key)}` : "");
 
   return (
     <aside
