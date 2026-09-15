@@ -2,7 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import Script from "next/script";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+import { nextPageView } from "@/lib/pageViews";
 
 /**
  * The Meta pixel, loaded once and kept in step with client-side navigation.
@@ -17,17 +18,18 @@ import { useEffect, useRef } from "react";
  * Silent no-op without an id, exactly like the GA4 and Ads tags: a missing env
  * var must never break a page.
  */
+/* The last path a PageView was counted for, per page load. Module-level rather
+   than a ref: React Strict Mode (and any remount) runs the effect again for the
+   same path, and a ref would be reset with the component. */
+let lastPageViewPath: string | null = null;
+
 export default function MetaPixel({ pixelId }: { pixelId: string }) {
   const pathname = usePathname();
-  /* The base code's own PageView covers the first render; skipping it here
-     avoids counting the landing page twice. */
-  const firstRender = useRef(true);
 
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
+    const { fire, last } = nextPageView(lastPageViewPath, pathname);
+    lastPageViewPath = last;
+    if (!fire) return;
     try {
       window.fbq?.("track", "PageView");
     } catch {

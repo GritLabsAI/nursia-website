@@ -1,17 +1,20 @@
 /**
- * GA4 events for the things worth knowing about.
+ * GA4 + PostHog events for the things worth knowing about.
  *
- * The site already loads GA4 in the root layout; this is the vocabulary on top
- * of it. Everything funnels through one `track` so the shape of an event is
- * decided in one place, and so a page never breaks because analytics is
- * blocked — which it often is. An ad blocker, a privacy setting, or simply no
- * GA id in the environment all end the same way here: a no-op.
+ * The site already loads GA4 and PostHog in the root layout; this is the
+ * vocabulary on top of them. Everything funnels through one `track` so the
+ * shape of an event is decided in one place — and so one edit sends every
+ * event to both (NUR-05 / PH-11) — and so a page never breaks because
+ * analytics is blocked — which it often is. An ad blocker, a privacy setting,
+ * or simply no id in the environment all end the same way here: a no-op.
  *
  * What is deliberately NOT sent: the question stem, the options, or anything a
  * person typed. An item id and whether it was answered correctly is enough to
  * find a broken question; the content is already ours and does not need to
  * make a round trip through Google to be read.
  */
+
+import { capturePostHog } from "@/lib/posthogBridge";
 
 type Params = Record<string, string | number | boolean | undefined>;
 
@@ -26,7 +29,12 @@ declare global {
 function track(event: string, params: Params = {}) {
   if (typeof window === "undefined") return;
   /* Drop undefined rather than sending the string "undefined" as a dimension. */
-  const clean = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined));
+  const clean = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined)) as Record<
+    string,
+    string | number | boolean
+  >;
+  /* PostHog is the system of record for the funnel; GA4 keeps its reports. */
+  capturePostHog(event, clean);
   try {
     if (typeof window.gtag === "function") {
       window.gtag("event", event, clean);
@@ -148,11 +156,14 @@ function adsConversion(sendTo: string | undefined) {
  * NOT done here; it would mean shipping user data to Meta from the browser,
  * and it belongs in the Conversions API on the server if it is ever wanted.
  */
-function meta(event: string, params: Params = {}) {
+function meta(event: string, params: Params = {}, eventId?: string) {
   if (typeof window === "undefined") return;
   const clean = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined));
   try {
-    window.fbq?.("track", event, clean);
+    /* eventID is the id the same occurrence carries everywhere else (GA4 and
+       PostHog `event_id`), so a server-side copy can ever be deduplicated. */
+    if (eventId) window.fbq?.("track", event, clean, { eventID: eventId });
+    else window.fbq?.("track", event, clean);
   } catch {
     /* analytics must never take a page down with it */
   }
@@ -255,11 +266,18 @@ export function resourceOffered(p: FunnelContext & { placement?: string }) {
 }
 
 export function resourceClicked(p: FunnelContext & { placement?: string }) {
-  track("resource_clicked", { ...funnelParams(p), placement: p.placement });
+  const eventId = newEventId();
+  track("resource_clicked", { ...funnelParams(p), placement: p.placement, event_id: eventId });
   /* Meta's mid-funnel signal. Not the conversion the campaign bids toward,
      but enough volume to give delivery something to learn from long before
      signups alone would. */
-  meta("Lead", { content_name: p.resource, content_category: p.guide });
+  meta("Lead", { content_name: p.resource, content_category: p.guide }, eventId);
+}
+
+/** One id per occurrence, shared by GA4/PostHog `event_id` and the Pixel `eventID`. */
+export function newEventId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 }
 
 /**

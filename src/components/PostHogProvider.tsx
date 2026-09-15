@@ -2,6 +2,8 @@
 
 import posthog from "posthog-js";
 import { useEffect } from "react";
+import { PERSONAL_URL_PARAMS, redactCapture } from "@/lib/analyticsRedaction";
+import { INITIAL_KEYS, flushPendingPostHog, hasRegisteredInitialTouch, initialAttributionProperties } from "@/lib/posthogBridge";
 
 /**
  * PostHog on the marketing site.
@@ -33,6 +35,12 @@ import { useEffect } from "react";
  */
 export default function PostHogProvider({ token }: { token: string }) {
   useEffect(() => {
+    /* Once per page load: React Strict Mode and remounts re-run this effect, and
+       a second init would reset the SDK's state. */
+    if ((posthog as unknown as { __loaded?: boolean }).__loaded) {
+      flushPendingPostHog();
+      return;
+    }
     posthog.init(token, {
       api_host: "/ingest",
       /* Where "open in PostHog" links point. Without it the toolbar and replay
@@ -46,9 +54,26 @@ export default function PostHogProvider({ token }: { token: string }) {
          is enforced against this rather than against a Lighthouse run, because
          a lab number cannot tell you what a nurse on hospital wifi sees. */
       capture_performance: { web_vitals: true },
+      /* Nothing a session token, contact detail or one-time code can reach
+         PostHog's storage — every property of every event, the initial URL in
+         $set_once and replay page-meta included (analyticsRedaction.ts). */
+      before_send: redactCapture,
+      /* before_send only sees events. The SDK also keeps the landing URL in
+         its own persistence ($initial_person_info) and sends it with the
+         /flags request, so the same parameters are masked at the source too.
+         This also masks ad click-id VALUES inside PostHog's automatic URL
+         properties; attribution is unaffected — the validated initial_* super
+         properties below carry the real values. */
+      mask_personal_data_properties: true,
+      custom_personal_data_properties: [...PERSONAL_URL_PARAMS],
+      /* No App Router route uses the fragment; dropping it from captured URLs
+         keeps a token-bearing hash out of persistence as well. */
+      disable_capture_url_hashes: true,
     });
 
     initialAttribution();
+    /* Events track() fired before init. */
+    flushPendingPostHog();
   }, [token]);
 
   return null;
@@ -65,45 +90,24 @@ export default function PostHogProvider({ token }: { token: string }) {
  * stamps property values as they were at ingestion — so a channel written once
  * at first touch stays readable on every later event, including that one.
  *
- * `register_once` is doing the real work. It writes only if the property is
- * absent, which makes "first touch wins" true at the storage layer rather than
- * something this function has to remember to enforce, and it stores them as
- * super properties — attached to every later event from this browser, carried
- * through the eventual `$identify`, and costing no person profile in the
- * meantime. `setPersonProperties` would be the obvious alternative and is the
+ * The whole first touch is registered once — only while no initial_* property
+ * exists (see hasRegisteredInitialTouch: `register_once` alone would add a later
+ * channel's keys next to the first one's) — as super properties: attached to
+ * every later event from this browser, carried through the eventual
+ * `$identify`, and costing no person profile in the meantime. `setPersonProperties` would be the obvious alternative and is the
  * wrong one here: under `identified_only` it is either a no-op or it creates
  * the profile we just said we did not want for anonymous readers.
  */
-const ATTRIBUTION = [
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_content",
-  "utm_term",
-  /* Google's click ids. gclid is the web one; gbraid and wbraid arrive instead
-     on iOS app campaigns, and a purchase that only stored gclid is an orphan. */
-  "gclid",
-  "gbraid",
-  "wbraid",
-  "fbclid",
-  /* Ours — which landing page, so creative clusters stay separable. */
-  "src",
-] as const;
-
 function initialAttribution() {
   try {
-    const params = new URLSearchParams(window.location.search);
-    const initial: Record<string, string> = {};
-
-    for (const key of ATTRIBUTION) {
-      const value = params.get(key);
-      if (value) initial[`initial_${key}`] = value;
-    }
-
+    /* The Phase 2 allowlist decides what counts and what a valid value looks
+       like (UTMs incl. utm_id, Meta campaign/ad set/ad ids, gclid, gbraid,
+       wbraid, fbclid, src) — the same rules as the nursia_attr cookie and the
+       app, so the three never disagree about a visit. */
+    const initial = initialAttributionProperties(window.location.search, window.location.pathname);
     if (Object.keys(initial).length === 0) return;
-
-    initial.initial_landing_path = window.location.pathname;
-    posthog.register_once(initial);
+    if (hasRegisteredInitialTouch((key) => posthog.get_property(key), INITIAL_KEYS)) return;
+    posthog.register(initial);
   } catch {
     /* analytics must never take a page down with it */
   }

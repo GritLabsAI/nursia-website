@@ -105,10 +105,10 @@ function useFunnelParams() {
 
   return {
     next,
-    resource: params.get("r") ?? undefined,
-    guide: params.get("g") ?? undefined,
-    experiment: params.get("x") ?? undefined,
-    variant: params.get("v") ?? undefined,
+    resource: params.get("resource") ?? params.get("r") ?? undefined,
+    guide: params.get("guide") ?? params.get("g") ?? undefined,
+    experiment: params.get("experiment") ?? params.get("x") ?? undefined,
+    variant: params.get("variant") ?? params.get("v") ?? undefined,
   };
 }
 
