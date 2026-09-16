@@ -95,16 +95,41 @@ describe("track() → GA4 + PostHog (one pipeline)", () => {
     expect(pendingPostHogEvents()).toHaveLength(0);
   });
 
-  it("resource_clicked → one Pixel Lead whose eventID equals the GA4/PostHog event_id", async () => {
+  it("resource_clicked stays a content-funnel event: GA4 + PostHog, nothing to Meta", async () => {
     const analytics = await import("@/lib/analytics");
     analytics.resourceClicked({ guide: "nclex-pharm", resource: "cheat-sheet", placement: "inline" } as never);
     const [, props] = ph.captures.find(([e]) => e === "resource_clicked")!;
     expect(typeof props.event_id).toBe("string");
-    expect(fbq).toHaveBeenCalledTimes(1);
-    expect(fbq.mock.calls[0][0]).toBe("track");
-    expect(fbq.mock.calls[0][1]).toBe("Lead");
-    expect(fbq.mock.calls[0][3]).toEqual({ eventID: props.event_id });
     expect(gtag).toHaveBeenCalledWith("event", "resource_clicked", expect.objectContaining({ event_id: props.event_id }));
+    // Lead now means "an account was created" and is sent by app.nursia.io.
+    expect(fbq).not.toHaveBeenCalled();
+  });
+
+  it("sign_up sends no Meta event from this site", async () => {
+    const analytics = await import("@/lib/analytics");
+    analytics.signedUp("email", {});
+    expect(fbq).not.toHaveBeenCalled();
+  });
+});
+
+describe("Meta ViewContent routes", () => {
+  it("fires on landing pages, guides and pricing, with content_name and content_category", async () => {
+    const { viewContentFor } = await import("@/lib/pageViews");
+    expect(viewContentFor("/lp/meta")).toEqual({ content_name: "meta", content_category: "landing_page" });
+    expect(viewContentFor("/guides/nclex-pharmacology")).toEqual({
+      content_name: "nclex-pharmacology",
+      content_category: "guide",
+    });
+    expect(viewContentFor("/pricing")).toEqual({ content_name: "pricing", content_category: "pricing" });
+    expect(viewContentFor("/pricing/")).toEqual({ content_name: "pricing", content_category: "pricing" });
+    expect(viewContentFor("/lp/meta?utm_source=meta")).toEqual({ content_name: "meta", content_category: "landing_page" });
+  });
+
+  it("does not fire on anything else", async () => {
+    const { viewContentFor } = await import("@/lib/pageViews");
+    for (const path of ["/", "/guides", "/lp", "/contact", "/privacy", "/nursing/wound-care", "/guides/a/b"]) {
+      expect(viewContentFor(path)).toBeNull();
+    }
   });
 });
 
