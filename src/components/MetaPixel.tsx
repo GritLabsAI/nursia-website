@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Script from "next/script";
 import { useEffect } from "react";
-import { nextPageView } from "@/lib/pageViews";
+import { nextPageView, viewContentFor } from "@/lib/pageViews";
 
 /**
  * The Meta pixel, loaded once and kept in step with client-side navigation.
@@ -22,6 +22,9 @@ import { nextPageView } from "@/lib/pageViews";
    than a ref: React Strict Mode (and any remount) runs the effect again for the
    same path, and a ref would be reset with the component. */
 let lastPageViewPath: string | null = null;
+/* Same reasoning for ViewContent, but it needs its own guard: the base code
+   fires no ViewContent, so the first load counts. */
+let lastViewContentPath: string | null = null;
 
 export default function MetaPixel({ pixelId }: { pixelId: string }) {
   const pathname = usePathname();
@@ -29,9 +32,13 @@ export default function MetaPixel({ pixelId }: { pixelId: string }) {
   useEffect(() => {
     const { fire, last } = nextPageView(lastPageViewPath, pathname);
     lastPageViewPath = last;
-    if (!fire) return;
     try {
-      window.fbq?.("track", "PageView");
+      if (fire) window.fbq?.("track", "PageView");
+      const content = viewContentFor(pathname);
+      if (content && lastViewContentPath !== pathname) {
+        lastViewContentPath = pathname;
+        window.fbq?.("track", "ViewContent", content);
+      }
     } catch {
       /* analytics must never take a page down with it */
     }
