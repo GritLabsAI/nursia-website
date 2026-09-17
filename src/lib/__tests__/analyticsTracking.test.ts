@@ -95,16 +95,20 @@ describe("track() → GA4 + PostHog (one pipeline)", () => {
     expect(pendingPostHogEvents()).toHaveLength(0);
   });
 
-  it("resource_clicked → one Pixel Lead whose eventID equals the GA4/PostHog event_id", async () => {
+  it("resource_clicked → GA4 and PostHog only; never a Meta Lead (Lead means an account was created)", async () => {
     const analytics = await import("@/lib/analytics");
     analytics.resourceClicked({ guide: "nclex-pharm", resource: "cheat-sheet", placement: "inline" } as never);
     const [, props] = ph.captures.find(([e]) => e === "resource_clicked")!;
     expect(typeof props.event_id).toBe("string");
-    expect(fbq).toHaveBeenCalledTimes(1);
-    expect(fbq.mock.calls[0][0]).toBe("track");
-    expect(fbq.mock.calls[0][1]).toBe("Lead");
-    expect(fbq.mock.calls[0][3]).toEqual({ eventID: props.event_id });
     expect(gtag).toHaveBeenCalledWith("event", "resource_clicked", expect.objectContaining({ event_id: props.event_id }));
+    expect(fbq).not.toHaveBeenCalled();
+  });
+
+  it("sign_up on this site sends no Meta CompleteRegistration (that is the app's onboarding event now)", async () => {
+    const analytics = await import("@/lib/analytics");
+    analytics.signedUp("email", { guide: "nclex-pharm" } as never);
+    expect(gtag).toHaveBeenCalledWith("event", "sign_up", expect.objectContaining({ method: "email" }));
+    expect(fbq).not.toHaveBeenCalled();
   });
 });
 

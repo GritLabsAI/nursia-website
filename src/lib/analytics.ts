@@ -137,37 +137,14 @@ function adsConversion(sendTo: string | undefined) {
 
 /* ------------------------------------------------------------------ meta */
 
-/**
- * Meta pixel events.
- *
- * The pixel itself is loaded by the root layout; this is the vocabulary on top
- * of it, and the same no-op-when-absent contract as `track` above. The pixel
- * is blocked far more often than GA4 is — Safari, iOS, and every content
- * blocker in the world take a run at it — so a missing `fbq` is the normal
- * case, not an error worth surfacing.
- *
- * Only Meta's STANDARD event names get `track`; anything of our own would need
- * `trackCustom`, and a standard event is what Ads Manager can optimise
- * delivery toward. Hence CompleteRegistration for a signup rather than a
- * prettier name of our own invention.
- *
- * As with GA4, nothing a person typed is sent. Advanced matching — hashing an
- * email into the pixel to recover attribution Safari dropped — is deliberately
- * NOT done here; it would mean shipping user data to Meta from the browser,
- * and it belongs in the Conversions API on the server if it is ever wanted.
+/*
+ * No Meta events are sent from here. The pixel itself (root layout) still sends
+ * PageView. Per the growth tracker ("Meta event flow"), the conversions are
+ * app.nursia.io's: Lead when an account is created, CompleteRegistration when
+ * onboarding is finished — both claimed once per person and sent through the
+ * Conversions API. A copy from this site would be counted as an extra
+ * account or an extra onboarding in the same dataset.
  */
-function meta(event: string, params: Params = {}, eventId?: string) {
-  if (typeof window === "undefined") return;
-  const clean = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined));
-  try {
-    /* eventID is the id the same occurrence carries everywhere else (GA4 and
-       PostHog `event_id`), so a server-side copy can ever be deduplicated. */
-    if (eventId) window.fbq?.("track", event, clean, { eventID: eventId });
-    else window.fbq?.("track", event, clean);
-  } catch {
-    /* analytics must never take a page down with it */
-  }
-}
 
 /* ---------------------------------------------------------------- funnel */
 
@@ -266,12 +243,11 @@ export function resourceOffered(p: FunnelContext & { placement?: string }) {
 }
 
 export function resourceClicked(p: FunnelContext & { placement?: string }) {
-  const eventId = newEventId();
-  track("resource_clicked", { ...funnelParams(p), placement: p.placement, event_id: eventId });
-  /* Meta's mid-funnel signal. Not the conversion the campaign bids toward,
-     but enough volume to give delivery something to learn from long before
-     signups alone would. */
-  meta("Lead", { content_name: p.resource, content_category: p.guide }, eventId);
+  track("resource_clicked", { ...funnelParams(p), placement: p.placement, event_id: newEventId() });
+  /* Not sent to Meta any more. It went out as Lead, but Lead now means an
+     account was created, and "a guide download is not an account, and no
+     standard event describes it" (growth tracker). The content funnel reads it
+     from GA4 and PostHog instead (NUR-37). */
 }
 
 /** One id per occurrence, shared by GA4/PostHog `event_id` and the Pixel `eventID`. */
@@ -308,12 +284,8 @@ export function signedUp(method: AuthMethod, context: FunnelContext = {}) {
   track("sign_up", { method, ...funnelParams(context) });
   /* The campaign's PRIMARY conversion — this is what Google Ads bids toward. */
   adsConversion(process.env.NEXT_PUBLIC_ADS_SIGNUP_LABEL);
-  /* Same conversion, told to Meta. CompleteRegistration is the standard event
-     Ads Manager offers as an optimisation goal for exactly this. */
-  meta("CompleteRegistration", {
-    registration_method: method,
-    content_name: context.guide,
-  });
+  /* Nothing to Meta: CompleteRegistration now means onboarding finished, and a
+     new account is the app's Lead — both sent by app.nursia.io's server. */
 }
 
 export function loggedIn(method: AuthMethod) {
