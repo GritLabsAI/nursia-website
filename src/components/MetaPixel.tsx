@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Script from "next/script";
 import { useEffect } from "react";
 import { nextPageView } from "@/lib/pageViews";
+import { nextViewContent, type ViewContentParams } from "@/lib/metaViewContent";
 
 /**
  * The Meta pixel, loaded once and kept in step with client-side navigation.
@@ -22,6 +23,35 @@ import { nextPageView } from "@/lib/pageViews";
    than a ref: React Strict Mode (and any remount) runs the effect again for the
    same path, and a ref would be reset with the component. */
 let lastPageViewPath: string | null = null;
+/* Same idea for ViewContent, which (unlike PageView) the base code doesn't send. */
+let lastViewContentPath: string | null = null;
+
+/**
+ * Send ViewContent once the Pixel exists. The base code is an afterInteractive
+ * script, so on the first page load this effect can run before `fbq` is
+ * defined; wait briefly rather than lose the landing page's view. Creating a
+ * stand-in `fbq` here is not an option: the base code skips `init` when one
+ * already exists.
+ */
+function trackViewContent(params: ViewContentParams) {
+  const send = () => {
+    try {
+      window.fbq?.("track", "ViewContent", params);
+    } catch {
+      /* analytics must never take a page down with it */
+    }
+  };
+  if (window.fbq) return send();
+  const startedAt = Date.now();
+  const timer = window.setInterval(() => {
+    if (window.fbq) {
+      window.clearInterval(timer);
+      send();
+    } else if (Date.now() - startedAt > 8000) {
+      window.clearInterval(timer); // blocked or no pixel: nothing to send to
+    }
+  }, 100);
+}
 
 export default function MetaPixel({ pixelId }: { pixelId: string }) {
   const pathname = usePathname();
@@ -29,12 +59,18 @@ export default function MetaPixel({ pixelId }: { pixelId: string }) {
   useEffect(() => {
     const { fire, last } = nextPageView(lastPageViewPath, pathname);
     lastPageViewPath = last;
-    if (!fire) return;
-    try {
-      window.fbq?.("track", "PageView");
-    } catch {
-      /* analytics must never take a page down with it */
+    if (fire) {
+      try {
+        window.fbq?.("track", "PageView");
+      } catch {
+        /* analytics must never take a page down with it */
+      }
     }
+    // Landing pages, guides and pricing also send ViewContent on every view
+    // (growth tracker, "Meta event flow"); see src/lib/metaViewContent.ts.
+    const view = nextViewContent(lastViewContentPath, pathname);
+    lastViewContentPath = view.last;
+    if (view.params) trackViewContent(view.params);
   }, [pathname]);
 
   return (
