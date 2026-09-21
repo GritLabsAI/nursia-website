@@ -12,15 +12,30 @@ const nextConfig: NextConfig = {
    * real and partly an artefact of who runs a blocker, with no way to tell the
    * halves apart. Same-origin requests are not blocked, so the comparison holds.
    *
-   * The static split matters: the SDK bundle and session-replay recorder come
-   * from the assets host, everything else from the ingestion host. Pointing both
-   * at one destination silently breaks one of them.
+   * The asset-host split matters, and is bigger than the SDK bundle and replay
+   * recorder: with a same-origin `api_host` posthog-js can't infer a US/EU
+   * region from the URL, so it falls back to routing every "assets"-type
+   * request (`requestRouter.endpointFor("assets", …)` in posthog-js) through
+   * `api_host` unchanged. That includes `/array/<token>/config[.js]` — the
+   * remote-config fetch that gates anything server-controlled, Core Web
+   * Vitals autocapture among them (`capture_performance: { web_vitals: true }`
+   * in PostHogProvider.tsx only sets local defaults; the SDK only starts
+   * capturing once remote config echoes `capturePerformance.web_vitals` back).
+   * Only `/ingest/static/*` was ever forwarded to the assets host, so
+   * `/ingest/array/*` fell through to the catch-all below and hit the
+   * ingestion host instead — remote config silently never loaded, and with it
+   * every event gated behind it, while locally-configured capture (pageview,
+   * autocapture) kept working. Route it wherever the static bundle goes.
    */
   async rewrites() {
     return [
       {
         source: "/ingest/static/:path*",
         destination: "https://us-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/array/:path*",
+        destination: "https://us-assets.i.posthog.com/array/:path*",
       },
       {
         source: "/ingest/:path*",
