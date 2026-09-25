@@ -99,9 +99,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       url: `/nursing/${p.slug}`,
       publishedTime: `${p.publishedAt}T00:00:00.000Z`,
       modifiedTime: `${p.updatedAt}T00:00:00.000Z`,
-      ...(p.authorName
-        ? { authors: [`${p.authorName}, ${p.authorHonorific}`] }
-        : {}),
+      /* No `authors` entry: see the note by articleSchema below. */
     },
     twitter: { card: "summary_large_image", title: p.h1, description },
   };
@@ -187,28 +185,17 @@ export default async function NursingLibraryPage({ params }: Params) {
     timeRequired: `PT${p.minutes}M`,
     url,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
-    ...(p.author
-      ? {
-          author: {
-            "@type": "Person",
-            name: p.author.name,
-            honorificSuffix: p.author.honorific,
-            jobTitle: p.author.jobTitle,
-            knowsAbout: p.author.knowsAbout ?? [],
-            ...(p.author.sameAs?.length ? { sameAs: p.author.sameAs } : {}),
-            worksFor: { "@type": "Organization", name: SITE.name, url: SITE.url },
-          },
-        }
-      : {}),
-    ...(p.reviewedBy
-      ? {
-          reviewedBy: {
-            "@type": "Person",
-            name: p.reviewedBy.name,
-            honorificSuffix: p.reviewedBy.honorific,
-          },
-        }
-      : {}),
+    /*
+     * No `author` or `reviewedBy` node here for the time being.
+     *
+     * The byline these fields fed was a named, credentialed nurse who does
+     * not exist — invented copy, not a placeholder for a real reviewer.
+     * Claiming authorship by a fictitious licensed professional on health
+     * content is the kind of thing that costs trust the moment it is
+     * noticed, so it comes out everywhere rather than staying live while a
+     * real byline is sorted out. Reintroduce this once `p.author` points at
+     * an actual named reviewer.
+     */
     publisher: {
       "@type": "Organization",
       "@id": `${SITE.url}#organization`,
@@ -262,11 +249,6 @@ export default async function NursingLibraryPage({ params }: Params) {
 
             <div className="mt-5">
               <Byline
-                by={
-                  p.author?.name
-                    ? `${p.author.name}, ${p.author.honorific}`
-                    : undefined
-                }
                 updated={monthYear(p.updatedAt!)}
                 minutes={p.minutes ?? undefined}
               />

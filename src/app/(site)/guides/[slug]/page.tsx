@@ -74,7 +74,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       url: `/guides/${g.slug}`,
       publishedTime: `${g.publishedAt}T00:00:00.000Z`,
       modifiedTime: `${g.updatedAt}T00:00:00.000Z`,
-      authors: [`${g.authorName}, ${g.authorHonorific}`],
+      /* No `authors` entry: see the note by articleSchema below. */
     },
     twitter: { card: "summary_large_image", title: g.h1, description },
   };
@@ -147,24 +147,17 @@ export default async function GuidePage({ params }: Params) {
     timeRequired: `PT${g.minutes}M`,
     url,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
-    author: {
-      "@type": "Person",
-      name: g.author?.name,
-      honorificSuffix: g.author?.honorific,
-      jobTitle: g.author?.jobTitle,
-      knowsAbout: g.author?.knowsAbout ?? [],
-      ...(g.author?.sameAs?.length ? { sameAs: g.author.sameAs } : {}),
-      worksFor: { "@type": "Organization", name: SITE.name, url: SITE.url },
-    },
-    ...(g.reviewedBy
-      ? {
-          reviewedBy: {
-            "@type": "Person",
-            name: g.reviewedBy.name,
-            honorificSuffix: g.reviewedBy.honorific,
-          },
-        }
-      : {}),
+    /*
+     * No `author` or `reviewedBy` node here for the time being.
+     *
+     * The byline these fields fed was a named, credentialed nurse who does
+     * not exist — invented copy, not a placeholder for a real reviewer.
+     * Claiming authorship by a fictitious licensed professional on health
+     * content is the kind of thing that costs trust the moment it is
+     * noticed, so it comes out everywhere rather than staying live while a
+     * real byline is sorted out. Reintroduce this once `g.author` points at
+     * an actual named reviewer.
+     */
     publisher: {
       "@type": "Organization",
       "@id": `${SITE.url}#organization`,
@@ -206,7 +199,6 @@ export default async function GuidePage({ params }: Params) {
 
             <div className="mt-5">
               <Byline
-                by={`${g.author?.name}, ${g.author?.honorific}`}
                 updated={monthYear(g.updatedAt!)}
                 minutes={g.minutes ?? undefined}
               />
