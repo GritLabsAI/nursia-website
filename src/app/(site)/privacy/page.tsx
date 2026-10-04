@@ -4,7 +4,7 @@ import { LegalPage } from "@/components/LegalPage";
 export const metadata: Metadata = {
   title: { absolute: "Privacy policy | Nursia" },
   description:
-    "What Nursia collects — an email, a password, and your answers — what we do with it, and what we never do with it.",
+    "What Nursia collects — an email, a password, your answers and usage data — what we do with it, who receives it, and what we never do with it.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -12,13 +12,13 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy policy"
-      intro="We collect an email address, a password, and the answers you give. That is the whole list, and this page explains what each one is for."
+      intro="We collect an email address, a password, and the answers you give, plus basic usage and crash data. This page explains what each one is for and who receives it."
       sections={[
         {
           h2: "What we collect",
           body: [
-            "Your email address, so you can log in and so we can reach you about your account. A hashed password — we never see the original. Your answers and the time you spend on them, because that is what produces your weak-topic ranking and your readiness estimate.",
-            "We do not ask for your name, your school, or your test date at sign-up. If you tell us your test date later inside the product, it is used to build your study plan and nothing else.",
+            "Your email address, so you can log in and so we can reach you about your account. A hashed password — we never see the original. Your answers and the time you spend on them, because that is what produces your weak-topic ranking and your readiness estimate. Your phone number, only if you choose to add one. A user ID, in-app usage events, and crash and error reports, so we can understand how the product is used and fix bugs.",
+            "We do not ask for your name, your school, your phone number, or your test date at sign-up. If you tell us your test date later inside the product, it is used to build your study plan and nothing else.",
           ],
         },
         {
@@ -28,9 +28,16 @@ export default function PrivacyPage() {
           ],
         },
         {
+          h2: "Who we share it with",
+          body: [
+            "Meta and Google (Google Analytics 4) receive a hashed email address and phone number (where provided), your user ID, and in-app events, for advertising and measurement — for example, to measure which ads lead to sign-ups.",
+            "PostHog receives usage events for product analytics. Sentry receives crash and error reports so we can fix bugs.",
+          ],
+        },
+        {
           h2: "What we never do",
           body: [
-            "We do not sell your data, we do not share it with advertisers, and we do not add you to a mailing list because you contacted support. Emails from us are about your account or things you explicitly asked for, and every one has a working unsubscribe link.",
+            "We do not sell your data, and we do not add you to a mailing list because you contacted support. Emails from us are about your account or things you explicitly asked for, and every one has a working unsubscribe link.",
           ],
         },
         {
