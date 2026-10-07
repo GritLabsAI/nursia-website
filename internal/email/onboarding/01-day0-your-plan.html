@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light only">
+<title>Your first 10 questions are ready</title>
+<!--
+  Nursia onboarding email 1 of 5 — ACTIVATION
+  Trigger:   event: onboarding_completed — send immediately, no delay
+  Guard:     none, always the first send for a new account
+  Exit:      n/a — fires exactly once per user
+  Subject:   Your first 10 questions are ready
+  Preheader: Set up for {{ exam | default: 'NCLEX-RN' }}, {{ daily_target | default: 25 }} a day. No card needed.
+  Merge:     Liquid. Fallbacks are written into the template with | default, so a missing field never prints blank.
+  Global suppression (checked at send time on every email in this sequence):
+  stop on subscription_started, unsubscribed, or account_deleted.
+-->
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:wght@400&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;padding:0;background:#FBFAF6;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
+  table{border-collapse:collapse;}
+  img{border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;}
+  a{color:#0B6B62;}
+  @media only screen and (max-width:620px){
+    .container{width:100% !important;}
+    .gutter{padding-left:16px !important;padding-right:16px !important;}
+    .h1{font-size:28px !important;}
+    .stack{display:block !important;width:100% !important;}
+    .stack-gap{padding:0 0 12px 0 !important;}
+    .stack-flush{padding:0 !important;}
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#FBFAF6;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#FBFAF6;">Set up for {{ exam | default: 'NCLEX-RN' }}, {{ daily_target | default: 25 }} a day. No card needed.&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FBFAF6" style="background:#FBFAF6;">
+<tr><td align="center">
+  <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">
+
+    <tr><td class="gutter" style="padding:28px 24px 20px;">
+      <a href="https://nursia.io/?utm_source=lifecycle&amp;utm_medium=email&amp;utm_campaign=onboarding&amp;utm_content=e1_logo"><img src="assets/nursia-logo.png" width="120" alt="Nursia" style="display:block;width:120px;height:auto;"></a>
+    </td></tr>
+    <tr><td style="height:1px;line-height:1px;font-size:1px;background:#E3DFD4;">&nbsp;</td></tr>
+
+    <tr><td class="gutter" style="padding:36px 24px 8px;">
+<p style="margin:0 0 12px;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;line-height:16px;letter-spacing:0.14em;text-transform:uppercase;color:#6E6B63;">Welcome to Nursia</p>
+<h1 class="h1" style="margin:0 0 20px;font-family:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif;font-weight:800;font-size:32px;line-height:1.06;letter-spacing:-0.022em;color:#14161A;">Your plan is set. Start with <span style="background:#F5E85C;padding:0 4px;">10 questions</span>.</h1>
+<p style="margin:0 0 20px;font-family:'Source Serif 4',Georgia,'Times New Roman',serif;font-size:17px;line-height:1.68;color:#3A3D44;">You're set up for {{ exam | default: "NCLEX-RN" }}, and the plan below is saved. Change any of it in Settings, whenever you like.</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;background:#FFFFFF;border:1px solid #E3DFD4;border-radius:4px;">
+  <tr><td style="padding:22px;"><p style="margin:0 0 12px;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;line-height:16px;letter-spacing:0.14em;text-transform:uppercase;color:#6E6B63;">Your setup</p><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td style="padding:10px 0;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6E6B63;">Exam</td>
+    <td align="right" style="padding:10px 0;font-family:'IBM Plex Mono','Courier New',monospace;font-size:14px;font-weight:500;color:#14161A;">{{ exam | default: "NCLEX-RN" }}</td>
+  </tr>
+  <tr>
+    <td style="padding:10px 0;border-top:1px solid #E3DFD4;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6E6B63;">Test date</td>
+    <td align="right" style="padding:10px 0;border-top:1px solid #E3DFD4;font-family:'IBM Plex Mono','Courier New',monospace;font-size:14px;font-weight:500;color:#14161A;">{{ test_date | default: "Not set yet" }}</td>
+  </tr>
+  <tr>
+    <td style="padding:10px 0;border-top:1px solid #E3DFD4;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6E6B63;">Daily target</td>
+    <td align="right" style="padding:10px 0;border-top:1px solid #E3DFD4;font-family:'IBM Plex Mono','Courier New',monospace;font-size:14px;font-weight:500;color:#14161A;">{{ daily_target | default: 25 }} questions</td>
+  </tr>
+  <tr>
+    <td style="padding:10px 0;border-top:1px solid #E3DFD4;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6E6B63;">Benchmark</td>
+    <td align="right" style="padding:10px 0;border-top:1px solid #E3DFD4;font-family:'IBM Plex Mono','Courier New',monospace;font-size:14px;font-weight:500;color:#14161A;">{% if benchmark_correct != blank %}{{ benchmark_correct }} of 3{% else %}Skipped{% endif %}</td>
+  </tr></table></td></tr>
+</table>
+<p style="margin:0 0 12px;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;line-height:16px;letter-spacing:0.14em;text-transform:uppercase;color:#6E6B63;">What the free account has</p>
+<p style="margin:0 0 20px;font-family:'Source Serif 4',Georgia,'Times New Roman',serif;font-size:17px;line-height:1.68;color:#3A3D44;"><strong style="font-family:'IBM Plex Mono','Courier New',monospace;font-weight:500;color:#14161A;">50</strong> questions, with the reasoning written out on every one, including the ones you get right. Your answers are kept and scored, so your weak topics show up as you go.</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 0;">
+  <tr><td bgcolor="#0B6B62" style="border-radius:3px;">
+    <a href="{{ app_url | default: "https://app.nursia.io" }}?utm_source=lifecycle&amp;utm_medium=email&amp;utm_campaign=onboarding&amp;utm_content=e1" style="display:inline-block;padding:14px 24px;font-family:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif;font-weight:600;font-size:15px;line-height:16px;letter-spacing:-0.01em;color:#FFFFFF;text-decoration:none;border-radius:3px;">Start the 10-question quiz</a>
+  </td></tr>
+</table>
+<p style="margin:16px 0 0;font-family:'Source Serif 4',Georgia,'Times New Roman',serif;font-size:15px;line-height:1.6;color:#6E6B63;">No card, and nothing turns into a subscription. Questions about anything here: <a href="mailto:hello@nursia.io" style="color:#0B6B62;text-decoration:underline;">hello@nursia.io</a>.</p>
+    </td></tr>
+
+    <tr><td class="gutter" style="padding:8px 24px 40px;">
+      <p style="margin:0;font-family:'Source Serif 4',Georgia,'Times New Roman',serif;font-size:17px;line-height:1.68;color:#3A3D44;">The Nursia team</p>
+    </td></tr>
+    <tr><td style="height:1px;line-height:1px;font-size:1px;background:#E3DFD4;">&nbsp;</td></tr>
+
+    <tr><td class="gutter" style="padding:24px 24px 40px;">
+      <p style="margin:0 0 12px;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;line-height:1.7;color:#6E6B63;">You're getting this because you made a Nursia account and finished setup. Email 1 of 5. <a href="{{ unsubscribe_url }}" style="color:#6E6B63;text-decoration:underline;">Unsubscribe</a> &middot; <a href="{{ preferences_url }}" style="color:#6E6B63;text-decoration:underline;">Email preferences</a></p>
+      <p style="margin:0 0 12px;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;line-height:1.7;color:#6E6B63;">{{ postal_address }}</p>
+      <p style="margin:0;font-family:'IBM Plex Mono','Courier New',monospace;font-size:11px;line-height:1.7;color:#6E6B63;">NCLEX, NCLEX-RN and NCLEX-PN are registered trademarks of the National Council of State Boards of Nursing. Nursia is not affiliated with, endorsed by, or sponsored by the NCSBN.</p>
+    </td></tr>
+
+  </table>
+</td></tr>
+</table>
+</body>
+</html>

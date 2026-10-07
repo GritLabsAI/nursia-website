@@ -1,0 +1,36 @@
+{
+  "name": "mailroom",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "content": "node scripts/sync-content.mjs",
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
+    "db:import": "node --env-file=.env.local scripts/import-local.mjs",
+    "schedule": "node --env-file=.env.local scripts/schedule.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0",
+    "@upstash/qstash": "^2.8.0",
+    "liquidjs": "^10.30.0",
+    "next": "16.3.1",
+    "nodemailer": "^10.0.16",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.1",
+    "typescript": "^5"
+  }
+}

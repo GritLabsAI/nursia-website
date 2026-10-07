@@ -35,7 +35,8 @@
     "nursing:write": "tsx pipeline/nursing/12-write.ts",
     "nursing:status": "tsx pipeline/nursing/status.ts",
     "nursing:publish": "tsx --env-file=.env.local pipeline/nursing/13-publish.ts",
-    "nursing:dedupe": "tsx --env-file=.env.local pipeline/nursing/14-dedupe.ts"
+    "nursing:dedupe": "tsx --env-file=.env.local pipeline/nursing/14-dedupe.ts",
+    "email": "tsx --env-file=.env.local internal/email/tool/server.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.3.3",
@@ -55,13 +56,16 @@
     "@firebase/rules-unit-testing": "^5.0.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
     "firebase-admin": "^14.3.0",
     "firebase-tools": "^15.28.1",
+    "liquidjs": "^10.30.0",
     "opentype.js": "^2.0.0",
+    "pg": "^8.23.1",
     "playwright-core": "^1.63.0",
     "sharp": "^0.35.3",
     "tailwindcss": "^4",
