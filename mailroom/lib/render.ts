@@ -1,6 +1,9 @@
 import { Liquid } from "liquidjs";
 import { makeUnsubToken } from "./unsubscribe";
 import { quizForEmail } from "./quiz";
+import { quizAmpHtml } from "./quiz-amp";
+import { pricingFor } from "./pricing";
+import { NURSIA_PLAY_URL, PREPCLEVER_APPS } from "./apps";
 import { readTemplate, templateAsset, type TemplateDef } from "./templates";
 import type { Settings } from "./db";
 
@@ -20,6 +23,8 @@ export type Attachment = { filename: string; content: string; content_id: string
 export type Rendered = {
   subject: string;
   html: string;
+  /** The AMP part, for templates answered inside the email (the daily quiz). */
+  amp?: string;
   attachments: Attachment[];
   unsubscribeUrl: string;
 };
@@ -34,7 +39,7 @@ export function unsubscribeUrl(settings: Settings, brand: string, email: string,
 const escapeHtml = (v: string) => v.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
 /** Whether an uploaded email already links to unsubscribe, so it doesn't need the standard footer. */
-export const hasUnsubscribe = (html: string) => /\{\{-?\s*(unsubscribe_url|preferences_url)/.test(html);
+export const hasUnsubscribe = (html: string) => /\{\{-?\s*(unsubscribe_url|preferences_url)\b/.test(html);
 
 /**
  * The legal minimum under an uploaded email: who sent it, where from, and a
@@ -70,10 +75,14 @@ export async function render(
   const site = (brand.website || defaultSite(t.brand)).replace(/\/$/, "");
   const invite = (medium: string) =>
     `${site}/?utm_source=referral&utm_medium=${medium}&utm_campaign=friend_invite${vars.user_id ? `&utm_content=${encodeURIComponent(vars.user_id)}` : ""}`;
+  const { html: source } = readTemplate(t);
+  /* Prices in their own currency, for the Nursia emails that quote one. */
+  const pricing = t.brand === "nursia" && /plan_(name|price|discount|total)/.test(source + subject) ? await pricingFor(vars.user_id) : {};
   const exam = t.brand === "nursia" ? "NCLEX" : vars.exam || "my exam";
   const name = t.brand === "nursia" ? "Nursia" : "PrepClever";
   const scope = {
     preferences_url: unsub,
+    ...pricing,
     ...vars,
     unsubscribe_url: unsub,
     postal_address: brand.postalAddress || vars.postal_address || "",
@@ -82,13 +91,16 @@ export async function render(
     whatsapp_url: `https://wa.me/?text=${encodeURIComponent(`I'm prepping for ${exam} with ${name}. It's free to start. Join me: ${invite("whatsapp")}`)}`,
     continue_url: `${site}/?utm_source=email&utm_medium=lifecycle&utm_campaign=keep_practising`,
     instagram_url: brand.instagramUrl || "",
-    play_store_url: brand.playStoreUrl || "",
+    /* PrepClever has an app per exam family: theirs if known, else blank so the
+       email lists every app (prepclever_apps). Nursia has the one. */
+    play_store_url: t.brand === "prepclever" ? PREPCLEVER_APPS[vars.exam_app ?? ""]?.playUrl ?? "" : brand.playStoreUrl || NURSIA_PLAY_URL,
+    app_name: t.brand === "prepclever" ? PREPCLEVER_APPS[vars.exam_app ?? ""]?.name ?? "PrepClever" : "Nursia",
+    prepclever_apps: Object.values(PREPCLEVER_APPS),
     app_store_url: brand.appStoreUrl || "",
     /* Interactive questions: each option is a signed link that marks the answer. */
     quiz: t.quiz ? await quizForEmail(t.brand, vars, settings, t.quiz) : undefined,
   };
 
-  const { html: source } = readTemplate(t);
   let html = await liquid.parseAndRender(source, scope);
   if (t.custom?.footer) html = withFooter(html, scope.unsubscribe_url, scope.postal_address, name);
   const attachments: Attachment[] = [];
@@ -106,9 +118,21 @@ export async function render(
     return `src="cid:${cid}"`;
   });
 
+  const amp = opts.mode === "send" && scope.quiz?.set.length
+    ? quizAmpHtml({
+        brand: t.brand,
+        site: settings.siteUrl,
+        set: scope.quiz.set,
+        exam: t.brand === "nursia" ? "NCLEX-RN" : vars.exam || "exam",
+        unsubscribeUrl: unsub,
+        postalAddress: scope.postal_address,
+      })
+    : undefined;
+
   return {
     subject: await liquid.parseAndRender(subject, scope),
     html,
+    amp,
     attachments,
     unsubscribeUrl: unsub,
   };

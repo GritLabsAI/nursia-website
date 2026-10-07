@@ -1,4 +1,5 @@
 import type { Contact } from "./db";
+import { PREPCLEVER_APPS } from "./apps";
 
 /**
  * Lists built from what people did, instead of from a CSV.
@@ -113,7 +114,7 @@ type Profile = {
 };
 
 /* exam_* are filled from exam_series for PrepClever, which covers many exams. */
-export type User = Profile & { email: string; exam_title?: string; exam_code?: string };
+export type User = Profile & { email: string; exam_title?: string; exam_code?: string; exam_app?: string };
 
 /* The PrepClever schema is older: no question counter, no exam track. */
 const PROFILE_COLS: Record<DbKey, string> = {
@@ -121,7 +122,7 @@ const PROFILE_COLS: Record<DbKey, string> = {
   prepclever: "id,full_name,user_state,created_at,last_seen_at,exam_date,is_internal,has_completed_onboarding,selected_exam_series_id",
 };
 
-export type Extra = "streaks" | "subs" | "commerce" | "paidOrders" | "practised" | "devices";
+export type Extra = "streaks" | "subs" | "commerce" | "paidOrders" | "practised" | "devices" | "os";
 
 export type Snapshot = {
   users: User[];
@@ -132,6 +133,8 @@ export type Snapshot = {
   practised?: Set<string>;
   /** Native platforms each user has been seen on: an app session or a push token. */
   devices?: Map<string, Set<string>>;
+  /** Operating systems PostHog has seen each user on in the last 90 days ("Android", "iOS", "Windows", …). */
+  os?: Map<string, string[]>;
 };
 
 /* One snapshot per database for a minute, so previewing then saving doesn't
@@ -144,11 +147,11 @@ export async function snapshot(db: DbKey, needs: Extra[]): Promise<Snapshot> {
     const [auth, profiles] = await Promise.all([authUsers(db), table<Profile>(db, "profiles", `select=${PROFILE_COLS[db]}`)]);
     const emails = new Map(auth.filter((u) => u.email && !u.is_anonymous).map((u) => [u.id, u.email!]));
     const exams = db === "prepclever"
-      ? new Map((await table<{ id: string; code: string; title: string }>(db, "exam_series", "select=id,code,title")).map((e) => [e.id, e]))
-      : new Map<string, { id: string; code: string; title: string }>();
+      ? new Map((await table<{ id: string; code: string; title: string; brand_id: string | null }>(db, "exam_series", "select=id,code,title,brand_id")).map((e) => [e.id, e]))
+      : new Map<string, { id: string; code: string; title: string; brand_id: string | null }>();
     const users: User[] = profiles.filter((p) => emails.has(p.id)).map((p) => {
       const ex = p.selected_exam_series_id ? exams.get(p.selected_exam_series_id) : undefined;
-      return { ...p, email: emails.get(p.id)!, exam_title: ex?.title, exam_code: ex?.code };
+      return { ...p, email: emails.get(p.id)!, exam_title: ex?.title, exam_code: ex?.code, exam_app: ex?.brand_id ?? undefined };
     });
     hit = { at: Date.now(), snap: { users } };
     cache.set(db, hit);
@@ -171,6 +174,11 @@ export async function snapshot(db: DbKey, needs: Extra[]): Promise<Snapshot> {
       } else if (need === "paidOrders") {
         const rows = await table<{ user_id: string }>(db, "dodo_orders", "select=user_id&status=eq.paid");
         s.paidOrders = new Set(rows.map((r) => r.user_id));
+      } else if (need === "os") {
+        /* PostHog keys people by distinct id; the Supabase user id is one of them once they've signed in.
+           Without PostHog configured nobody has a known OS, which ranks everyone alike. */
+        const byId = await posthogOs().catch(() => new Map<string, string[]>());
+        s.os = new Map(s.users.flatMap((u) => (byId.has(u.id.toLowerCase()) ? [[u.id, byId.get(u.id.toLowerCase())!] as const] : [])));
       } else if (need === "devices") {
         /* The apps log "android" or "web" per session; a push token only exists once the app is installed.
            Only native rows are fetched, so this stays small however much web traffic there is. */
@@ -230,6 +238,8 @@ export function fields(db: DbKey, u: User): Contact {
     c.exam = u.exam_title ?? "";
     c.exam_short = u.exam_code ?? "";
     c.exam_id = u.selected_exam_series_id ?? "";
+    /* Which of PrepClever's apps is theirs (lib/apps.ts); blank sends them all. */
+    c.exam_app = u.exam_app ?? "";
   }
   return c;
 }
@@ -396,7 +406,7 @@ export const PRESETS: Preset[] = [
   {
     id: "no_android_app",
     label: "Hasn't installed the Android app",
-    description: "No Android app session and no Android push token, so they've only used the website. Anyone seen on an iPhone is left out.",
+    description: "No Android app session and no Android push token, so they've only used the website. Anyone seen on an iPhone is left out, and so is anyone whose PrepClever exam has no app yet.",
     dbs: ["nursia", "prepclever"],
     template: "nursia-app-install",
     params: [
@@ -407,6 +417,8 @@ export const PRESETS: Preset[] = [
     match: (u, s, p) => {
       const seen = s.devices!.get(u.id);
       if (seen?.has("android") || seen?.has("ios")) return false;
+      /* PrepClever: an exam whose family has no app yet has nothing to install. */
+      if (u.exam_app && !PREPCLEVER_APPS[u.exam_app]) return false;
       if (u.created_at > ago(num(p.hours, 24) * 3600_000)) return false;
       const days = num(p.days, 30);
       return (days === 0 || (!!u.last_seen_at && u.last_seen_at > ago(days * DAY))) && {};
@@ -451,6 +463,18 @@ export async function hogql(query: string) {
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(`PostHog ${res.status}: ${body.detail ?? body.error ?? "query failed"}`);
   return body.results as unknown[][];
+}
+
+/** distinct id -> the OSes PostHog saw that person on in the last 90 days. */
+async function posthogOs() {
+  const rows = await hogql(`select e.oses, groupArray(pdi.distinct_id)
+      from (select person_id, groupUniqArray(properties.$os) as oses from events
+             where timestamp > now() - interval 90 day and properties.$os is not null group by person_id) as e
+      join person_distinct_ids as pdi on pdi.person_id = e.person_id
+     group by e.person_id, e.oses limit ${MAX_ROWS}`);
+  const out = new Map<string, string[]>();
+  for (const [oses, ids] of rows) for (const x of ids as string[]) out.set(x.toLowerCase(), oses as string[]);
+  return out;
 }
 
 /** HogQL string literal. Event names come from a dropdown, but quote them anyway. */

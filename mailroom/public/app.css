@@ -431,3 +431,10 @@ table.users td { vertical-align: top; }
 .tags code, .files code { font-size: 12px; }
 label.check { flex-direction: row; align-items: center; gap: 10px; font-weight: 500; }
 label.check input { width: auto; }
+
+/* Automations: the all-automations table picks the one below it. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+tr.link-row{cursor:pointer}
+tr.link-row:hover td,tr.link-row:focus-visible td{background:var(--sunk)}
+tr.link-row.on td{background:var(--sunk)}
+tr.link-row.on td:first-child{box-shadow:inset 3px 0 0 var(--ink)}

@@ -1,7 +1,8 @@
 import {
-  addSuppression, getCampaign, getFlowState, getLists, getSettings, insertSends, listCampaigns, markFailed, markSent, queuedSends, saveFlowState,
-  saveCampaign, sql, statsFor, suppressedSet, type Campaign, type Contact, type Send, type Settings,
+  addSuppression, fromLineOf, getCampaign, nextGapRelease, getFlowState, getLists, getMailboxes, getSettings, insertSends, listCampaigns, markFailed, markSent, queuedSends, saveFlowState,
+  saveCampaign, sql, statsFor, suppressedSet, type Campaign, type Contact, type Mailbox, type Send, type Settings,
 } from "./db";
+import { createHash } from "node:crypto";
 import { findTemplate, type TemplateDef } from "./templates";
 import { render } from "./render";
 import { listEmails, listUnsubscribed, sendEmail, type EmailSummary } from "./resend";
@@ -23,8 +24,13 @@ const WORKERS = 4;
 const CHUNK_MS = 200_000;
 
 /* Unsubscribe and answer links always point at this deployment, wherever it's hosted. */
+/* Links in an email must reach the hosted Mailroom: the saved address first,
+   then the deployment's own, and a localhost one only when nothing else is set. */
+const local = (u: string) => /\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(u);
+
 export function settingsWithSecret(s: Awaited<ReturnType<typeof getSettings>>): Settings {
-  return { ...s, siteUrl: baseUrl(), unsubSecret: process.env.EMAIL_UNSUB_SECRET ?? "" };
+  const site = [s.siteUrl, baseUrl()].find((u) => u && !local(u)) ?? baseUrl();
+  return { ...s, siteUrl: site, unsubSecret: process.env.EMAIL_UNSUB_SECRET ?? "" };
 }
 
 export function listIdsOf(c: Pick<Campaign, "listId" | "listIds">) {
@@ -48,7 +54,7 @@ export async function audienceOf(c: Pick<Campaign, "listId" | "listIds">) {
   return [...byEmail.values()];
 }
 
-function listUnsubHeader(url: string, mailbox?: string) {
+export function listUnsubHeader(url: string, mailbox?: string) {
   return {
     "List-Unsubscribe": mailbox ? `<${url}>, <mailto:${mailbox}?subject=unsubscribe>` : `<${url}>`,
     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
@@ -71,6 +77,7 @@ export async function sendTest(c: Campaign, to: string, settings: Settings) {
     reply_to: c.replyTo || undefined,
     subject: `[Test] ${r.subject}`,
     html: r.html,
+    amp: r.amp,
     attachments: r.attachments.length ? r.attachments : undefined,
     tags: [{ name: "kind", value: "test" }],
   });
@@ -93,11 +100,30 @@ export async function startCampaign(c: Campaign) {
   await kick(c.id);
 }
 
-export function kick(cid: string) {
+export function kick(cid: string, notBefore?: number) {
   return enqueue("/api/jobs/send", { campaignId: cid }, async () => {
     while ((await processCampaign(cid)) > 0) { /* keep going locally */ }
-  });
+  }, notBefore);
 }
+
+/**
+ * Resend's free plan stops at 100 emails a UTC day. Hitting that isn't a
+ * failure: the rest stay queued and the campaign carries on just after the
+ * quota resets at midnight UTC (05:30 India time).
+ */
+/**
+ * Hours between any two emails to the same person: somewhere from 4 to 6,
+ * fixed per person. Tests to the team don't wait, and neither does cart
+ * recovery: that's revenue at risk, so it goes as soon as it's due (it still
+ * counts as their latest email).
+ */
+export const GAP = { min: 4, max: 6 };
+const NONE = { min: 0, max: 0 };
+const NO_GAP_TEMPLATES = new Set(["nursia-cart-recovery", "nursia-checkout-reminder", "prepclever-cart-recovery", "prepclever-checkout-reminder"]);
+const gapFor = (c: Campaign) => (c.name.startsWith("Test") || c.id.startsWith("test_") || NO_GAP_TEMPLATES.has(c.templateId) ? NONE : GAP);
+
+const isQuota = (err: unknown) => /daily email sending quota/i.test(err instanceof Error ? err.message : String(err));
+const afterReset = () => { const d = new Date(); d.setUTCHours(24, 5, 0, 0); return d.getTime(); };
 
 /**
  * Sends queued rows until the time budget runs out. Returns how many are
@@ -110,33 +136,77 @@ export async function processCampaign(cid: string): Promise<number> {
   if (!t) return 0;
   const settings = settingsWithSecret(await getSettings());
   const mailbox = settings.brands[c.brand]?.replyTo;
+  /* Without its own address every unsubscribe link is broken: hold everything until it's set. */
+  if (!settings.siteUrl) {
+    c.error = "Mailroom's own address isn't set (Settings, or MAILROOM_URL), so nothing sends: unsubscribe links would be broken. Checking again every 30 minutes.";
+    c.resumeAt = new Date(Date.now() + 30 * 60_000).toISOString();
+    await saveCampaign(c);
+    await kick(cid, Date.now() + 30 * 60_000);
+    return 0;
+  }
+  if (c.resumeAt) { c.resumeAt = undefined; await saveCampaign(c); }
   const started = Date.now();
+  const boxes = c.rotate ? await getMailboxes() : [];
+  let quota = false;
 
-  while (Date.now() - started < CHUNK_MS) {
-    const queue = await queuedSends(cid, 40);
+  while (Date.now() - started < CHUNK_MS && !quota) {
+    const queue = await queuedSends(cid, 40, gapFor(c));
     if (!queue.length) break;
     const work = async () => {
-      for (let s = queue.shift(); s; s = queue.shift()) await sendOne(c, t, s, settings, mailbox);
+      for (let s = queue.shift(); s && !quota; s = queue.shift()) {
+        if ((await sendOne(c, t, s, settings, mailbox, boxes)) === "quota") quota = true;
+      }
     };
     await Promise.all(Array.from({ length: WORKERS }, work));
   }
 
+  if (quota) {
+    c.error = `Daily sending limit reached; the rest go out after ${new Date(afterReset()).toISOString().slice(0, 16).replace("T", " ")} UTC.`;
+    c.resumeAt = new Date(afterReset()).toISOString();
+    await saveCampaign(c);
+    await kick(cid, afterReset());
+    return 0;
+  }
+
   const [{ n }] = await sql`select count(*)::int as n from sends where campaign_id = ${cid} and status = 'queued'`;
+  /* Everyone left is inside their gap: come back when the first of them is clear, not straight away. */
+  if (n > 0 && gapFor(c).max && !(await queuedSends(cid, 1, gapFor(c))).length) {
+    const at = (await nextGapRelease(cid, gapFor(c))) ?? Date.now() + 30 * 60_000;
+    c.error = `${n} waiting for the ${GAP.min}–${GAP.max} hour gap since their last email; next at ${new Date(at).toISOString().slice(0, 16).replace("T", " ")} UTC.`;
+    c.resumeAt = new Date(at + 60_000).toISOString();
+    await saveCampaign(c);
+    await kick(cid, at + 60_000);
+    return 0;
+  }
   if (n === 0) await finish(c);
   return n as number;
 }
 
-async function sendOne(c: Campaign, t: TemplateDef, s: Send, settings: Settings, mailbox?: string) {
+/**
+ * Which mailbox a person hears from when a campaign rotates senders: picked
+ * from their address, so the same person always gets the same sender and a
+ * reply thread stays in one place.
+ */
+function senderFor(c: Campaign, email: string, boxes: Mailbox[]) {
+  const mine = boxes.filter((m) => m.brand === c.brand);
+  if (!c.rotate || mine.length < 2) return { from: c.from, replyTo: c.replyTo };
+  const m = mine[createHash("sha256").update(email.toLowerCase()).digest().readUInt32BE(0) % mine.length];
+  return { from: fromLineOf(m), replyTo: m.replyTo || c.replyTo || m.email };
+}
+
+async function sendOne(c: Campaign, t: TemplateDef, s: Send, settings: Settings, mailbox?: string, boxes: Mailbox[] = []): Promise<"sent" | "failed" | "quota"> {
   try {
+    const sender = senderFor(c, s.email, boxes);
     const vars = { ...c.vars, ...own(s.contact), email: s.email };
     const r = await render(t, c.subject, vars, settings, { mode: "send", campaignId: c.id });
     const res = await sendEmail(
       {
-        from: c.from,
+        from: sender.from,
         to: [s.email],
-        reply_to: c.replyTo || undefined,
+        reply_to: sender.replyTo || undefined,
         subject: r.subject,
         html: r.html,
+        amp: r.amp,
         scheduled_at: c.scheduledAt || undefined,
         headers: listUnsubHeader(r.unsubscribeUrl, mailbox),
         attachments: r.attachments.length ? r.attachments : undefined,
@@ -148,8 +218,12 @@ async function sendOne(c: Campaign, t: TemplateDef, s: Send, settings: Settings,
       `${c.id}:${s.email.toLowerCase()}`,
     );
     await markSent(c.id, s.email, res.id);
+    return "sent";
   } catch (err) {
+    /* Left queued: it goes in the next day's quota. */
+    if (isQuota(err)) return "quota";
     await markFailed(c.id, s.email, err instanceof Error ? err.message : String(err));
+    return "failed";
   }
 }
 

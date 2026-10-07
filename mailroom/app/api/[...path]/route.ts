@@ -11,7 +11,7 @@ import { hasUnsubscribe, render } from "@/lib/render";
 import { isEmail, parseCsv } from "@/lib/csv";
 import { audienceOf, campaignsWithStats, listIdsOf, overview, sendTest, settingsWithSecret, startCampaign, sync } from "@/lib/campaigns";
 import { campaignChecks, senderChecks } from "@/lib/checks";
-import { FLOWS, getFlow, overviewOf, runNextDue, sendStep, sendStepTest, setFlow } from "@/lib/flows";
+import { FLOWS, flowsSummary, getFlow, overviewOf, runNextDue, sendStep, sendStepTest, setFlow } from "@/lib/flows";
 import { PRESETS, configured, describe, posthogCohorts, posthogEvents, runAudience, testConnection, type AudienceDef, type DbKey } from "@/lib/audiences";
 import {
   cancelEmail, createWebhook, sendEmail, deleteWebhook, getDomain, listDomains, listWebhooks, setTracking, setTrackingSubdomain, verifyDomain, type Domain,
@@ -89,6 +89,9 @@ async function summarize(rows: { c: Campaign; stats: Awaited<ReturnType<typeof s
     stats,
     /* Handed to Resend with a future send time: still cancellable. */
     scheduled: c.status === "sent" && !!c.scheduledAt && Date.parse(c.scheduledAt) > Date.now(),
+    /* Queued here with a set start, or held by the daily limit or the 6-hour gap. */
+    waiting: c.status === "sending" && !!c.resumeAt && Date.parse(c.resumeAt) > Date.now(),
+    startsAt: c.status === "sending" && c.resumeAt && Date.parse(c.resumeAt) > Date.now() ? c.resumeAt : c.scheduledAt,
   }));
 }
 
@@ -258,6 +261,7 @@ on("POST", "/api/lists/:id/refresh", async (_q, [lid]) => {
 /* ── flows ────────────────────────────────────────────────────────────── */
 
 on("GET", "/api/flows", () => json(FLOWS.map((f) => ({ id: f.id, name: f.name, brand: f.db, description: f.description }))));
+on("GET", "/api/flows/summary", async () => json(await flowsSummary()));
 on("GET", "/api/flows/:id", async (_q, [fid]) => json(await overviewOf(flowOr404(fid))));
 
 on("PUT", "/api/flows/:id", async (req, [fid]) => {

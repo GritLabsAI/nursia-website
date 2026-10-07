@@ -16,6 +16,7 @@ behind Google sign-in for gritlabsai.co, nursia.io and prepclever.in accounts.
 | Big sends | queued in chunks through QStash → `/api/jobs/send` |
 | Live results | Resend webhook → `/api/webhooks/resend` (signed) |
 | Answer links in emails | `/q/<token>`, marked by `lib/quiz.ts`, page in `lib/quiz-page.ts` |
+| Answering inside the email (AMP) | `lib/quiz-amp.ts` posts to `/api/quiz/amp`; sent over Resend SMTP |
 | Unsubscribe | `/unsubscribe` |
 | Templates + Nursia question bank | compiled into `lib/content.generated.ts` |
 
@@ -64,3 +65,37 @@ looked is a "baseline" and never gets a welcome. New onboardings get the welcome
 about 15–20 minutes later, and Nursia then follows the onboarding series on its
 rules. Sending only happens once "Send automatically" is switched on in
 Automations, and it stays paused while a brand's postal address is empty.
+
+## Daily quiz
+
+`nursia-daily` and `prepclever-daily` (Automations → "… daily quiz") send the
+three-question email once a day from 09:00 India time to everyone onboarded who
+used the app in the last 14 days (both adjustable on the page). Paying members
+and people onboarded before the flow existed get it too. PrepClever questions
+come from each person's own exam. Clicking an answer marks it on `/q/…`; when
+the last one is answered, `lib/quiz-results.ts` emails the score with every
+question, their answer, the right one and the explanation, once per set
+(`quiz_results` table). Like the onboarding flows, nothing sends until
+"Send automatically" is switched on.
+
+### Answering inside the email
+
+The daily quiz also carries an AMP part (`lib/quiz-amp.ts`), so in Gmail,
+Yahoo and Mail.ru the questions are answered in the email itself: a tap posts
+to `/api/quiz/amp`, which records it and sends back the marking, explanation
+and score. Resend's API has no AMP field, so any email with an AMP part goes
+through Resend's SMTP relay instead (`lib/resend.ts`); scheduled sends stay on
+the API with HTML only. Every other client, and Gmail until the sender is
+registered, shows the HTML part with its answer links as before.
+
+Before Gmail shows it:
+
+1. SPF, DKIM and DMARC must pass for the sending domain.
+2. Test in your own Gmail: Settings → General → Dynamic email → Developer
+   settings, add the sender address, then send a test from the composer.
+3. Register each sender with Google
+   (https://developers.google.com/workspace/gmail/ampemail/register), which
+   asks for a real production email sent to ampforemail.whitelisting@gmail.com.
+
+Check a change with `npx amphtml-validator --html_format AMP4EMAIL <file>`:
+Gmail drops an AMP part that fails it and shows the HTML part.

@@ -1,3 +1,5 @@
+import nodemailer, { type Transporter } from "nodemailer";
+
 /**
  * The handful of Resend endpoints the tool needs, behind one throttle.
  *
@@ -47,6 +49,8 @@ export type OutgoingEmail = {
   to: string[];
   subject: string;
   html: string;
+  /** An AMP part (text/x-amp-html). The API has no field for it, so these go over SMTP. */
+  amp?: string;
   reply_to?: string;
   scheduled_at?: string;
   headers?: Record<string, string>;
@@ -55,11 +59,45 @@ export type OutgoingEmail = {
 };
 
 export function sendEmail(email: OutgoingEmail, idempotencyKey?: string) {
+  /* SMTP can't schedule, so a scheduled send keeps to the API and its HTML part. */
+  if (email.amp && !email.scheduled_at) return sendSmtp(email, idempotencyKey);
   return call<{ id: string }>("/emails", {
     method: "POST",
-    body: JSON.stringify(email),
+    body: JSON.stringify({ ...email, amp: undefined }),
     headers: idempotencyKey ? { "Idempotency-Key": idempotencyKey.slice(0, 256) } : {},
   });
+}
+
+/**
+ * The same send through Resend's SMTP relay, which passes the MIME through as
+ * built: text/plain, then text/x-amp-html, then text/html, the order AMP
+ * clients need. Tags aren't available over SMTP; the idempotency key is a header.
+ */
+let smtp: Transporter | undefined;
+
+async function sendSmtp(email: OutgoingEmail, idempotencyKey?: string) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new ResendError(0, "RESEND_API_KEY is not set in .env.local");
+  smtp ??= nodemailer.createTransport({ host: "smtp.resend.com", port: 465, secure: true, auth: { user: "resend", pass: key }, pool: true, maxConnections: 4 });
+  await slot();
+  try {
+    const info = await smtp.sendMail({
+      from: email.from,
+      to: email.to,
+      replyTo: email.reply_to,
+      subject: email.subject,
+      html: email.html,
+      amp: email.amp,
+      headers: { ...email.headers, ...(idempotencyKey ? { "Resend-Idempotency-Key": idempotencyKey.slice(0, 256) } : {}) },
+      attachments: email.attachments?.map((a) => ({ filename: a.filename, content: a.content, encoding: "base64", cid: a.content_id })),
+    });
+    /* Resend answers with its email id, which the webhooks are keyed on. */
+    const id = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.exec(info.response ?? "")?.[0] ?? info.messageId ?? "";
+    return { id };
+  } catch (e) {
+    const code = (e as { responseCode?: number }).responseCode ?? 0;
+    throw new ResendError(code, e instanceof Error ? e.message : String(e));
+  }
 }
 
 export type EmailSummary = { id: string; created_at: string; last_event: string; to: string[] };

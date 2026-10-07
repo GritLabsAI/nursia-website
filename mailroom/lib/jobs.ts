@@ -23,10 +23,17 @@ export function qstash() {
   return (client ??= new Client({ token: process.env.QSTASH_TOKEN!, baseUrl: process.env.QSTASH_URL }));
 }
 
-/** Calls `path` with `body` in the background. Locally, `inline` runs instead. */
-export async function enqueue(path: string, body: unknown, inline: () => Promise<unknown>) {
+/**
+ * Calls `path` with `body` in the background, or not before `notBefore` (ms).
+ * Locally, `inline` runs instead, and a delayed job is left for the hosted app.
+ */
+export async function enqueue(path: string, body: unknown, inline: () => Promise<unknown>, notBefore?: number) {
   if (hosted()) {
-    await qstash().publishJSON({ url: `${baseUrl()}${path}`, body, retries: 3 });
+    await qstash().publishJSON({ url: `${baseUrl()}${path}`, body, retries: 3, ...(notBefore ? { notBefore: Math.ceil(notBefore / 1000) } : {}) });
+    return;
+  }
+  if (notBefore) {
+    console.log(`job ${path}: waiting until ${new Date(notBefore).toISOString()}; the hosted app picks it up from there`);
     return;
   }
   void inline().catch((e) => console.error(`job ${path}:`, e));

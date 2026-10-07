@@ -94,6 +94,17 @@ const statements = [
      answered_at timestamptz not null default now(),
      unique (quiz_key, idx)
    )`,
+  /* One row per finished set: claiming it is what makes the results email go once. */
+  `create table if not exists quiz_results (
+     quiz_key text primary key,
+     brand text not null,
+     email text not null,
+     right_count int not null,
+     total int not null,
+     sent_at timestamptz not null default now()
+   )`,
+  /* Lifetime scores in the quiz email read every answer a person has given. */
+  `create index if not exists quiz_answers_person on quiz_answers (brand, email)`,
 ];
 
 for (const s of statements) await sql.query(s);

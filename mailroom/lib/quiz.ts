@@ -127,6 +127,26 @@ async function prepcleverById(qid: string): Promise<Question | undefined> {
   return d ? pcQuestion(d) : undefined;
 }
 
+let readyCache: { at: number; ids: Set<string> } | undefined;
+
+/** PrepClever exams with at least `min` questions in the pool; others can't fill a daily set. */
+export async function prepcleverQuizExams(min = 3): Promise<Set<string>> {
+  if (readyCache && Date.now() - readyCache.at < 3600_000) return readyCache.ids;
+  const url = process.env.SUPABASE_URL_PREPCLEVER?.replace(/\/$/, "");
+  const key = process.env.SUPABASE_SECRET_KEY_PREPCLEVER;
+  if (!url || !key) throw new Error("PrepClever Supabase isn't configured");
+  const exams = await prepcleverRest("exam_series?select=id");
+  /* A count per exam: the pool is bigger than one page of rows. */
+  const counts = await Promise.all(exams.map(async (e) => {
+    const res = await fetch(`${url}/rest/v1/notification_quiz_questions?select=question_id&exam_id=eq.${e.id}`, {
+      method: "HEAD", headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact" }, cache: "no-store",
+    });
+    return [String(e.id), Number(res.headers.get("content-range")?.split("/")[1] ?? 0)] as const;
+  }));
+  readyCache = { at: Date.now(), ids: new Set(counts.filter(([, n]) => n >= min).map(([id]) => id)) };
+  return readyCache.ids;
+}
+
 /** Someone without a chosen exam (an uploaded list, say) gets the most-taken one. */
 async function defaultPrepcleverExam() {
   const rows = await prepcleverRest(`notification_quiz_of_day?select=exam_id&quiz_date=eq.${today()}&limit=50`);
@@ -169,6 +189,9 @@ export async function quizForEmail(brand: Brand, vars: Record<string, string>, s
     stem: q.stem,
     options: q.options.map((text, idx) => ({ letter: LETTERS[idx], text, url: `${site}/q/${token}?c=${idx}` })),
     skip_url: `${site}/q/${token}?c=skip`,
+    /* The whole set for the AMP version (lib/quiz-amp.ts), answered inside the
+       email. Each question carries its own token; the answers stay server-side. */
+    set: questions.map((x, i) => ({ topic: x.topic, stem: x.stem, options: x.options, token: i ? signQuiz({ ...base, i }) : token })),
   };
 }
 

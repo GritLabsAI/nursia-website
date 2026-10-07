@@ -90,6 +90,7 @@ function ask({ title, body = "", confirm = "Confirm", cancel = "Cancel", input }
 
 function statusChip(c) {
   if (c.scheduled) return `<span class="chip stamp">Scheduled</span>`;
+  if (c.waiting) return `<span class="chip wait">Starts ${esc(when(c.startsAt))}</span>`;
   return {
     draft: `<span class="chip">Draft</span>`,
     sending: `<span class="chip wait">Sending</span>`,
@@ -116,8 +117,8 @@ views.home = async () => {
   const t = ov.totals;
   const r = (a, b) => (b ? a / b : null);
   const issues = Object.entries(health).flatMap(([k, list]) => list.map((x) => ({ brand: k, ...x })));
-  const scheduled = state.campaigns.filter((c) => c.scheduled).sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt));
-  const recent = state.campaigns.filter((c) => c.status !== "draft" && !c.scheduled).slice(0, 6);
+  const scheduled = state.campaigns.filter((c) => c.scheduled || c.waiting).sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+  const recent = state.campaigns.filter((c) => c.status !== "draft" && !c.scheduled && !c.waiting).slice(0, 6);
 
   view.innerHTML = `
   <div class="page-head"><div><h1>Home</h1><p>What's going out, and how the last emails did.</p></div>
@@ -142,15 +143,27 @@ views.home = async () => {
       <section class="panel" id="flowCallout"><h2>Onboarding</h2><p class="muted small">Checking who's due…</p></section>
       <section class="panel"><h2>Coming up</h2>
         ${scheduled.length ? `<ul class="upcoming">${scheduled.map((c) => `<li>
-          <div class="date-tile"><b>${new Date(c.scheduledAt).getDate()}</b><span>${new Date(c.scheduledAt).toLocaleDateString(undefined, { month: "short" })}</span></div>
-          <div><a href="#/email/${c.id}">${esc(c.name)}</a><div class="muted small">${time(c.scheduledAt)}, to ${plural(c.stats.recipients, "person", "people")}</div></div></li>`).join("")}</ul>`
+          <div class="date-tile"><b>${new Date(c.startsAt).getDate()}</b><span>${new Date(c.startsAt).toLocaleDateString(undefined, { month: "short" })}</span></div>
+          <div><a href="#/email/${c.id}">${esc(c.name)}</a><div class="muted small">${time(c.startsAt)}, to ${plural(c.waiting ? c.stats.queued : c.stats.recipients, "person", "people")}</div></div></li>`).join("")}</ul>`
         : `<p class="muted small" style="margin-top:6px">Nothing scheduled. Choose "Schedule" on the last step of a new email.</p>`}
+        <div id="autoUpcoming"></div>
       </section>
     </div>
   </div>
 
   <section class="panel" style="margin-top:20px"><h2>Last 30 days</h2>${lineChart(ov.series)}</section>`;
   bindRows();
+
+  /* Automations that are on, and when each next sends. */
+  api("GET", "/api/flows/summary").then((all) => {
+    const on = all.filter((f) => f.autoRun && f.nextAt).sort((a, b) => a.nextAt.localeCompare(b.nextAt));
+    const el = document.getElementById("autoUpcoming");
+    if (!el || !on.length) return;
+    el.innerHTML = `<h3 style="margin-top:16px">Automations</h3><ul class="upcoming">${on.map((f) => `<li>
+      <div class="date-tile"><b>${new Date(f.nextAt).getDate()}</b><span>${new Date(f.nextAt).toLocaleDateString(undefined, { month: "short" })}</span></div>
+      <div><a href="#/automations" data-auto="${f.id}">${esc(f.name)}</a><div class="muted small">Next check ${time(f.nextAt)} · ${esc(f.schedule)}</div></div></li>`).join("")}</ul>`;
+    el.querySelectorAll("[data-auto]").forEach((a) => a.addEventListener("click", () => { flowId = a.dataset.auto; }));
+  }).catch(() => {});
 
   /* The flow count reads every account from Supabase, so it fills in after the page. */
   Promise.all(["nursia-onboarding", "prepclever-onboarding"].map((x) => api("GET", `/api/flows/${x}`))).then((fs) => {
@@ -171,7 +184,7 @@ views.home = async () => {
 function emailTable(rows) {
   return `<div class="table-wrap"><table><thead><tr><th>Email</th><th>Status</th><th class="r">People</th><th class="r">Opened</th><th class="r">Clicked</th></tr></thead><tbody>
   ${rows.map((c) => `<tr class="link" data-href="#/email/${c.id}">
-    <td><b>${esc(c.name)}</b><span class="sub">${brandTag(c.brand)}&ensp;${c.scheduled ? `goes out ${when(c.scheduledAt)}` : c.status === "draft" ? `edited ${when(c.createdAt)}` : when(c.sentAt ?? c.createdAt)}</span></td>
+    <td><b>${esc(c.name)}</b><span class="sub">${brandTag(c.brand)}&ensp;${c.scheduled ? `goes out ${when(c.scheduledAt)}` : c.waiting ? `starts ${when(c.startsAt)}` : c.status === "draft" ? `edited ${when(c.createdAt)}` : when(c.sentAt ?? c.createdAt)}</span></td>
     <td>${statusChip(c)}</td>
     <td class="r num">${int(c.stats.recipients)}</td>
     <td class="r num"><b>${c.status === "draft" || c.scheduled ? "–" : pct(c.stats.openRate)}</b></td>
@@ -692,7 +705,14 @@ function report(c, filter = "all") {
     report(await api("GET", `/api/campaigns/${c.id}`));
   }));
   clearTimeout(poll);
-  if (c.status === "sending") poll = setTimeout(async () => { if (location.hash === `#/email/${c.id}`) report(await api("GET", `/api/campaigns/${c.id}`), filter); }, 2500);
+  /* Quick while it's going out; once a minute while it waits for its start time or the gap. */
+  const waiting = c.resumeAt && Date.parse(c.resumeAt) > Date.now();
+  if (c.status === "sending") poll = setTimeout(async () => {
+    if (location.hash !== `#/email/${c.id}`) return;
+    const keep = [document.scrollingElement.scrollTop, view.scrollTop];
+    report(await api("GET", `/api/campaigns/${c.id}`), filter);
+    [document.scrollingElement.scrollTop, view.scrollTop] = keep;
+  }, waiting ? 60_000 : 5000);
 }
 
 /* ── automations ──────────────────────────────────────────────────────── */
@@ -700,31 +720,49 @@ function report(c, filter = "all") {
 let flowPoll;
 const openWho = new Set();
 
-views.automations = async () => {
+/* `quiet` refreshes in place (the background poll): no loading placeholder, same scroll position. */
+views.automations = async ({ quiet = false } = {}) => {
   clearTimeout(flowPoll);
-  view.innerHTML = `<div class="page-head"><div><h1>Automatic emails</h1><p>Checking every account against the app…</p></div></div>`;
-  const f = await api("GET", `/api/flows/${flowId}`);
+  if (!quiet) view.innerHTML = `<div class="page-head"><div><h1>Automatic emails</h1><p>Checking every account against the app…</p></div></div>`;
+  const [f, all] = await Promise.all([api("GET", `/api/flows/${flowId}`), api("GET", "/api/flows/summary")]);
   if (!location.hash.startsWith("#/automations")) return;
+  const scroll = [document.scrollingElement.scrollTop, view.scrollTop];
   const totalDue = f.steps.reduce((a, s) => a + s.due, 0);
   const running = f.steps.find((s) => s.running);
   const ex = f.exits;
-  const keptOut = ex.subscribed + ex.suppressed + ex.internal + ex.undeliverable;
+  const keptOut = ex.subscribed + ex.suppressed + ex.internal + ex.undeliverable + (ex.noQuestions ?? 0);
 
   view.innerHTML = `
   <div class="page-head"><div><h1>Automatic emails</h1><p>${esc(f.description)} Each email goes only to people whose activity fits it right now, and nobody gets the same one twice.</p></div>
-    <div class="row"><div class="seg" role="group" aria-label="Brand">${[["nursia-onboarding", "Nursia"], ["prepclever-onboarding", "PrepClever"]].map(([k, v]) => `<button data-flow="${k}" class="${flowId === k ? "on" : ""}">${v}</button>`).join("")}</div>
+    <div class="row"><label class="sr-only" for="flowPick">Automation</label><select id="flowPick">${all.map((x) => `<option value="${x.id}" ${x.id === flowId ? "selected" : ""}>${esc(x.name)}${x.autoRun ? " · on" : ""}</option>`).join("")}</select>
     <button class="btn primary" id="runAll" ${totalDue && !running ? "" : "disabled"}>Send next due step</button></div></div>
+
+  <section class="panel flush" style="margin-bottom:20px">
+    <div class="section-head" style="padding:18px 18px 0"><h2>All automations</h2><span class="muted small">Totals since each one started. Pick a row to open it.</span></div>
+    <div class="table-wrap"><table><thead><tr><th>Automation</th><th>Status</th><th>Schedule</th><th>Next send</th><th class="r">Sent</th><th class="r">Delivered</th><th class="r">Opened</th><th class="r">Clicked</th><th class="r">Unsubscribed</th><th class="r">Waiting</th><th>Last run</th></tr></thead><tbody>
+      ${all.map((x) => `<tr class="link-row${x.id === flowId ? " on" : ""}" data-pick="${x.id}" tabindex="0">
+        <td><b>${esc(x.name)}</b></td>
+        <td>${x.autoRun ? `<span class="chip ok">On</span>` : `<span class="chip">Off</span>`}</td>
+        <td class="small">${esc(x.schedule)}</td>
+        <td class="small">${x.autoRun && x.nextAt ? `${day(x.nextAt)} ${time(x.nextAt)}` : `<span class="muted">Off</span>`}</td>
+        <td class="r num">${int(x.totals.sent)}</td><td class="r num">${int(x.totals.delivered)}</td>
+        <td class="r num">${pct(x.totals.openRate)}</td><td class="r num">${pct(x.totals.clickRate)}</td>
+        <td class="r num">${int(x.totals.unsubscribed)}</td><td class="r num">${int(x.totals.queued)}</td>
+        <td class="small muted">${x.lastRunAt ? when(x.lastRunAt) : "–"}</td></tr>`).join("")}
+    </tbody></table></div>
+  </section>
 
   <div class="figures" style="margin-bottom:20px">
     <div class="figure"><div class="v num">${int(totalDue)}</div><div class="k">Due now</div><div class="s">across ${plural(f.steps.length, "email")}</div></div>
-    <div class="figure"><div class="v num">${int(f.enrolled)}</div><div class="k">Watched</div><div class="s">onboarded since ${f.baselineAt ? when(f.baselineAt) : "now"}</div></div>
-    <div class="figure"><div class="v num">${int(keptOut)}</div><div class="k">Left out</div><div class="s">${int(ex.subscribed)} paying, ${int(ex.suppressed)} unsubscribed, ${int(ex.internal)} team, ${int(ex.undeliverable)} bad address</div></div>
+    <div class="figure"><div class="v num">${int(f.enrolled)}</div><div class="k">Watched</div><div class="s">${f.everyone ? "everyone onboarded" : `onboarded since ${f.baselineAt ? when(f.baselineAt) : "now"}`}</div></div>
+    <div class="figure"><div class="v num">${int(keptOut)}</div><div class="k">Left out</div><div class="s">${int(ex.subscribed)} paying, ${int(ex.suppressed)} unsubscribed, ${int(ex.internal)} team, ${int(ex.undeliverable)} bad address${ex.noQuestions ? `, ${int(ex.noQuestions)} exam has no questions yet` : ""}</div></div>
   </div>
 
   <div class="panel toggle-row" style="margin-bottom:26px">
     <div><h3>Send automatically</h3>
-      <p class="small muted" style="margin-top:2px">${f.autoRun ? "On. Every 5 minutes Mailroom checks who's due and sends, even with this laptop off." : "Off. Mailroom still watches for new sign-ups, but nothing goes out until you press Send or switch this on."} It won't send while the postal address is missing.</p>
-      ${f.baselineAt ? `<p class="small muted" style="margin-top:4px">Watching since ${when(f.baselineAt)}. Anyone already onboarded then won't get a welcome.</p>` : ""}
+      <p class="small muted" style="margin-top:2px">${f.autoRun ? "On. Every 5 minutes Mailroom checks who's due and sends, even with this laptop off." : "Off. Mailroom still watches for new sign-ups, but nothing goes out until you press Send or switch this on."}</p>
+      ${f.blocked?.length ? `<p class="small" style="margin-top:4px;color:var(--warn)">Paused: ${esc(f.blocked.join(" "))}</p>` : ""}
+      ${f.baselineAt && !f.everyone ? `<p class="small muted" style="margin-top:4px">Watching since ${when(f.baselineAt)}. Anyone already onboarded then won't get a welcome.</p>` : ""}
       ${f.lastAutoResult ? `<p class="small muted" style="margin-top:4px">Last run: ${esc(f.lastAutoResult)}</p>` : ""}</div>
     <button type="button" class="switch" role="switch" aria-checked="${f.autoRun}" aria-label="Send automatically" id="autoSw"><span></span></button>
   </div>
@@ -737,7 +775,7 @@ views.automations = async () => {
           <div class="top"><div><h2>${esc(s.title)}</h2><p class="small muted">Subject: ${esc(s.subject ?? "")}</p></div>
             <div class="due"><b class="num">${int(s.due)}</b><span>due now</span></div></div>
           <p class="rule">${esc(s.rule)}</p>
-          ${s.params.length ? `<details style="margin-top:10px"><summary>Change timing</summary><form class="params" data-step="${s.id}">${s.params.map((p) => `<label>${esc(p.label)}<input type="number" min="0" name="${p.key}" value="${esc(p.value)}"></label>`).join("")}<button class="btn sm">Save</button></form></details>` : ""}
+          ${s.params.length ? `<details style="margin-top:10px"><summary>Change timing</summary><form class="params" data-step="${s.id}">${s.params.map((p) => `<label>${esc(p.label)}<input ${/^\d+$/.test(String(p.value)) ? 'type="number" min="0"' : 'type="text"'} name="${p.key}" value="${esc(p.value)}"></label>`).join("")}<button class="btn sm">Save</button></form></details>` : ""}
           <div class="stats"><span><b class="num">${int(s.totals.sent)}</b> sent</span><span><b class="num">${pct(s.totals.openRate)}</b> opened</span><span><b class="num">${pct(s.totals.clickRate)}</b> clicked</span>
             ${s.runs[0] ? `<a href="#/email/${s.runs[0].id}" style="margin-left:auto">Last sent ${when(s.runs[0].at)}</a>` : ""}</div>
           <div class="row acts">
@@ -753,7 +791,12 @@ views.automations = async () => {
         </div></div></li>`).join("")}
   </ol>
   <p class="end muted small" style="padding-left:58px">${f.steps.length > 1 ? "The series ends after the last email." : "The welcome is the only automatic email here for now."} Anyone who pays, unsubscribes or bounces leaves straight away.</p>`;
-  view.querySelectorAll("[data-flow]").forEach((b) => b.addEventListener("click", () => { flowId = b.dataset.flow; views.automations(); }));
+  const pick = (id) => { flowId = id; views.automations(); };
+  view.querySelector("#flowPick").addEventListener("change", (e) => pick(e.target.value));
+  view.querySelectorAll("[data-pick]").forEach((r) => {
+    r.addEventListener("click", () => pick(r.dataset.pick));
+    r.addEventListener("keydown", (e) => { if (e.key === "Enter") pick(r.dataset.pick); });
+  });
 
   view.querySelector("#autoSw").addEventListener("click", () => guard(async () => {
     if (!f.autoRun && !(await ask({ title: `Send ${esc(f.name)} emails automatically?`, body: "Every 5 minutes, due emails go to real people without you pressing Send. Send yourself a test of each one first.", confirm: "Turn on" }))) return;
@@ -792,7 +835,9 @@ views.automations = async () => {
     toast(r.result ?? "Sending");
     setTimeout(views.automations, 1500);
   }));
-  if (running) flowPoll = setTimeout(() => location.hash.startsWith("#/automations") && views.automations(), 3000);
+  if (quiet) [document.scrollingElement.scrollTop, view.scrollTop] = scroll;
+  /* While a step is sending, check back every 30s; each check reads every account, and a send waiting out the gap can take hours. */
+  if (running) flowPoll = setTimeout(() => location.hash.startsWith("#/automations") && views.automations({ quiet: true }), 30_000);
 };
 
 /* ── users ────────────────────────────────────────────────────────────── */

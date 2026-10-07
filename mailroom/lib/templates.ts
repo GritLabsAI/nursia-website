@@ -123,10 +123,10 @@ const LIFECYCLE: {
     key: "plans-nudge",
     group: "Turn into paid",
     name: "What full access adds",
-    subject: (_e, brand) => (brand === "nursia" ? "Free or full access: the difference" : "What PrepClever Premium adds"),
+    subject: (_e, brand) => (brand === "nursia" ? "{% if first_name != blank %}{{first_name}}, full{% else %}Full{% endif %} access is 50% off with FLAT50" : "What PrepClever Premium adds"),
     vars: [],
     sample: {},
-    purpose: "For people who looked at the plans but didn't start checkout.",
+    purpose: "For people who looked at the plans but didn't start checkout. Nursia's offers 50% off with FLAT50.",
     suggest: { preset: "paywall_no_checkout" },
   },
   {
@@ -142,23 +142,22 @@ const LIFECYCLE: {
   {
     key: "cart-recovery",
     group: "Turn into paid",
-    name: "Checkout reminder with 20% off",
-    subject: () => "Your Pro plan is saved — 20% off inside",
+    name: "Checkout reminder with 50% off",
+    subject: () => "Your Pro plan is saved — 50% off inside",
     vars: ["cart_id", "discount_expiry"],
     sample: { cart_id: "c_8812", discount_expiry: "Sunday, 11:59 PM" },
-    purpose: "Offers the COMEBACK20 code. Only send it if that code really works at checkout.",
+    purpose: "Offers the FLAT50 code (50% off). Only send it if that code really works at checkout.",
     suggest: { preset: "checkout_abandoned" },
   },
   {
     key: "app-install",
     group: "Get the app",
     name: "Get the Android app",
-    subject: (_e, brand) => `{% if first_name != blank %}{{first_name}}, practise{% else %}Practise{% endif %} on your phone with the ${brand === "nursia" ? "Nursia" : "PrepClever"} app`,
+    subject: (_e, brand) => `{% if first_name != blank %}{{first_name}}, practise{% else %}Practise{% endif %} on your phone with the ${brand === "nursia" ? "Nursia" : "{{ app_name }}"} app`,
     vars: [],
     sample: {},
-    purpose: "Points people who haven't used the Android app yet to Google Play. Needs the brand's Play Store link.",
+    purpose: "Points people who haven't used the Android app yet to Google Play. PrepClever people get the app for their exam, or all of them if no exam is set.",
     suggest: { preset: "no_android_app" },
-    requires: ["playStoreUrl"],
   },
 ];
 
@@ -206,6 +205,17 @@ export const TEMPLATES: TemplateDef[] = [
       requires: t.requires,
     })),
   ),
+  {
+    id: "nursia-daily-reminder",
+    brand: "nursia",
+    group: "Habits",
+    name: "Daily reminder",
+    subject: "{% if first_name != blank %}{{first_name}}, got{% else %}Got{% endif %} ten minutes for NCLEX today?",
+    file: "nursia/daily-reminder",
+    vars: [],
+    sample: {},
+    purpose: "A friendly nudge to practise today, with the Android app. Sent every evening by the Nursia daily reminder automation.",
+  },
   ...ONBOARDING.map(([file, name, subject, vars]) => ({
     id: `nursia-onboarding-${file.slice(0, 2)}`,
     brand: "nursia" as const,
@@ -273,6 +283,7 @@ export function templateAsset(t: TemplateDef, rel: string): Asset | undefined {
 const SYSTEM_FIELDS = new Set([
   "email", "unsubscribe_url", "preferences_url", "postal_address", "invite_url", "invite_label",
   "whatsapp_url", "continue_url", "instagram_url", "play_store_url", "app_store_url", "app_url", "user_id",
+  "app_name", "prepclever_apps", "exam_app", "pc_app",
 ]);
 
 /**

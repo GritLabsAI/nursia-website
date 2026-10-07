@@ -187,7 +187,7 @@ export function answerPage(
       <p class="note">${msg}</p>
       <ol class="recap">${all.map((x, i) => `<li><b style="background:${r[i] === "1" ? th.ok : r[i] === "0" ? th.bad : th.muted}">${r[i] === "1" ? "&#10003;" : r[i] === "0" ? "&#10005;" : "&#8250;"}</b><span style="text-transform:capitalize">${esc(x?.topic || `Question ${i + 1}`)}</span></li>`).join("")}</ol>
       <a class="btn" href="${th.app}/practice?${utm}">Keep practising</a>
-      <p class="note">Tomorrow's questions arrive in your inbox.</p>
+      <p class="note">Your score and every answer, explained, are on their way to your inbox. Tomorrow's questions follow in the morning.</p>
     </section>`;
   }
 

@@ -64,6 +64,10 @@ export type Campaign = {
   error?: string;
   /** Set when a flow step sent this, so the flow page can total it per step. */
   flow?: { id: string; step: string };
+  /** Spread the send across all the brand's mailboxes; each person always gets the same one. */
+  rotate?: boolean;
+  /** When a send that's waiting (a set start, the daily limit, the 6-hour gap) picks up again. */
+  resumeAt?: string;
 };
 
 export type Suppression = { email: string; reason: "unsubscribed" | "bounced" | "complained" | "manual"; at: string; campaignId?: string };
@@ -359,9 +363,35 @@ export async function insertSends(cid: string, rows: { email: string; status: Se
   }
 }
 
-export async function queuedSends(cid: string, limit: number) {
-  const rows = await sql`select * from sends where campaign_id = ${cid} and status = 'queued' order by email limit ${limit}`;
+/**
+ * Queued recipients of a campaign. With a gap, anyone who got any email from
+ * us within their gap is left out for now, whichever campaigns or automations
+ * the emails came from. Each person's gap sits between `gap.min` and `gap.max`
+ * hours, fixed by their address, so a batch spreads out rather than everyone
+ * becoming sendable at the same minute.
+ */
+export type Gap = { min: number; max: number };
+const NO_GAP: Gap = { min: 0, max: 0 };
+
+export async function queuedSends(cid: string, limit: number, gap: Gap = NO_GAP) {
+  const lo = Math.round(gap.min * 60), spread = Math.round((gap.max - gap.min) * 60) + 1;
+  const rows = gap.max
+    ? await sql`select * from sends q where q.campaign_id = ${cid} and q.status = 'queued'
+                  and not exists (select 1 from sends r where r.email = q.email and r.status = 'sent'
+                                   and r.sent_at > now() - make_interval(mins => ${lo} + abs(hashtext(q.email)) % ${spread}))
+                order by q.email limit ${limit}`
+    : await sql`select * from sends where campaign_id = ${cid} and status = 'queued' order by email limit ${limit}`;
   return rows.map(rowToSend);
+}
+
+/** When the first person held back by their gap becomes sendable again. */
+export async function nextGapRelease(cid: string, gap: Gap) {
+  const lo = Math.round(gap.min * 60), spread = Math.round((gap.max - gap.min) * 60) + 1;
+  const [r] = await sql`select min(r.sent_at + make_interval(mins => ${lo} + abs(hashtext(q.email)) % ${spread})) as at
+                          from sends q join sends r on r.email = q.email and r.status = 'sent'
+                         where q.campaign_id = ${cid} and q.status = 'queued'
+                           and r.sent_at > now() - make_interval(mins => ${lo} + abs(hashtext(q.email)) % ${spread})`;
+  return r?.at ? new Date(r.at).getTime() : null;
 }
 
 export async function markSent(cid: string, email: string, resendId: string) {
@@ -505,6 +535,78 @@ export async function markStep(fid: string, userId: string, step: string, at: st
 export async function getAnswer(quizKey: string, idx: number) {
   const [r] = await sql`select choice, correct from quiz_answers where quiz_key = ${quizKey} and idx = ${idx}`;
   return r as { choice: number; correct: boolean } | undefined;
+}
+
+export async function answersFor(quizKey: string) {
+  const rows = await sql`select idx, choice, correct from quiz_answers where quiz_key = ${quizKey} order by idx`;
+  return rows as { idx: number; choice: number; correct: boolean }[];
+}
+
+/** True for the one caller that gets to send this set's results; false if someone already did. */
+export async function claimQuizResult(r: { quizKey: string; brand: string; email: string; right: number; total: number }) {
+  const rows = await sql`insert into quiz_results (quiz_key, brand, email, right_count, total)
+                         values (${r.quizKey}, ${r.brand}, ${r.email}, ${r.right}, ${r.total})
+                         on conflict (quiz_key) do nothing returning quiz_key`;
+  return rows.length > 0;
+}
+
+export async function releaseQuizResult(quizKey: string) {
+  await sql`delete from quiz_results where quiz_key = ${quizKey}`;
+}
+
+export type Lifetime = { correct: number; attempted: number; answered: number; accuracy: number; days: number; streak: number };
+
+/**
+ * Everything a person has answered, for the score in the quiz email. Days come
+ * from the set's key (brand:date:hash); the streak is consecutive days with an
+ * answer, ending today or, before today's set is touched, yesterday.
+ */
+export async function lifetimeFor(brand: string, email: string): Promise<Lifetime> {
+  const rows = (await sql`select split_part(quiz_key, ':', 2) as day,
+                                 count(*)::int as answered,
+                                 count(*) filter (where correct)::int as correct,
+                                 count(*) filter (where choice >= 0)::int as attempted
+                            from quiz_answers where brand = ${brand} and email = ${email.toLowerCase()}
+                           group by 1 order by 1 desc`) as { day: string; answered: number; correct: number; attempted: number }[];
+  const sum = (k: "answered" | "correct" | "attempted") => rows.reduce((n, r) => n + r[k], 0);
+  const dayMs = 86_400_000;
+  let streak = 0;
+  let expect = Date.parse(new Date().toISOString().slice(0, 10));
+  if (rows[0] && Date.parse(rows[0].day) < expect) expect -= dayMs;
+  for (const r of rows) {
+    if (Date.parse(r.day) !== expect) break;
+    streak++;
+    expect -= dayMs;
+  }
+  const attempted = sum("attempted");
+  const correct = sum("correct");
+  return { correct, attempted, answered: sum("answered"), accuracy: attempted ? Math.round((correct / attempted) * 100) : 0, days: rows.length, streak };
+}
+
+/**
+ * When each address last got each of these templates, from any campaign or
+ * automation. Queued counts as now while its campaign is sending, so a send
+ * that's waiting isn't repeated; a paused or canceled campaign's queue doesn't.
+ */
+export async function templateHistory(templateIds: string[]) {
+  const out = new Map<string, Map<string, number>>(templateIds.map((t) => [t, new Map()]));
+  if (!templateIds.length) return out;
+  const rows = (await sql`select c.doc->>'templateId' as t, lower(s.email) as email,
+                                 max(case when s.status = 'queued' then now() else s.sent_at end) as at
+                            from sends s join campaigns c on c.id = s.campaign_id
+                           where c.doc->>'templateId' = any(${templateIds})
+                             and (s.status = 'sent' or (s.status = 'queued' and c.status = 'sending'))
+                           group by 1, 2`) as { t: string; email: string; at: string | Date }[];
+  for (const r of rows) out.get(r.t)!.set(r.email, new Date(r.at).getTime());
+  return out;
+}
+
+/** Sends today (UTC, the day Resend's quota counts) by an automation's campaigns. */
+export async function flowSendsToday(flowId: string, step: string) {
+  const [r] = await sql`select count(*)::int as n from sends s join campaigns c on c.id = s.campaign_id
+                         where c.doc->'flow'->>'id' = ${flowId} and c.doc->'flow'->>'step' = ${step}
+                           and (s.status = 'sent' or (s.status = 'queued' and c.status = 'sending')) and coalesce(s.sent_at, c.created_at) >= date_trunc('day', now() at time zone 'utc')`;
+  return r.n as number;
 }
 
 /** First answer wins; a second click on another option doesn't change the record. */
