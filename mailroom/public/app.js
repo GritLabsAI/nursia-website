@@ -112,27 +112,49 @@ function postmark(iso, size = "") {
 
 const views = {};
 
+/** Where all the mail got to: open rate as the headline, then sent, delivered, opened, clicked on one ramp. */
+function ledger(t) {
+  const r = (a, b) => (b ? a / b : null);
+  const open = r(t.opened, t.delivered);
+  const [whole, frac] = open == null ? ["–", ""] : (Math.round(open * 1000) / 10).toFixed(1).split(".");
+  const stages = [
+    ["Sent", t.sent, "--d-sent", "all time"],
+    ["Delivered", t.delivered, "--d-delivered", `${pct(r(t.delivered, t.sent))} of sent`],
+    ["Opened", t.opened, "--d-opened", `${pct(open)} of delivered`],
+    ["Clicked", t.clicked, "--d-clicked", `${pct(r(t.clicked, t.delivered))} of delivered`],
+  ];
+  const base = t.sent || 1;
+  const seg = (n, c) => `<i style="width:${share(n, base)}%;background:var(${c})"></i>`;
+  return `<section class="panel ledger" aria-label="Delivery across every email">
+    <div class="ledger-top">
+      <div class="ledger-hero"><span class="k">Open rate, every email</span>
+        <span class="v">${whole}${frac ? `<small>.${frac}%</small>` : ""}</span>
+        <span class="s">${int(t.opened)} of ${int(t.delivered)} delivered emails opened</span></div>
+      <div class="ledger-flow">
+        <div class="ramp" role="img" aria-label="${int(t.sent)} sent, ${int(t.delivered)} delivered, ${int(t.opened)} opened, ${int(t.clicked)} clicked">${seg(t.clicked, "--d-clicked")}${seg(t.opened - t.clicked, "--d-opened")}${seg(t.delivered - t.opened, "--d-delivered")}${seg(t.sent - t.delivered, "--d-sent")}</div>
+        <div class="stages">${stages.map(([k, n, c, sub]) => `<div class="stage"><span class="lbl"><i style="background:var(${c})"></i>${k}</span><b>${int(n)}</b><span>${sub}</span></div>`).join("")}</div>
+      </div>
+    </div>
+    <div class="ledger-foot"><span class="${t.bounced ? "bad" : ""}">Bounced <b>${int(t.bounced)}</b></span><span>Unsubscribed <b>${int(t.unsubscribed)}</b></span><span>Click-through of opens <b>${pct(r(t.clicked, t.opened))}</b></span></div>
+  </section>`;
+}
+
 views.home = async () => {
   const [ov, health] = await Promise.all([api("GET", "/api/overview"), api("GET", "/api/health").catch(() => ({}))]);
   const t = ov.totals;
   const r = (a, b) => (b ? a / b : null);
   const issues = Object.entries(health).flatMap(([k, list]) => list.map((x) => ({ brand: k, ...x })));
   const scheduled = state.campaigns.filter((c) => c.scheduled || c.waiting).sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-  const recent = state.campaigns.filter((c) => c.status !== "draft" && !c.scheduled && !c.waiting).slice(0, 6);
+  const recent = state.campaigns.filter((c) => c.status !== "draft" && !c.scheduled && !c.waiting && !isTest(c) && c.status !== "canceled").slice(0, 6);
 
   view.innerHTML = `
-  <div class="page-head"><div><h1>Home</h1><p>What's going out, and how the last emails did.</p></div>
+  <div class="page-head"><div><h1>Home</h1><p>Where your email is landing, and what goes out next.</p></div>
     <a class="btn primary big" href="#/new">New email</a></div>
 
   ${issues.length ? `<details class="attention"><summary>${plural(issues.length, "thing")} to fix before your next send</summary>
     <ul>${issues.map((x) => `<li><b>${BRANDS[x.brand]}:</b> ${esc(x.text)}</li>`).join("")}</ul></details>` : ""}
 
-  <div class="figures">
-    <div class="figure"><div class="v num">${int(t.sent)}</div><div class="k">Emails sent</div><div class="s">all time</div></div>
-    <div class="figure"><div class="v num">${pct(r(t.delivered, t.sent))}</div><div class="k">Delivered</div><div class="s">${plural(t.bounced, "bounce")}</div></div>
-    <div class="figure"><div class="v num">${pct(r(t.opened, t.delivered))}</div><div class="k">Opened</div><div class="s">${int(t.opened)} people</div></div>
-    <div class="figure"><div class="v num">${pct(r(t.clicked, t.delivered))}</div><div class="k">Clicked</div><div class="s">${int(t.unsubscribed)} unsubscribed</div></div>
-  </div>
+  ${ledger(t)}
 
   <div class="home-grid">
     <section class="panel flush">
@@ -140,13 +162,12 @@ views.home = async () => {
       ${recent.length ? emailTable(recent) : `<div class="empty"><h2>Nothing sent yet</h2><p>Pick a template and a list, then send it now or schedule it.</p><a class="btn primary" href="#/new">New email</a></div>`}
     </section>
     <div class="form">
-      <section class="panel" id="flowCallout"><h2>Onboarding</h2><p class="muted small">Checking who's due…</p></section>
+      <section class="panel flush" id="autoPanel"><div class="section-head" style="padding:18px 18px 0"><h2>Automations</h2><a href="#/automations">Manage</a></div><p class="muted small" style="padding:0 18px 18px">Loading…</p></section>
       <section class="panel"><h2>Coming up</h2>
         ${scheduled.length ? `<ul class="upcoming">${scheduled.map((c) => `<li>
           <div class="date-tile"><b>${new Date(c.startsAt).getDate()}</b><span>${new Date(c.startsAt).toLocaleDateString(undefined, { month: "short" })}</span></div>
           <div><a href="#/email/${c.id}">${esc(c.name)}</a><div class="muted small">${time(c.startsAt)}, to ${plural(c.waiting ? c.stats.queued : c.stats.recipients, "person", "people")}</div></div></li>`).join("")}</ul>`
         : `<p class="muted small" style="margin-top:6px">Nothing scheduled. Choose "Schedule" on the last step of a new email.</p>`}
-        <div id="autoUpcoming"></div>
       </section>
     </div>
   </div>
@@ -154,41 +175,61 @@ views.home = async () => {
   <section class="panel" style="margin-top:20px"><h2>Last 30 days</h2>${lineChart(ov.series)}</section>`;
   bindRows();
 
-  /* Automations that are on, and when each next sends. */
+  /* Every automation that's on: when it next sends and how its email is doing. One quick read, no app data. */
   api("GET", "/api/flows/summary").then((all) => {
-    const on = all.filter((f) => f.autoRun && f.nextAt).sort((a, b) => a.nextAt.localeCompare(b.nextAt));
-    const el = document.getElementById("autoUpcoming");
-    if (!el || !on.length) return;
-    el.innerHTML = `<h3 style="margin-top:16px">Automations</h3><ul class="upcoming">${on.map((f) => `<li>
-      <div class="date-tile"><b>${new Date(f.nextAt).getDate()}</b><span>${new Date(f.nextAt).toLocaleDateString(undefined, { month: "short" })}</span></div>
-      <div><a href="#/automations" data-auto="${f.id}">${esc(f.name)}</a><div class="muted small">Next check ${time(f.nextAt)} · ${esc(f.schedule)}</div></div></li>`).join("")}</ul>`;
-    el.querySelectorAll("[data-auto]").forEach((a) => a.addEventListener("click", () => { flowId = a.dataset.auto; }));
-  }).catch(() => {});
-
-  /* The flow count reads every account from Supabase, so it fills in after the page. */
-  Promise.all(["nursia-onboarding", "prepclever-onboarding"].map((x) => api("GET", `/api/flows/${x}`))).then((fs) => {
-    const due = fs.reduce((a, f) => a + f.steps.reduce((b, s) => b + s.due, 0), 0);
-    const on = fs.filter((f) => f.autoRun).map((f) => f.name);
-    const el = document.getElementById("flowCallout");
+    const el = document.getElementById("autoPanel");
     if (!el) return;
-    el.innerHTML = `<h2>Onboarding</h2><div class="due-callout">
-      <div><span class="big num">${int(due)}</span> <span class="muted">${due === 1 ? "person is" : "people are"} due for an onboarding email</span></div>
-      <p class="small muted">${on.length ? `Sending automatically: ${on.join(" and ")}.` : "Automatic sending is off."}</p>
-      <div><a class="btn ${due ? "primary" : ""}" href="#/automations">${due ? "Review and send" : "Open automations"}</a></div></div>`;
+    const on = all.filter((f) => f.autoRun).sort((a, b) => (a.nextAt ?? "").localeCompare(b.nextAt ?? ""));
+    const off = all.length - on.length;
+    el.innerHTML = `<div class="section-head" style="padding:18px 18px 4px"><h2>Automations</h2><a href="#/automations">Manage</a></div>
+      ${on.length ? `<ul class="autos">${on.map((f) => `<li><a href="#/automations" data-auto="${f.id}">
+        <span class="nm"><span class="live" aria-hidden="true"></span>${esc(f.name)}</span>
+        <span class="nx">${f.nextAt ? `Next ${time(f.nextAt)}` : ""}</span>
+        <span class="st num">${int(f.totals.sent)} sent<span class="muted">${f.totals.delivered ? `${pct(f.totals.openRate)} opened` : "–"}</span></span></a></li>`).join("")}</ul>`
+        : `<p class="muted small" style="padding:0 18px 18px">No automations are on. Switch one on in Automations.</p>`}
+      ${off ? `<p class="muted small" style="padding:10px 18px 16px;border-top:1px solid var(--line)">${plural(off, "automation")} off</p>` : ""}`;
+    el.querySelectorAll("[data-auto]").forEach((a) => a.addEventListener("click", () => { flowId = a.dataset.auto; }));
   }).catch(() => {
-    const el = document.getElementById("flowCallout");
-    if (el) el.innerHTML = `<h2>Onboarding</h2><p class="muted small">Connect Supabase in .env.local to see who's due.</p>`;
+    const el = document.getElementById("autoPanel");
+    if (el) el.querySelector("p").textContent = "Couldn't load automations. Refresh to try again.";
   });
 };
 
+const isTest = (c) => /^test\b/i.test(c.name);
+const share = (a, b) => (b ? Math.max(0, Math.min(100, (a / b) * 100)) : 0);
+
+/** State, then how far the mail got: delivered of sent, and a bar of delivered/opened/clicked. */
+function statusCell(c) {
+  const st = c.stats;
+  let detail = "";
+  if (c.status === "draft") detail = `Edited ${when(c.createdAt)}`;
+  else if (c.scheduled) detail = `To ${plural(st.recipients, "person", "people")}`;
+  else if (c.waiting) detail = `${int(st.queued)} waiting, ${int(st.sent)} sent`;
+  else if (st.sent || st.queued) detail = st.queued
+    ? `${int(st.sent)} of ${int(st.sent + st.queued)} sent`
+    : `${int(st.delivered)} of ${int(st.sent)} delivered${st.bounced ? `, ${int(st.bounced)} bounced` : ""}`;
+  else if (st.failed) detail = `${int(st.failed)} failed`;
+  const base = st.sent || 1;
+  const bar = st.sent && c.status !== "draft" && !c.scheduled
+    ? `<span class="mini" aria-hidden="true"><i style="width:${share(st.clicked, base)}%;background:var(--d-clicked)"></i><i style="width:${share(st.opened - st.clicked, base)}%;background:var(--d-opened)"></i><i style="width:${share(st.delivered - st.opened, base)}%;background:var(--d-delivered)"></i><i style="width:${share(st.sent - st.delivered, base)}%;background:var(--d-sent)"></i></span>`
+    : "";
+  return `<div class="status-cell">${statusChip(c)}${bar}${detail ? `<span class="detail">${detail}</span>` : ""}</div>`;
+}
+
+function rateCell(c, kind) {
+  if (c.status === "draft" || c.scheduled || !c.stats.delivered) return `<span class="muted">–</span>`;
+  const r = kind === "click" ? c.stats.clickRate : c.stats.openRate;
+  return `<span class="rate ${kind}"><b>${pct(r)}</b><span class="bar"><i style="width:${share(r ?? 0, 1)}%"></i></span></span>`;
+}
+
 function emailTable(rows) {
-  return `<div class="table-wrap"><table><thead><tr><th>Email</th><th>Status</th><th class="r">People</th><th class="r">Opened</th><th class="r">Clicked</th></tr></thead><tbody>
+  return `<div class="table-wrap"><table><thead><tr><th>Email</th><th>Status</th><th class="r">Recipients</th><th class="r">Open rate</th><th class="r">Click rate</th></tr></thead><tbody>
   ${rows.map((c) => `<tr class="link" data-href="#/email/${c.id}">
-    <td><b>${esc(c.name)}</b><span class="sub">${brandTag(c.brand)}&ensp;${c.scheduled ? `goes out ${when(c.scheduledAt)}` : c.waiting ? `starts ${when(c.startsAt)}` : c.status === "draft" ? `edited ${when(c.createdAt)}` : when(c.sentAt ?? c.createdAt)}</span></td>
-    <td>${statusChip(c)}</td>
+    <td><b>${esc(c.name)}</b>${isTest(c) ? `<span class="tag-test">Test</span>` : ""}<span class="sub">${brandTag(c.brand)}&ensp;${c.scheduled ? `goes out ${when(c.scheduledAt)}` : c.waiting ? `starts ${when(c.startsAt)}` : c.status === "draft" ? `edited ${when(c.createdAt)}` : when(c.sentAt ?? c.createdAt)}</span></td>
+    <td>${statusCell(c)}</td>
     <td class="r num">${int(c.stats.recipients)}</td>
-    <td class="r num"><b>${c.status === "draft" || c.scheduled ? "–" : pct(c.stats.openRate)}</b></td>
-    <td class="r num">${c.status === "draft" || c.scheduled ? "–" : pct(c.stats.clickRate)}</td></tr>`).join("")}
+    <td class="r">${rateCell(c, "open")}</td>
+    <td class="r">${rateCell(c, "click")}</td></tr>`).join("")}
   </tbody></table></div>`;
 }
 
@@ -207,11 +248,12 @@ function lineChart(series) {
     const v = (top / 4) * g;
     return `<line class="grid" x1="${L}" x2="${W - 8}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
   }).join("");
-  const ticks = series.map((p, i) => (i % 7 === 0 || i === series.length - 1) ? `<text x="${x(i)}" y="${H - 4}" text-anchor="middle">${new Date(p.date).toLocaleDateString(undefined, { day: "numeric", month: "short" })}</text>` : "").join("");
+  const last = series.length - 1;
+  const ticks = series.map((p, i) => ((i % 7 === 0 && last - i >= 4) || i === last) ? `<text x="${x(i)}" y="${H - 4}" text-anchor="middle">${new Date(p.date).toLocaleDateString(undefined, { day: "numeric", month: "short" })}</text>` : "").join("");
   const hits = series.map((p, i) => `<rect x="${x(i) - 10}" y="${T}" width="20" height="${H - T - B}" fill="transparent"><title>${p.date}: ${p.sent} sent, ${p.opened} opened, ${p.clicked} clicked</title></rect>`).join("");
   const line = (k, c) => `<path d="${path(k)}" fill="none" stroke="var(${c})" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>`;
-  return `<div class="legend"><span><i style="background:var(--ink-2)"></i>Sent</span><span><i style="background:var(--stamp)"></i>Opened</span><span><i style="background:var(--ok)"></i>Clicked</span></div>
-  <div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Emails sent, opened and clicked per day over the last 30 days">${grid}${ticks}${line("sent", "--ink-2")}${line("opened", "--stamp")}${line("clicked", "--ok")}${hits}</svg></div>`;
+  return `<div class="legend"><span><i style="background:var(--d-delivered)"></i>Sent</span><span><i style="background:var(--d-opened)"></i>Opened</span><span><i style="background:var(--d-clicked)"></i>Clicked</span></div>
+  <div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Emails sent, opened and clicked per day over the last 30 days">${grid}${ticks}${line("sent", "--d-delivered")}${line("opened", "--d-opened")}${line("clicked", "--d-clicked")}${hits}</svg></div>`;
 }
 
 /* ── composer: Email → People → Send ──────────────────────────────────── */
@@ -626,15 +668,19 @@ async function stepSend() {
 
 views.emails = (params) => {
   const tab = params.get("tab") ?? "sent";
+  /* Test sends go to the team; they're hidden unless asked for, so real campaigns lead. */
+  const showTests = params.get("tests") === "1";
+  const tests = state.campaigns.filter(isTest).length;
   const groups = {
-    scheduled: state.campaigns.filter((c) => c.scheduled),
-    sent: state.campaigns.filter((c) => c.status !== "draft" && !c.scheduled),
+    scheduled: state.campaigns.filter((c) => c.scheduled || c.waiting),
+    sent: state.campaigns.filter((c) => c.status !== "draft" && !c.scheduled && !c.waiting),
     drafts: state.campaigns.filter((c) => c.status === "draft"),
   };
   const labels = { scheduled: "Scheduled", sent: "Sent", drafts: "Drafts" };
-  const rows = groups[tab] ?? [];
+  const rows = (groups[tab] ?? []).filter((c) => showTests || !isTest(c));
   view.innerHTML = `<div class="page-head"><div><h1>Emails</h1></div><a class="btn primary" href="#/new">New email</a></div>
-    <nav class="tabs" aria-label="Email status">${Object.keys(groups).map((k) => `<a href="#/emails?tab=${k}" class="${k === tab ? "on" : ""}">${labels[k]}<span class="muted">${groups[k].length}</span></a>`).join("")}</nav>
+    <div class="tabs-row"><nav class="tabs" aria-label="Email status">${Object.keys(groups).map((k) => `<a href="#/emails?tab=${k}${showTests ? "&tests=1" : ""}" class="${k === tab ? "on" : ""}">${labels[k]}<span class="muted">${groups[k].filter((c) => showTests || !isTest(c)).length}</span></a>`).join("")}</nav>
+    ${tests ? `<a class="small" href="#/emails?tab=${tab}${showTests ? "" : "&tests=1"}">${showTests ? "Hide test sends" : `Show ${plural(tests, "test send")}`}</a>` : ""}</div>
     <div class="panel flush">${rows.length ? emailTable(rows) : `<div class="empty"><h2>${tab === "scheduled" ? "Nothing scheduled" : tab === "drafts" ? "No drafts" : "Nothing sent yet"}</h2><p>${tab === "scheduled" ? 'Choose "Schedule" on the last step of a new email.' : "Start with a template."}</p><a class="btn primary" href="#/new">New email</a></div>`}</div>`;
   bindRows();
 };
