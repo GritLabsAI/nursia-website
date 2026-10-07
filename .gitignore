@@ -64,3 +64,6 @@ pipeline/data/downloads/
 pipeline/*/data/
 .tmp/
 *.zip
+
+# email campaign tool — contact lists and send history
+/internal/email/.data/
