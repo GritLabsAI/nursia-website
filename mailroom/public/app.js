@@ -185,7 +185,7 @@ views.home = async () => {
       ${on.length ? `<ul class="autos">${on.map((f) => `<li><a href="#/automations" data-auto="${f.id}">
         <span class="nm"><span class="live" aria-hidden="true"></span>${esc(f.name)}</span>
         <span class="nx">${f.nextAt ? `Next ${time(f.nextAt)}` : ""}</span>
-        <span class="st num">${int(f.totals.sent)} sent<span class="muted">${f.totals.delivered ? `${pct(f.totals.openRate)} opened` : "–"}</span></span></a></li>`).join("")}</ul>`
+        <span class="st num">${int(f.totals.sent)} sent<span class="muted">${f.totals.delivered ? `${pct(f.totals.openRate)} opened (${int(f.totals.opened)})` : "–"}</span></span></a></li>`).join("")}</ul>`
         : `<p class="muted small" style="padding:0 18px 18px">No automations are on. Switch one on in Automations.</p>`}
       ${off ? `<p class="muted small" style="padding:10px 18px 16px;border-top:1px solid var(--line)">${plural(off, "automation")} off</p>` : ""}`;
     el.querySelectorAll("[data-auto]").forEach((a) => a.addEventListener("click", () => { flowId = a.dataset.auto; }));
@@ -219,7 +219,8 @@ function statusCell(c) {
 function rateCell(c, kind) {
   if (c.status === "draft" || c.scheduled || !c.stats.delivered) return `<span class="muted">–</span>`;
   const r = kind === "click" ? c.stats.clickRate : c.stats.openRate;
-  return `<span class="rate ${kind}"><b>${pct(r)}</b><span class="bar"><i style="width:${share(r ?? 0, 1)}%"></i></span></span>`;
+  const n = kind === "click" ? c.stats.clicked : c.stats.opened;
+  return `<span class="rate ${kind}"><b>${pct(r)}</b><span class="bar"><i style="width:${share(r ?? 0, 1)}%"></i></span><span class="cnt">${int(n)} of ${int(c.stats.delivered)}</span></span>`;
 }
 
 function emailTable(rows) {
@@ -792,7 +793,7 @@ views.automations = async ({ quiet = false } = {}) => {
         <td class="small">${esc(x.schedule)}</td>
         <td class="small">${x.autoRun && x.nextAt ? `${day(x.nextAt)} ${time(x.nextAt)}` : `<span class="muted">Off</span>`}</td>
         <td class="r num">${int(x.totals.sent)}</td><td class="r num">${int(x.totals.delivered)}</td>
-        <td class="r num">${pct(x.totals.openRate)}</td><td class="r num">${pct(x.totals.clickRate)}</td>
+        <td class="r num">${pct(x.totals.openRate)}<span class="cnt">${int(x.totals.opened)}</span></td><td class="r num">${pct(x.totals.clickRate)}<span class="cnt">${int(x.totals.clicked)}</span></td>
         <td class="r num">${int(x.totals.unsubscribed)}</td><td class="r num">${int(x.totals.queued)}</td>
         <td class="small muted">${x.lastRunAt ? when(x.lastRunAt) : "–"}</td></tr>`).join("")}
     </tbody></table></div>
@@ -822,7 +823,7 @@ views.automations = async ({ quiet = false } = {}) => {
             <div class="due"><b class="num">${int(s.due)}</b><span>due now</span></div></div>
           <p class="rule">${esc(s.rule)}</p>
           ${s.params.length ? `<details style="margin-top:10px"><summary>Change timing</summary><form class="params" data-step="${s.id}">${s.params.map((p) => `<label>${esc(p.label)}<input ${/^\d+$/.test(String(p.value)) ? 'type="number" min="0"' : 'type="text"'} name="${p.key}" value="${esc(p.value)}"></label>`).join("")}<button class="btn sm">Save</button></form></details>` : ""}
-          <div class="stats"><span><b class="num">${int(s.totals.sent)}</b> sent</span><span><b class="num">${pct(s.totals.openRate)}</b> opened</span><span><b class="num">${pct(s.totals.clickRate)}</b> clicked</span>
+          <div class="stats"><span><b class="num">${int(s.totals.sent)}</b> sent</span><span><b class="num">${pct(s.totals.openRate)}</b> opened <span class="num">(${int(s.totals.opened)})</span></span><span><b class="num">${pct(s.totals.clickRate)}</b> clicked <span class="num">(${int(s.totals.clicked)})</span></span>
             ${s.runs[0] ? `<a href="#/email/${s.runs[0].id}" style="margin-left:auto">Last sent ${when(s.runs[0].at)}</a>` : ""}</div>
           <div class="row acts">
             ${s.running ? `<span class="chip wait">Sending</span>` : ""}

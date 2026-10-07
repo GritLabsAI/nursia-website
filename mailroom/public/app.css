@@ -509,3 +509,6 @@ tr.link-row.on td:first-child{box-shadow:inset 3px 0 0 var(--ink)}
 .tabs-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
 .tabs-row .tabs { border-bottom: 0; margin-bottom: -1px; }
 .tabs-row > a { text-decoration: none; font-weight: 500; padding-bottom: 10px; }
+
+/* the count under a percentage: what the rate is made of */
+.cnt { display: block; font-size: 12px; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
