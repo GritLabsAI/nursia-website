@@ -260,6 +260,35 @@ const EMAILS = {
   }),
 };
 
+/* Both apps are Android-only for now. The store link is the brand's Play
+   Store setting in Mailroom, which blocks the send while it's empty; the
+   referrer carries the UTMs through to Play's install attribution. */
+const PLAY = '{{ play_store_url }}{% if play_store_url contains "?" %}&amp;{% else %}?{% endif %}referrer=utm_source%3Demail%26utm_medium%3Dlifecycle%26utm_campaign%3Dapp_install';
+
+EMAILS["app-install"] = (b, k) => ({
+  title: `Get the ${b.name} app`,
+  pre: "Same account, same progress, on your Android phone.",
+  body: [
+    hero(b, {
+      kick: "Now on Android",
+      h1: `${hi(b, "take", "Take")} your prep ${b.hl("on your phone")}.`,
+      body: b.name === "Nursia"
+        ? "The Nursia app is on Google Play. Sign in with this same account and everything you've done so far is already there, ready for ten questions on the bus or between shifts."
+        : "The PrepClever app is on Google Play. Sign in with this same account and your exam, progress and practice are already there, ready for a quick set whenever you have a few minutes.",
+      cta: { url: PLAY, label: "Get it on Google Play &rarr;" },
+    }),
+    steps(b, {
+      kick: "Two minutes to set up",
+      items: [
+        ["Install from Google Play", "It's free to download."],
+        ["Sign in with this email", "Use {{ email }}, the account you already have."],
+        [b.name === "Nursia" ? "Pick up where you left off" : "Practise in short sets", b.name === "Nursia" ? "Your answers, weak topics and review list come with you." : "Ten questions at a time fits around work or college. Premium is subscribed to in the app."],
+      ],
+    }),
+    note(b, { kick: "On an iPhone?", text: `The app is Android only for now. You can keep practising in your browser at ${a(b, href(b, "/practice", k, "iphone"), b.app.replace("https://", ""))}.` }),
+  ],
+});
+
 /* ── assemble ─────────────────────────────────────────────────────────── */
 
 for (const [key, b] of Object.entries(BRANDS)) {

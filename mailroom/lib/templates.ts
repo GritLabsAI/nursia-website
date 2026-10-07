@@ -29,6 +29,8 @@ export type TemplateDef = {
   purpose: string;
   /** The audience preset that fits it, offered first when picking people. */
   suggest?: { preset: string; params?: Record<string, string> };
+  /** Brand settings the email can't do without; sending is blocked while one is blank. */
+  requires?: ("playStoreUrl" | "appStoreUrl")[];
   /** Set on templates uploaded from the dashboard; they carry their own HTML and images. */
   custom?: { html: string; assets: Record<string, Asset>; footer: boolean; archived: boolean; updatedAt: string; createdBy?: string };
 };
@@ -45,6 +47,7 @@ const LIFECYCLE: {
   sample: Record<string, string>;
   purpose: string;
   suggest?: { preset: string };
+  requires?: ("playStoreUrl" | "appStoreUrl")[];
 }[] = [
   {
     key: "onboarding-welcome",
@@ -146,6 +149,17 @@ const LIFECYCLE: {
     purpose: "Offers the COMEBACK20 code. Only send it if that code really works at checkout.",
     suggest: { preset: "checkout_abandoned" },
   },
+  {
+    key: "app-install",
+    group: "Get the app",
+    name: "Get the Android app",
+    subject: (_e, brand) => `{% if first_name != blank %}{{first_name}}, practise{% else %}Practise{% endif %} on your phone with the ${brand === "nursia" ? "Nursia" : "PrepClever"} app`,
+    vars: [],
+    sample: {},
+    purpose: "Points people who haven't used the Android app yet to Google Play. Needs the brand's Play Store link.",
+    suggest: { preset: "no_android_app" },
+    requires: ["playStoreUrl"],
+  },
 ];
 
 const ONBOARDING = [
@@ -189,6 +203,7 @@ export const TEMPLATES: TemplateDef[] = [
       sample: { ...t.sample },
       purpose: t.purpose,
       suggest: t.suggest,
+      requires: t.requires,
     })),
   ),
   ...ONBOARDING.map(([file, name, subject, vars]) => ({

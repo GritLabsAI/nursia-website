@@ -1,6 +1,7 @@
 import { getLists, getSettings, suppressedSet, type Campaign } from "./db";
 import { audienceOf, listIdsOf } from "./campaigns";
 import { listDomains } from "./resend";
+import { findTemplate } from "./templates";
 
 /**
  * What stands between a campaign and a clean send. "block" stops it; "warn"
@@ -44,6 +45,12 @@ export async function campaignChecks(c: Campaign) {
     if (list.source && Date.now() - Date.parse(list.refreshedAt ?? list.createdAt) > 6 * 3600_000)
       out.push({ level: "warn", text: `"${list.name}" was last pulled from ${list.source.source === "posthog" ? "PostHog" : "Supabase"} ${new Date(list.refreshedAt ?? list.createdAt).toLocaleString()}. Refresh it on the list page so it matches who qualifies today.` });
   out.push(...(await senderChecks(c)));
+  const t = await findTemplate(c.templateId);
+  const s = await getSettings();
+  const LABEL = { playStoreUrl: "Google Play", appStoreUrl: "App Store" } as const;
+  for (const k of t?.requires ?? [])
+    if (!s.brands[c.brand][k]?.trim())
+      out.push({ level: "block", text: `This email's button needs the ${c.brand === "nursia" ? "Nursia" : "PrepClever"} ${LABEL[k]} link. Add it in Settings, under "Links in emails".` });
   return { checks: out, reachable };
 }
 

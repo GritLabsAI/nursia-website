@@ -121,7 +121,7 @@ const PROFILE_COLS: Record<DbKey, string> = {
   prepclever: "id,full_name,user_state,created_at,last_seen_at,exam_date,is_internal,has_completed_onboarding,selected_exam_series_id",
 };
 
-export type Extra = "streaks" | "subs" | "commerce" | "paidOrders" | "practised";
+export type Extra = "streaks" | "subs" | "commerce" | "paidOrders" | "practised" | "devices";
 
 export type Snapshot = {
   users: User[];
@@ -130,6 +130,8 @@ export type Snapshot = {
   commerce?: Map<string, { event_name: string; claimed_at: string; order_ref: string | null }[]>;
   paidOrders?: Set<string>;
   practised?: Set<string>;
+  /** Native platforms each user has been seen on: an app session or a push token. */
+  devices?: Map<string, Set<string>>;
 };
 
 /* One snapshot per database for a minute, so previewing then saving doesn't
@@ -169,6 +171,19 @@ export async function snapshot(db: DbKey, needs: Extra[]): Promise<Snapshot> {
       } else if (need === "paidOrders") {
         const rows = await table<{ user_id: string }>(db, "dodo_orders", "select=user_id&status=eq.paid");
         s.paidOrders = new Set(rows.map((r) => r.user_id));
+      } else if (need === "devices") {
+        /* The apps log "android" or "web" per session; a push token only exists once the app is installed.
+           Only native rows are fetched, so this stays small however much web traffic there is. */
+        const [sessions, tokens] = await Promise.all([
+          table<{ user_id: string; platform: string }>(db, "app_sessions", "select=user_id,platform&platform=in.(android,ios)"),
+          table<{ user_id: string; platform: string | null }>(db, "user_push_tokens", "select=user_id,platform").catch(() => []),
+        ]);
+        s.devices = new Map();
+        for (const r of [...sessions, ...tokens]) {
+          const p = String(r.platform ?? "").toLowerCase();
+          if (p !== "android" && p !== "ios") continue;
+          (s.devices.get(r.user_id) ?? s.devices.set(r.user_id, new Set()).get(r.user_id)!).add(p);
+        }
       } else if (need === "practised") {
         const rows = await table<{ user_id: string }>(db, "ngn_attempts", "select=user_id");
         s.practised = new Set(rows.map((r) => r.user_id));
@@ -377,6 +392,25 @@ export const PRESETS: Preset[] = [
     params: [],
     needs: ["subs"],
     match: (u, s) => !s.subs!.has(u.id) && {},
+  },
+  {
+    id: "no_android_app",
+    label: "Hasn't installed the Android app",
+    description: "No Android app session and no Android push token, so they've only used the website. Anyone seen on an iPhone is left out.",
+    dbs: ["nursia", "prepclever"],
+    template: "nursia-app-install",
+    params: [
+      { key: "days", label: "Active on the website in the last N days (0 = anyone)", type: "number", default: "30" },
+      { key: "hours", label: "At least N hours since signup", type: "number", default: "24" },
+    ],
+    needs: ["devices"],
+    match: (u, s, p) => {
+      const seen = s.devices!.get(u.id);
+      if (seen?.has("android") || seen?.has("ios")) return false;
+      if (u.created_at > ago(num(p.hours, 24) * 3600_000)) return false;
+      const days = num(p.days, 30);
+      return (days === 0 || (!!u.last_seen_at && u.last_seen_at > ago(days * DAY))) && {};
+    },
   },
   {
     id: "exam_soon",
